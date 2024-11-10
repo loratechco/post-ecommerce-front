@@ -9,7 +9,8 @@ interface Props {
     nameLabel: string;
     className?: string;
     disabled?: boolean;
-    register?: UseFormRegisterReturn;  // این ویژگی برای ثبت ورودی در فرم استفاده می‌شود
+    register?: UseFormRegisterReturn;
+    key?: string | number;
 }
 
 function AuthInput(
@@ -19,12 +20,14 @@ function AuthInput(
         className = '',
         nameLabel,
         disabled,
+        key,
         register }: Props
 ) {
     return (
         <div className="grid gap-2">
-            <Label htmlFor={id}>{nameLabel}</Label>
-            <Input
+            
+            <Label htmlFor={id} key={`${key}-lable`}>{nameLabel}</Label>
+            <Input key={`${key}-input`}
                 {...register} // اینجا تمام اطلاعات مورد نیاز برای ثبت را پاس می‌دهیم
                 className={className}
                 id={id}

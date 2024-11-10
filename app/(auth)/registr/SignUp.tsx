@@ -1,30 +1,33 @@
 "use client"
-import { usePathname } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card"
-import AuthCardheader from "../../../components/auth-componetns/AuthCardHeader"
+import { CardContent } from "@/components/ui/card"
 import AuthToggle from "../../../components/auth-componetns/AuthToggle "
 import AuthBtn from "@/components/auth-componetns/AuthBtn";
 import Link from "next/link";
 import AuthInput from "@/components/auth-componetns/AuthInput";
+import { z } from "zod";
 
 function SignUp() {
 
-    return ( 
-        <Card className="mx-auto !border-zinc-400 max-w-screen-md max-sm:min-w-72 sm:min-w-96">
+    
 
-            {/* Form Title */}
-            <AuthCardheader
-                title="Sign Up"
-            />
 
-            <CardContent>
+    return (
+        <form action="">
+
+            <CardContent className="space-y-3">
+
+                <AuthInput
+                    id="name"
+                    type="text"
+                    placeholder="Json"
+                    nameLabel="Name"
+                />
 
                 <AuthInput
                     id="email"
                     type="email"
                     placeholder="example@gmail.com"
                     nameLabel="Email"
-                    className="mb-3"
                 />
 
                 <AuthInput
@@ -32,7 +35,6 @@ function SignUp() {
                     type="password"
                     placeholder="#Az123"
                     nameLabel="Password"
-                    className="mb-3"
                 />
 
                 <AuthInput
@@ -40,7 +42,6 @@ function SignUp() {
                     type="password"
                     placeholder="#Az123"
                     nameLabel="Password Confirmation"
-                    className="mb-3"
                 />
 
                 <div className="flex items-center">
@@ -67,8 +68,9 @@ function SignUp() {
                 />
 
             </CardContent>
-        </Card>
-     );
+        </form>
+
+    );
 }
 
 export default SignUp;
