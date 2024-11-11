@@ -15,6 +15,7 @@ export async function singIn({
     password: string;
     redirectTo?: string;
 }) {
+
     const res = await fetch(`${BACKEND_URL}/api/login`, {
         method: "POST",
         headers: {
@@ -22,14 +23,18 @@ export async function singIn({
         },
         body: JSON.stringify(credentials),
     });
-    
-    console.log("🚀 ~ res:", res)
-    
+
+    const { status, statusText } = res
+
     if (!res.ok) {
-        return null;
+        return { status, statusText };
     }
 
     const { token } = await res.json();
+
+    if (!token) {
+        return { status, statusText };
+    }
 
     saveSession(token);
 

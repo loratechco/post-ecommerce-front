@@ -10,7 +10,7 @@ interface Props {
     nameLabel: string;
     className?: string;
     disabled?: boolean;
-    register?: UseFormRegisterReturn;
+    register: UseFormRegisterReturn;
     key?: string | number;
 }
 
@@ -29,8 +29,8 @@ function AuthInput(
     return (
         <div className="grid gap-2">
 
-            <Label htmlFor={id} key={`${key}-lable`}>{nameLabel}</Label>
-            <Input key={`${key}-input`}
+            <Label htmlFor={id}>{nameLabel}</Label>
+            <Input 
                 {...register}
                 className={clsx(
                     className,

@@ -1,4 +1,6 @@
-import { toast } from "@/hooks/use-toast";
+"use client";
+
+import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 
 interface ErrorToastProps {
@@ -6,18 +8,20 @@ interface ErrorToastProps {
     description: string;
 }
 
-const ErrorToaster = ({ errors, description }: ErrorToastProps) => {
+const ErrorToast = ({ errors, description }: ErrorToastProps) => {
+    const { toast } = useToast();
+
     useEffect(() => {
         if (Object.keys(errors).length > 0) {
             toast({
-                className:"bg-gray-100",
                 description,
                 duration: 3000,
+                className: "bg-red-100 text-red-800", // رنگ دلخواه برای پیام خطا
             });
         }
-    }, [errors]);
+    }, [errors, toast]);
 
     return null;
 };
 
-export default ErrorToaster;
+export default ErrorToast;

@@ -11,22 +11,35 @@ import { useAuth } from "@/app/context/SessionProviderWrapper";// get token
 import AuthBtn from "@/components/auth-componetns/AuthBtn";
 import { singIn } from "@/lib/auth/login";
 
+
 export default function Login() {
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useLogin();
 
   const formSubmit = async (data: LoginFormData) => {
     const { email, password } = data;
-    // await useFetch({ email, password });
-   await singIn({email,password})
+
+   const login =  await singIn({ email, password })
+    
+    if (login.status) {
+      console.log("🚀 ~ formSubmit ~ status:", login.statusText)
+      return;
+    } 
   };
 
+  const errorMessages = {
+    email: errors?.email?.message,
+    password: errors?.password?.message,
+  };
+
+  // پیدا کردن اولین پیام خطای موجود
+  const firstError = Object.values(errorMessages).find(error => error);
   return (
     <CardContent>
 
       <ErrorToaster
         errors={errors}
-        description={'Your password or email is incorrect'}
+        description={firstError}
       />
 
       <form onSubmit={handleSubmit(formSubmit)} className="space-y-3">
@@ -63,7 +76,7 @@ export default function Login() {
           disabled={isSubmitting}
         />
 
-        <AuthToggle href="/registr" title="Sign Up" />
+        <AuthToggle href="/register" title="Sign Up" />
       </form>
     </CardContent>
   );

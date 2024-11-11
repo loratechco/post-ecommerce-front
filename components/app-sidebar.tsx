@@ -27,6 +27,11 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { signOut } from "@/lib/auth/logOut"
+import Link from "next/link"
+import ProfileUser from "@/app/dashboard/components/ProfileUser"
+import { Session } from "inspector/promises"
+
 
 const data = {
   user: {
@@ -152,22 +157,22 @@ const data = {
   ],
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  return (
-    <Sidebar variant="inset" {...props}>
+interface Props{
+  userData: Session ;
+}
+
+export function AppSidebar({ userData }:Props) {
+  return (  
+    <Sidebar variant="inset">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
-                </div>
-              </a>
+              <Link href="#">
+                
+                <ProfileUser userData={userData} />
+
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -176,10 +181,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
+
+        <button
+          onClick={() => signOut()}
+          className="my-3"
+        >
+          Log out
+        </button>
+
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
+
+      {/* <SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   )
 }

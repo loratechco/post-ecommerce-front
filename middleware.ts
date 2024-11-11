@@ -4,25 +4,22 @@ import { cookieName } from "@/lib/auth/storage";
 export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get(cookieName)?.value;
   const { pathname } = request.nextUrl;
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = 1;
 
   if (!accessToken && pathname.startsWith("/dashboard")) {
-    console.log(`Unauthorized access attempt to: ${pathname}`);
     const url = new URL(request.url);
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (accessToken && isAuthPage) {
-    console.log(`Redirecting logged-in user from ${pathname} to dashboard`);
+  // if (accessToken && isAuthPage) {
+  //   const url = new URL(request.url);
     
-    const url = new URL(request.url);
+  //   url.pathname = "/dashboard";
     
-    url.pathname = "/dashboard";
+  //   return NextResponse.redirect(url);
     
-    return NextResponse.redirect(url);
-    
-  }
+  // }
 
   console.log(`Access granted to: ${pathname}`);
   return NextResponse.next();
