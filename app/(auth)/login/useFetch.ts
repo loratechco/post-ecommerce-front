@@ -10,15 +10,16 @@ async function useFetch({ email, password }: Props) {
     const saveSession = (token: string) => {
         const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);  //30 days
         const expiresUTC = expires.toUTCString();
-    
+
         // ایجاد کوکی با ویژگی‌های امنیتی
-        document.cookie = `token=${token};
+        document.cookie =
+        `token=${token};
          path=/;
          expires=${expiresUTC};
          secure=${process.env.NODE_ENV === "production" ? "true" : "false"};
          SameSite=Strict`;
     };
-    
+
     try {
         const response = await axios.post("https://post-eco-api.liara.run/api/login", { email, password });
 
@@ -35,7 +36,7 @@ async function useFetch({ email, password }: Props) {
         }
 
     } catch (error) {
-        console.log("Error in login:", { error: error, status: error.status });
+        return axios.isAxiosError(error);
     }
 
 }

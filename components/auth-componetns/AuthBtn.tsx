@@ -26,8 +26,9 @@ function AuthBtn(
             className={clsx(
                 className, // custom class
                 "w-full",
-                disabled && "opacity-40"
+                { "pointer-events-none cursor-not-allowed": disabled }
             )}
+            disabled={disabled}
             onClick={onclick}
         >
             {nameBtn}

@@ -1,18 +1,23 @@
-"use client"
 import { toast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 
-function ErrorToast(errors:{}) {
+interface ErrorToastProps {
+    errors: Record<string, any>;
+    description: string;
+}
 
-    // Convert object keys to strings in the array by this Object.keys(errors)
+const ErrorToaster = ({ errors, description }: ErrorToastProps) => {
     useEffect(() => {
         if (Object.keys(errors).length > 0) {
             toast({
-                description: "Your password or email is incorrect",
+                className:"bg-gray-100",
+                description,
                 duration: 3000,
             });
         }
     }, [errors]);
-}
 
-export default ErrorToast;
+    return null;
+};
+
+export default ErrorToaster;

@@ -3,35 +3,40 @@ import AuthInput from "@/components/auth-componetns/AuthInput";
 import { CardContent } from "@/components/ui/card";
 import AuthToggle from "@/components/auth-componetns/AuthToggle ";
 import Link from "next/link";
-import ErrorToast from "./ErrorToast";
+import ErrorToaster from "./ErrorToast";
 import useLogin from "./useLoginForm";
 import { LoginFormData } from "./schema";
-import AuthBtnList from "../components/AuthBtnList";
 import useFetch from "./useFetch";
-import { useAuth } from "@/app/context/SessionProviderWrapper";
+import { useAuth } from "@/app/context/SessionProviderWrapper";// get token
+import AuthBtn from "@/components/auth-componetns/AuthBtn";
+import { singIn } from "@/lib/auth/login";
 
 export default function Login() {
-  const { token } = useAuth();
-  console.log("🚀 ~ Login ~ token:", token)
-  
+
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useLogin();
-  // saver cookie
 
   const formSubmit = async (data: LoginFormData) => {
     const { email, password } = data;
-    await useFetch({ email, password });
+    // await useFetch({ email, password });
+   await singIn({email,password})
   };
-
-  ErrorToast(errors);
 
   return (
     <CardContent>
+
+      <ErrorToaster
+        errors={errors}
+        description={'Your password or email is incorrect'}
+      />
+
       <form onSubmit={handleSubmit(formSubmit)} className="space-y-3">
+
         <AuthInput
           id="email"
           type="email"
           placeholder="example@gmail.com"
           nameLabel="Email"
+          disabled={isSubmitting}
           register={register("email")}
         />
 
@@ -40,6 +45,7 @@ export default function Login() {
           type="password"
           placeholder="#Az123"
           nameLabel="Password"
+          disabled={isSubmitting}
           register={register("password")}
         />
 
@@ -49,7 +55,13 @@ export default function Login() {
           </Link>
         </div>
 
-        <AuthBtnList isSubmitting={isSubmitting} />
+        <AuthBtn
+          nameBtn="Login"
+          variant="default"
+          className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900 mt-3"
+          type="submit"
+          disabled={isSubmitting}
+        />
 
         <AuthToggle href="/registr" title="Sign Up" />
       </form>
