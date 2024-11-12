@@ -11,6 +11,7 @@ import { SignUpFormData, SignUpSchema } from "./schema";
 import ErrorToaster from "../login/ErrorToast";
 import { useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import axios from "axios";
 
 function SignUp() {
     // const user = useSession();
@@ -20,7 +21,25 @@ function SignUp() {
 
     console.log("🚀 ~ SignUp ~ errors:", errors)
     const formSubmit = async (data: SignUpFormData) => {
-        const { email, password, name, passwordConfirmation } = data;
+        const { email, password, name } = data;
+
+        //Test role
+        const role = "admin";
+        console.warn("This section may change later", role);
+
+        try {
+            const res = await axios.post(
+                "https://post-eco-api.liara.run/api/register",
+                { email, password, name, role }
+            );
+            console.log("🚀 ~ formSubmit ~ res:", res)
+            window.location.href = "/login";
+            if (res.status !== 201) {
+                throw res.statusText;
+            }
+        } catch (error) {
+            console.log(error);
+        }
         console.log(data);
     };
 
@@ -30,16 +49,15 @@ function SignUp() {
         password: errors?.password?.message,
         passwordConfirmation: errors?.passwordConfirmation?.message
     };
-
-    const firstError = Object.values(errorMessages).find(error => error);
     
+    const firstError = Object.values(errorMessages).find(error => error);
     return (
         <form onSubmit={handleSubmit(formSubmit)}>
 
             {firstError && (
                 <ErrorToaster
                     description={firstError}
-                    errors={errors}  
+                    errors={errors}
                 />
             )}
 
@@ -88,6 +106,7 @@ function SignUp() {
                         variant="default"
                         className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900"
                         type="submit"
+                        disabled={isSubmitting}
                     />
                 </div>
 

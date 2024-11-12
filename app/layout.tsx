@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 
 import getSession from "@/lib/auth/getSession"
 import { SessionProvider } from "@/lib/auth/SessionProvider"
+import Link from "next/link"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,9 +34,8 @@ export default async function RootLayout({
           inter.variable
         )}
       >
-        <SessionProvider
-          session={session}
-        >
+       
+        <SessionProvider session={session}>
           {children}
           <Toaster />
         </SessionProvider>
