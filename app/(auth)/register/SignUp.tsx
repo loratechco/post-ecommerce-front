@@ -1,23 +1,24 @@
 "use client"
 
 import { CardContent } from "@/components/ui/card";
-import AuthToggle from "@/components/auth-componetns/AuthToggle ";
-import AuthBtn from "@/components/auth-componetns/AuthBtn";
+import AuthToggle from "@/app/(auth)/components/AuthToggle ";
+import AuthBtn from "@/app/(auth)/components/AuthBtn";
 import Link from "next/link";
-import AuthInput from "@/components/auth-componetns/AuthInput";
+import AuthInput from "@/components/FormInput";
+// this is token context
 import { useSession } from "@/lib/auth/useSession";
 import useSignUp from "./useSignUp";
 import { SignUpFormData, SignUpSchema } from "./schema";
-import ErrorToaster from "../login/ErrorToast";
-import { useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
 import axios from "axios";
+import ErrorToast from "../../../components/ErrorToast";
+import { useEffect, useState } from "react";
 
 function SignUp() {
-    // const user = useSession();
-    // console.log("🚀 ~ SignUp ~ user:", user);
 
+    const [userMissingError, setUserMissingError] = useState<string | null>(null)
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useSignUp();
+
+    useEffect((() => setUserMissingError('')), [userMissingError])
 
     console.log("🚀 ~ SignUp ~ errors:", errors)
     const formSubmit = async (data: SignUpFormData) => {
@@ -32,34 +33,36 @@ function SignUp() {
                 "https://post-eco-api.liara.run/api/register",
                 { email, password, name, role }
             );
+            if (res.status !== 201)
+                return;
             console.log("🚀 ~ formSubmit ~ res:", res)
             window.location.href = "/login";
-            if (res.status !== 201) {
-                throw res.statusText;
-            }
+
         } catch (error) {
+            console.log("🚀 ~ formSubmit ~ error:", error)
+            setUserMissingError(error?.response?.data?.message);
+
             console.log(error);
         }
-        console.log(data);
     };
 
-    const errorMessages = {
-        name: errors?.name?.message,
-        email: errors?.email?.message,
-        password: errors?.password?.message,
-        passwordConfirmation: errors?.passwordConfirmation?.message
-    };
-    
-    const firstError = Object.values(errorMessages).find(error => error);
+    const errorMessages =
+        [
+            userMissingError,
+            errors?.name?.message,
+            errors?.email?.message,
+            errors?.password?.message,
+            errors?.passwordConfirmation?.message,
+        ];
+
     return (
         <form onSubmit={handleSubmit(formSubmit)}>
 
-            {firstError && (
-                <ErrorToaster
-                    description={firstError}
-                    errors={errors}
-                />
-            )}
+            <ErrorToast
+                dependency={errors}
+                errorMessagesArray={errorMessages}
+                dependencyOption={userMissingError}
+            />
 
             <CardContent className="space-y-3">
                 <AuthInput
@@ -67,6 +70,7 @@ function SignUp() {
                     type="text"
                     placeholder="Michael"
                     nameLabel="Name"
+                    disabled={isSubmitting}
                     register={register("name")}
                 />
 
@@ -75,6 +79,7 @@ function SignUp() {
                     type="email"
                     placeholder="example@gmail.com"
                     nameLabel="Email"
+                    disabled={isSubmitting}
                     register={register("email")}
                 />
 
@@ -83,6 +88,7 @@ function SignUp() {
                     type="password"
                     placeholder="#Az123"
                     nameLabel="Password"
+                    disabled={isSubmitting}
                     register={register("password")}
                 />
 
@@ -91,6 +97,7 @@ function SignUp() {
                     type="password"
                     placeholder="#Az123"
                     nameLabel="Password Confirmation"
+                    disabled={isSubmitting}
                     register={register("passwordConfirmation")}
                 />
 

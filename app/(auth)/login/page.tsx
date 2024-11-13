@@ -1,5 +1,5 @@
 import Login from "@/app/(auth)/login/Login"
-import AuthCardheader from "@/components/auth-componetns/AuthCardHeader";
+import AuthCardheader from "../components/AuthCardHeader";
 import { Card } from "@/components/ui/card";
 
 export default function Page() {

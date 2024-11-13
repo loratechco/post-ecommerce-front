@@ -1,6 +1,6 @@
 "use client"
 import { usePathname } from "next/navigation";
-import { CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Props {
     title: string;

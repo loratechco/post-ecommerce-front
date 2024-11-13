@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/sidebar"
 import { signOut } from "@/lib/auth/logOut"
 import Link from "next/link"
-import ProfileUser from "@/app/dashboard/components/ProfileUser"
+import ProfileUser from "@/app/dashboard/components/ProfileBadge"
 import { Session } from "inspector/promises"
 
 
@@ -168,11 +168,9 @@ export function AppSidebar({ userData }:Props) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="#">
                 
                 <ProfileUser userData={userData} />
 
-              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

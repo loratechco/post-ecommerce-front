@@ -6,11 +6,11 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthPage = 1;
 
-  if (!accessToken && pathname.startsWith("/dashboard")) {
-    const url = new URL(request.url);
-    url.pathname = "/login";
-    return NextResponse.redirect(url);
-  }
+  // if (!accessToken && pathname.startsWith("/dashboard")) {
+  //   const url = new URL(request.url);
+  //   url.pathname = "/login";
+  //   return NextResponse.redirect(url);
+  // }
 
   // if (accessToken && isAuthPage) {
   //   const url = new URL(request.url);

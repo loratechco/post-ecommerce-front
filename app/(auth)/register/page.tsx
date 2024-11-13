@@ -1,4 +1,4 @@
-import AuthCardheader from "@/components/auth-componetns/AuthCardHeader";
+import AuthCardheader from "../components/AuthCardHeader";
 import SignUp from "./SignUp";
 import { Card } from "@/components/ui/card"
 function SignUpPage() {

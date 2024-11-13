@@ -3,17 +3,16 @@ import React, { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ErrorToastProps {
-    errorMessages: (string | null | undefined)[];
+    errorMessagesArray: (string | null | undefined)[];
     dependency: any;
     dependencyOption?: any;
 }
 
-//(errorMessages) This should be given an array of errors with string indices
-const ErrorToast: React.FC<ErrorToastProps> = ({ errorMessages, dependency, dependencyOption = null }) => {
-    // Use toast hook to show error message if any
+//(errorMessagesArray) This should be given an array of errors with string indices
+const ErrorToast: React.FC<ErrorToastProps> = ({ errorMessagesArray, dependency, dependencyOption = null }) => {
     const { toast } = useToast();
     useEffect(() => {
-        const firstError = errorMessages.find((error) => error);
+        const firstError = errorMessagesArray.find((error) => error);
 
         if (firstError) {
             toast({

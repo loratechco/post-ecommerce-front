@@ -2,9 +2,9 @@
 import { usePathname } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card"
 import AuthCardheader from "../../../components/auth-componetns/AuthCardHeader"
-import AuthToggle from "../../../components/auth-componetns/AuthToggle "
-import AuthBtn from "@/components/auth-componetns/AuthBtn";
-import AuthInput from "@/components/auth-componetns/AuthInput";
+import AuthToggle from "../components/AuthToggle "
+import AuthBtn from "@/app/(auth)/components/AuthBtn";
+import AuthInput from "@/components/FormInput";
 
 import { useForm } from "react-hook-form";
 function ForgotPassword() {
@@ -26,7 +26,7 @@ function ForgotPassword() {
                     placeholder="example@gmail.com"
                     nameLabel="Email"
                     className="mb-3"
-                    {...register("email")} 
+                    {...register("email")}
                 />
 
                 <div className="space-y-3 mt-3">

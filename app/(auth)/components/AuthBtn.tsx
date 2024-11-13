@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
 
 interface Props {
     nameBtn: string;

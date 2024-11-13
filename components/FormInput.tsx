@@ -11,10 +11,9 @@ interface Props {
     className?: string;
     disabled?: boolean;
     register: UseFormRegisterReturn;
-    key?: string | number;
 }
 
-function AuthInput(
+function FormInput(
     {
         id,
         type,
@@ -22,15 +21,19 @@ function AuthInput(
         className = '',
         nameLabel,
         disabled,
-        key,
         register
     }: Props
 ) {
     return (
         <div className="grid gap-2">
 
-            <Label htmlFor={id}>{nameLabel}</Label>
-            <Input 
+            <Label
+
+                key={(id + "lable")}
+                htmlFor={id}>{nameLabel}</Label>
+            <Input
+                key={(id + "Input")}
+
                 {...register}
                 className={clsx(
                     className,
@@ -45,4 +48,4 @@ function AuthInput(
     );
 }
 
-export default AuthInput;
+export default FormInput;

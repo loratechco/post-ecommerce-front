@@ -1,20 +1,18 @@
 "use client";
-import AuthInput from "@/components/auth-componetns/AuthInput";
+import AuthInput from "@/components/FormInput";
 import { CardContent } from "@/components/ui/card";
-import AuthToggle from "@/components/auth-componetns/AuthToggle ";
+import AuthToggle from "@/app/(auth)/components/AuthToggle ";
 import Link from "next/link";
-import ErrorToaster from "./ErrorToast";
+import ErrorToaster from "../../../components/ErrorToast";
 import useLogin from "./useLoginForm";
 import { LoginFormData } from "./schema";
-import AuthBtn from "@/components/auth-componetns/AuthBtn";
+import AuthBtn from "@/app/(auth)/components/AuthBtn";
 import { singIn } from "@/lib/auth/login";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import ErrorToast from "./ErrorToast";
+import ErrorToast from "../../../components/ErrorToast";
 
 export default function Login() {
-  const { toast } = useToast();
-
   const [userMissingError, setUserMissingError] = useState<string | null>(null)
 
   //login hook
@@ -30,39 +28,15 @@ export default function Login() {
     console.log("🚀 ~ Login ~ userMissingError:", userMissingError)
     const { email, password } = data;
 
-    const singInResult: { status: number; statusText: string; } = await singIn({ email, password });
+    const singInResult:
+      { status: number; statusText: string; } = await singIn({ email, password });
 
-    if (singInResult?.status === 401) {
-      setUserMissingError('No email or password')
-      return;
-    } else if (singInResult?.status === 500) {
-      setUserMissingError('The server is not responding')
-      return;
-
-    } else {
-      setUserMissingError("There is a problem");
+    console.log(singInResult?.status);
+    if (singInResult?.status !== 200) {
+      setUserMissingError(singInResult?.statusText)
       return;
     }
-
   };
-
-  // useEffect(() => {
-  //   //find first error
-  //   const { email, password } = errors
-  //   const error = userMissingError || email?.message || password?.message;
-  //   console.log("🚀 ~ useEffect ~ error:", error)
-
-  //   if (error) {
-  //     toast({
-
-  //       description: error,
-  //       duration: 3000,
-  //       className: "bg-red-200 text-red-800",
-  //     });
-  //   }
-  // }, [userMissingError, errors, toast]);
-  console.log("🚀 ~ Login ~ errors:", errors)
-
 
   const errorMessages = [
     userMissingError,
@@ -74,8 +48,9 @@ export default function Login() {
     <CardContent>
 
       <ErrorToast
-        errorMessages={errorMessages}
+        errorMessagesArray={errorMessages}
         dependency={errors}
+        dependencyOption={userMissingError}
       />
       <form onSubmit={handleSubmit(formSubmit)} className="space-y-3">
 
