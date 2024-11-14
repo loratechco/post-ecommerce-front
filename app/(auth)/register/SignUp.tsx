@@ -22,19 +22,17 @@ function SignUp() {
 
     console.log("🚀 ~ SignUp ~ errors:", errors)
     const formSubmit = async (data: SignUpFormData) => {
-        const { email, password, name } = data;
-
-        //Test role
-        const role = "admin";
-        console.warn("This section may change later", role);
+        const { email, password, name, passwordConfirmation: password_confirmation } = data;
 
         try {
             const res = await axios.post(
                 "https://post-eco-api.liara.run/api/register",
-                { email, password, name, role }
+                { email, password, name, password_confirmation }
             );
+
             if (res.status !== 201)
                 return;
+
             console.log("🚀 ~ formSubmit ~ res:", res)
             window.location.href = "/login";
 

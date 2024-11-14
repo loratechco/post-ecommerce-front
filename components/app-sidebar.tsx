@@ -2,22 +2,17 @@
 
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
-  Map,
-  PieChart,
-  Send,
+  Home,
+  LogOut,
   Settings2,
-  SquareTerminal,
+  User2,
+  Wallet,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
+// import { NavProjects } from "@/components/nav-projects"
+// import { NavSecondary } from "@/components/nav-secondary"
+// import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
@@ -28,169 +23,84 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { signOut } from "@/lib/auth/logOut"
-import Link from "next/link"
+// import Link from "next/link"
 import ProfileUser from "@/app/dashboard/components/ProfileBadge"
 import { Session } from "inspector/promises"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import Image from "next/image"
+import Link from "next/link"
 
+const BASE_ROUTE = '/dashboard'
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
+      title: "Home",
+      url: BASE_ROUTE,
+      icon: Home,
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
+      title: "Wallet",
+      url: BASE_ROUTE + "/wallet",
+      icon: Wallet,
     },
     {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
+      title: 'Profile',
+      url: BASE_ROUTE + "/profile",
+      icon: User2,
     },
     {
       title: "Settings",
       url: "#",
       icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
     },
   ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+
 }
 
-interface Props{
-  userData: Session ;
+interface Props {
+  userData: Session;
 }
 
-export function AppSidebar({ userData }:Props) {
-  return (  
-    <Sidebar variant="inset">
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-                
-                <ProfileUser userData={userData} />
+export function AppSidebar({ userData }: Props) {
+  return (
+    <Sidebar variant="inset" className="h-full">
+      <ScrollArea className="flex-1">
 
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
 
-        <button
-          onClick={() => signOut()}
-          className="my-3"
-        >
-          Log out
-        </button>
+        <Link href="/dashboard/profile" className="bg-transparent">
+          <SidebarHeader className=" rounded-md h-14 hover:bg-gray-200 hover:text-black overflow-hidden">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton size="lg" asChild>
 
-      </SidebarContent>
+                  <ProfileUser userData={userData} />
 
-      {/* <SidebarFooter>
-      </SidebarFooter> */}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarHeader>
+        </Link>
+
+        <SidebarContent>
+          <NavMain items={data?.navMain} />
+          {/* <NavProjects projects={data.projects} /> */}
+          {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
+        </SidebarContent>
+
+        <SidebarFooter className="h-full flex justify-center mt-3">
+          <div className="">
+            <button
+              onClick={() => signOut()}
+              className="my-3 w-full flex justify-center items-center gap-2 rounded-md bg-red-200 hover:bg-red-300 py-2.5"
+            >
+              Log out
+              <LogOut size="15" />
+            </button>
+          </div>
+        </SidebarFooter>
+      </ScrollArea>
     </Sidebar>
+
   )
 }

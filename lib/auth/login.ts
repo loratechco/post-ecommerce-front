@@ -23,11 +23,12 @@ export async function singIn({
         },
         body: JSON.stringify(credentials),
     });
-
+    
     const { status, statusText } = res;
-
+    
+    
     if (!res.ok) 
-        return { status, statusText };
+        return { status, statusText, res:res.json() };
 
     const { token } = await res.json();
 

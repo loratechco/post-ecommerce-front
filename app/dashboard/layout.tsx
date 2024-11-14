@@ -16,15 +16,15 @@ function DashboardLayout({
     children: React.ReactNode
 }>) {
     return (
-        <>  
+        <>
             <SidebarProvider>
 
                 <AppSidebar />
 
-                <SidebarInset>
+                <SidebarInset >
                     <HeaderDasboard />
-                    <Suspense fallback={<Skeleton />}> 
-                    {children}
+                    <Suspense fallback={<Skeleton />}>
+                        {children}
                     </Suspense>
                 </SidebarInset>
 

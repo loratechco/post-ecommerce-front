@@ -31,7 +31,7 @@ export default function Login() {
     const singInResult:
       { status: number; statusText: string; } = await singIn({ email, password });
 
-    console.log(singInResult?.status);
+
     if (singInResult?.status !== 200) {
       setUserMissingError(singInResult?.statusText)
       return;
