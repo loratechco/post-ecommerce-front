@@ -9,42 +9,44 @@ import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
-import useImagePreview from "./useImagePrwie";
+import useImagePreview from "../useImagePrwie";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getData, postData } from "@/app/lib/fetchMethod";
 import axios from "axios";
+import formSchema from "./schemaEditProfile";
 
-function Account({ userToken }: { userToken: string | null }) {
+import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
+import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
+// تابع fetcher که با SWR استفاده می‌شود
+import useSWR from 'swr'
+const fetcher = (token) => getUserAccount(token);
+
+function Account() {
+
+    const userToken = useSession();  // گرفتن توکن کاربر از useSession
+
+    const { data, error } = useSWR(userToken, fetcher);  // دریافت داده‌ها از API
+
+
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
+    const [userData, setUserData] = useState<[] | Promise<void> | null>(null)
+
     useEffect(() => setFetchError(null), [fetchError])
 
-    const formSchema = z.object({
-        name: z.string()
-            .min(2, { message: "Name must be at least 2 characters long" })
-            .max(30, { message: "Name must be less than 30 characters" }),
-
-        lastname: z.string()
-            .min(2, { message: "Last name must be at least 2 characters long" })
-            .max(30, { message: "Last name must be less than 30 characters" }),
-
-        email: z.string()
-            .email({ message: "Please enter a valid email address" }),
-
-        "phoneNumber": z.string()
-            .regex(/^09\d{9}$/, { message: "Phone number must be in the format 09XXXXXXXXX" }),
-    });
-
     type FormData = z.infer<typeof formSchema>;
-    const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            name: '',
+            lastname: '',
+            email: '',
+            phoneNumber: '',
+        },
     });
 
-    const { preview, error } = useImagePreview(
-        watch("image")
-    );
-
+    const userAvatar = watch("image")
+    const { preview, previewError } = useImagePreview(userAvatar);
 
     const formFields = [
         { id: "name", register: register("name"), placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -53,25 +55,77 @@ function Account({ userToken }: { userToken: string | null }) {
         { id: "phoneNumber", register: register("phoneNumber"), placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
     ]
 
+    useEffect(() => {
+        console.log(error);
+        if (data) {
+            const { name, last_name, email, phone } = data;
+            setSwitchState(data?.business_customer);  // به‌روزرسانی وضعیت سوییچ
+            setUserData(data);  // ذخیره داده‌ها در وضعیت
+            reset({
+                name: name,
+                lastname: last_name,
+                email: email,
+                phoneNumber: phone,
+                image: data?.avatar,
+            });
+        }
+    }, [data])
+
+    // //GET User Data
+    // useEffect(() => {
+    //     getUserAccount(userToken, reset).then((res) => {
+    //         console.log("🚀 ~ getUserAccount ~ res:", res)
+
+    //         const { name, last_name, email, phone } = res
+    //         setSwitchState(res?.business_customer);
+    //         setUserData(res);
+    //         reset({
+    //             name: name,
+    //             lastname: last_name,
+    //             email: email,
+    //             phoneNumber: phone,
+    //             image: userData?.avatar,
+    //         });
+    //     }).catch((error) => {
+
+    //         setFetchError(error);
+    //     })
+    // }, [])
+
+    //PUT User Data
     const onSubmit = async (data: FormData) => {
+
+        const file = userAvatar[0];
+        const formData = new FormData();
+        formData.append("avatar", file);
+
+        console.log("🚀 ~ onSubmit ~ formData:", formData)
+        console.log(userAvatar[0]);
+
+        const { name, lastname, email, phoneNumber } = data;
         const userData = {
             name: data?.name,
             last_name: data?.lastname,
             email: data?.email,
             phone: data?.phoneNumber,
-            avatar: preview || false,
+            avatar: formData || null,
             business_customer: switchState || false,
             is_administrator: true,
+            password: "1234567",
+            password_confirmation: "1234567",
         }
 
         try {
             console.log(userToken);
-            const res = await axios.post("https://post-eco-api.liara.run/api/profile", {
+            const res = await axios.put("https://post-eco-api.liara.run/api/profile",
                 userData,
-                headers: {
-                    Authorization: `Bearer${userToken}`,
-                },
-            })
+                {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                    },
+                }
+            )
+
             console.log("🚀 ~ onSubmit ~ res:", res)
 
             if (res.status !== 200)
@@ -81,12 +135,11 @@ function Account({ userToken }: { userToken: string | null }) {
             setFetchError(error?.response?.data?.message)
             console.log(error?.response?.data?.message);
         }
-
     };
 
     const errorMessages = [
         fetchError,
-        error, // استفاده از پیام خطا از استیت مشترک
+        previewError, // استفاده از پیام خطا از استیت مشترک
         errors?.name?.message,
         errors?.lastname?.message,
         errors?.email?.message,
@@ -101,19 +154,24 @@ function Account({ userToken }: { userToken: string | null }) {
                 <ErrorToast
                     errorMessagesArray={errorMessages}
                     dependency={errors}
-                    dependencyOption={error || fetchError}
+                    dependencyOption={previewError || fetchError}
                 />
                 <div className="relative size-14 ">
+
                     <input
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
                         type="file"
                         accept="image/*"
-                        capture="user"
                         {...register("image")}
                     />
 
                     <Avatar className="cursor-pointer relative z-0 size-full">
-                        <AvatarImage src={`${preview || 'https://github.com/shadcn.png'}`} className="object-cover" />
+                        <AvatarImage
+                            src=
+                            {
+                                `${userData?.avatar || preview || 'https://github.com/shadcn.png'}`
+                            }
+                            className="object-cover" />
                         <AvatarFallback>JS</AvatarFallback>
                     </Avatar>
                 </div>
@@ -136,7 +194,7 @@ function Account({ userToken }: { userToken: string | null }) {
                 <div className="flex items-center space-x-2">
                     <Switch
                         defaultChecked={false}
-                        // checked={false}
+                        checked={switchState}
                         // disabled={true}
                         onCheckedChange={(checked) => {
                             setSwitchState(checked);

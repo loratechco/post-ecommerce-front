@@ -1,3 +1,4 @@
+"use client"
 import {
     Accordion,
     AccordionContent,
@@ -12,13 +13,26 @@ import { Form } from "@/components/ui/form"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "@/hooks/use-toast"
-
+import { useEffect, useState } from "react"
+// this is token context
+import { useSession } from "@/lib/auth/useSession";
+import axios from "axios"
 const FormSchema = z.object({
     marketing_emails: z.boolean().default(false).optional(),
     security_emails: z.boolean(),
 })
 
+
+import useSWR from 'swr';
+const fetcher = (...args) => fetch(...args).then((res) => res.json())
+
 function Permission() {
+
+    const token = useSession()
+    const [dataAccordionItems, setDataAccordionItems] = useState(["test1", "test2"]);
+
+    const { data, error } = useSWR('/api/profile-data', fetcher)
+
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
@@ -36,6 +50,42 @@ function Permission() {
             ),
         })
     }
+
+    useEffect(() => {
+        const getAccordionDataItems = async () => {
+
+            try {
+                const res = await axios.get('https://post-eco-api.liara.run/api/permissions',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
+                if (res?.status >= 200 && res?.status < 300) {
+                    return res;
+                }
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        getAccordionDataItems().then((res => {
+            console.log("🚀 ~ result ~ res:", res?.data)
+            const array: string[] = res?.data?.[""];
+            setDataAccordionItems(array);
+            console.log(array);
+
+        })).catch((error => {
+            console.log("��� ~ error ~ error:", error)
+            toast({
+                description: "Your message has been sent.",
+            })
+            return null;
+        }))
+    }, [token])
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
@@ -51,21 +101,18 @@ function Permission() {
                         </AccordionContent>
                     </AccordionItem>
 
-                    <AccordionItem value="item-2">
-                        <AccordionTrigger>Is it styled?</AccordionTrigger>
-                        <AccordionContent>
-                            Yes. It comes with default styles that matches the other
-                            components&apos; aesthetic.
-                        </AccordionContent>
-                    </AccordionItem>
+                    {
+                        dataAccordionItems?.map((items, index) => (
+                            <AccordionItem value={`${index}-item`} key={index}>
+                                <AccordionTrigger>{items}</AccordionTrigger>
+                                <AccordionContent>
+                                    Yes. It comes with default styles that matches the other
+                                    components&apos; aesthetic.
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))
+                    }
 
-                    <AccordionItem value="item-3">
-                        <AccordionTrigger>Is it animated?</AccordionTrigger>
-                        <AccordionContent>
-                            Yes. It&apos;s animated by default, but you can disable it if you
-                            prefer.
-                        </AccordionContent>
-                    </AccordionItem>
 
                 </Accordion>
                 <Button type="submit">Submit</Button>

@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 
 interface ImageData {
     preview: string | null;
-    error: string | null;
+    previewError: string | null;
 }
 
 function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData {
     const [imageData, setImageData] = useState<ImageData>({
         preview: null,
-        error: null,
+        previewError: null,
     });
 
     useEffect(() => {
@@ -19,12 +19,12 @@ function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData
             const fileURL = URL.createObjectURL(file);
             setImageData({
                 preview: fileURL,
-                error: null,
+                previewError: null,
             });
         } else {
             setImageData({
                 preview: null, // حفظ پیش‌نمایش قبلی در صورت خطا
-                error: `File size is too large. Please select an image smaller than ${maxSizeMB} MB.`,
+                previewError: `File size is too large. Please select an image smaller than ${maxSizeMB} MB.`,
             });
         }
 

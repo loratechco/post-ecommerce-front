@@ -20,7 +20,6 @@ export default function ChangePassword() {
         { id: "confirmation", register: register("confirmation"), nameLabel: "Confirmation Password" },
     ]
 
-
     const onSubmit = (data: FormData) => {
        
         console.log("🚀 ~ onSubmit ~ userData:", data)
@@ -34,14 +33,14 @@ export default function ChangePassword() {
     ]
     return (
 
-        <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
+        <form className="py-5 " onSubmit={handleSubmit(onSubmit)}>
 
             <ErrorToast
                 errorMessagesArray={errorMessages}
                 dependency={errors}
             />
 
-            <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
+            <div className="size-full space-y-3">
                 {formFields.map((field) => (
                     <FormInput
                         key={field?.id}
@@ -49,13 +48,13 @@ export default function ChangePassword() {
                         type='password'
                         nameLabel={field?.nameLabel}
                         register={field?.register}
-                        className="w-full border-gray-400"
+                        className="w-full lg:w-1/2 border-gray-400"
                         placeholder=""
                     />
                 ))}
             </div>
 
-            <Button type="submit" variant='default'>
+            <Button type="submit" variant='default' className="mt-5">
                 Save Changes
             </Button>
         </form>
