@@ -59,7 +59,7 @@ export default function WalletWithPagination() {
     )
 
     return (
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="w-full md:max-w-md mx-auto">
             <CardHeader>
                 <CardTitle>My Wallet</CardTitle>
                 <CardDescription>Manage your funds and view recent transactions</CardDescription>
@@ -150,6 +150,7 @@ export default function WalletWithPagination() {
                         <DialogFooter>
                             <Button onClick={handleCharge}>Charge</Button>
                         </DialogFooter>
+
                     </DialogContent>
                 </Dialog>
             </CardFooter>

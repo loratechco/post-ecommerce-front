@@ -1,172 +1,129 @@
-"use client"
+'use client'
+
+import { useState, useCallback } from 'react'
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
     AccordionTrigger,
 } from "@/components/ui/accordion"
+import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
-import PermissionToggle from "./PermissionToggle"
-import { z } from "zod"
+import { Label } from "@/components/ui/label"
 
-import { Form } from "@/components/ui/form"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "@/hooks/use-toast"
-import React, { ElementType, ReactNode, useEffect, useMemo, useState } from "react"
-// this is token context
-import { useSession } from "@/lib/auth/useSession";
-import axios from "axios"
-const FormSchema = z.object({
-    marketing_emails: z.boolean().default(false).optional(),
-    security_emails: z.boolean(),
-})
-
-import useSWR from 'swr';
-// const fetcher = (...args) => fetch(...args).then((res) => res.json())
-
-
-function Permission() {
-    const [accrdionComponent, setAccrdionComponent] = useState(null)
-    const token = useSession()
-    // const { data, error } = useSWR('/api/profile-data', fetcher)
-
-    const form = useForm<z.infer<typeof FormSchema>>({})
-
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        console.log("🚀 ~ onSubmit ~ data:", data?.id)
-
-        toast({
-            title: "You submitted the following values:",
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        })
-    }
-    const accordionData = [
-        {
-            id: 1, // اضافه کردن آیدی منحصر به فرد برای کتابخانه
-            title: "Accordion One",
-            items: [
-                { label: "Item One", description: "Description for Item One", id: 1, value: false },
-                { label: "Item Two", description: "Description for Item Two", id: 2, value: false },
-                { label: "Item Three", description: "Description for Item Three", id: 3, value: false }
-            ]
-        },
-
-        {
-            id: 2, // آیدی منحصر به فرد برای این کتابخانه
-            title: "Accordion Two",
-            items: [
-                { label: "Item One", description: "Description for Item One", id: 4, value: false },
-                { label: "Item Two", description: "Description for Item Two", id: 5, value: false },
-                { label: "Item Three", description: "Description for Item Three", id: 6, value: false }
-            ]
-        },
-        {
-            id: 3,
-            title: "Accordion Three",
-            items: [
-                { label: "Item One", description: "Description for Item One", id: 7, value: false },
-                { label: "Item Two", description: "Description for Item Two", id: 8, value: false },
-                { label: "Item Three", description: "Description for Item Three", id: 9, value: false }
-            ]
-        },
-        {
-            id: 4,
-            title: "Accordion Four",
-            items: [
-                { label: "Item One", description: "Description for Item One", id: 10, value: false },
-                { label: "Item Two", description: "Description for Item Two", id: 11, value: false },
-                { label: "Item Three", description: "Description for Item Three", id: 12, value: false }
-            ]
-        },
-        {
-            id: 5,
-            title: "Accordion Five",
-            items: [
-                { label: "custom Item", description: "Description for Item One", id: 13, value: true },
-                { label: "Item Two", description: "Description for Item Two", id: 14, value: false },
-                { label: "Item Three", description: "Description for Item Three", id: 15, value: false }
-            ]
-        }
-    ];
-
-    // useEffect(() => {
-    //     const getAccordionDataItems = async () => {
-
-    //         try {
-    //             const res = await axios.get('https://post-eco-api.liara.run/api/permissions',
-    //                 {
-    //                     headers: {
-    //                         Authorization: `Bearer ${token}`,
-    //                     },
-    //                 }
-    //             )
-    //             if (res?.status >= 200 && res?.status < 300) {
-    //                 return res;
-    //             }
-
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     }
-
-    //     getAccordionDataItems().then((res => {
-    //         console.log("🚀 ~ result ~ res:", res?.data)
-    //         const array: string[] = res?.data?.[""];
-    //         setDataAccordionItems(array);
-    //         console.log(array);
-
-    //     })).catch((error => {
-    //         console.log("��� ~ error ~ error:", error)
-    //         toast({
-    //             description: "Your message has been sent.",
-    //         })
-    //         return null;
-    //     }))
-    // }, [token])
-
-    const memoizedAccordionData = useMemo(() => {
-        console.log(852);
-        return accordionData.map((itemsAccordion, index) => (
-            <AccordionItem
-                value={`${index}-item`}
-                key={itemsAccordion.id}
-                className="w-full"
-            >
-                <AccordionTrigger className="w-full">{itemsAccordion?.title}</AccordionTrigger>
-                <AccordionContent className="w-full">
-                    {
-                        itemsAccordion?.items?.map((accordionContent) => (
-                            <PermissionToggle
-                                form={form}
-                                fomrLabel={accordionContent?.label}
-                                formDescription={accordionContent?.description}
-                                id={accordionContent?.id}
-                                checkedValue={accordionContent?.value}
-                                key={accordionContent?.id}
-                            />
-                        ))
-                    }
-                </AccordionContent>
-            </AccordionItem>
-        ));
-    }, [accordionData, form]); // محاسبه مجدد زمانی که فرم تغییر می‌کند.
-
-
-    return (
-        <Form {...form} >
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
-                <Accordion type="single" collapsible className="w-full">
-                    {memoizedAccordionData}
-                </Accordion>
-                <Button type="submit">Submit</Button>
-            </form>
-        </Form>
-    );
+// Define the types for our data structure
+type SwitchItem = {
+    id: string
+    name: string
 }
 
-export default Permission;
+type AccordionItemData = {
+    id: string
+    title: string
+    switches: SwitchItem[]
+}
+
+// Test array simulating dynamic data
+const testAccordionData: AccordionItemData[] = [
+    {
+        id: 'accordion1',
+        title: 'Personal Information',
+        switches: [
+            { id: 'switch1', name: 'Share Name' },
+            { id: 'switch2', name: 'Share Email' },
+            { id: 'switch3', name: 'Share Phone Number' },
+        ],
+    },
+    {
+        id: 'accordion2',
+        title: 'Notification Preferences',
+        switches: [
+            { id: 'switch4', name: 'Email Notifications' },
+            { id: 'switch5', name: 'SMS Notifications' },
+            { id: 'switch6', name: 'Push Notifications' },
+        ],
+    },
+    {
+        id: 'accordion3',
+        title: 'Privacy Settings',
+        switches: [
+            { id: 'switch7', name: 'Make Profile Public' },
+            { id: 'switch8', name: 'Allow Friend Requests' },
+            { id: 'switch9', name: 'Show Online Status' },
+        ],
+    },
+]
+
+// The main component
+export default function Permission({ items = testAccordionData }: { items?: AccordionItemData[] }) {
+    // State to keep track of switch statuses
+    const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({})
+    // State to store the result of active switches
+    const [activeItems, setActiveItems] = useState<string[]>([])
+
+    // Handle switch toggle
+    const handleSwitchChange = useCallback((id: string, checked: boolean) => {
+        setSwitchStates(prev => ({ ...prev, [id]: checked }))
+    }, [])
+
+    // Handle send button click
+    const handleSend = useCallback(() => {
+        const active = Object.entries(switchStates)
+            .filter(([, isActive]) => isActive)
+            .map(([id]) => id)
+        setActiveItems(active)
+        console.log('Active switches:', Object.entries(switchStates))
+    }, [switchStates])
+
+    console.log(activeItems);
+
+    return (
+        <div className="w-full pt-3">
+            <Accordion type="single" collapsible className="w-full">
+                {items.map((item) => (
+                    <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-zinc-100'>
+                        <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>{item.title}</AccordionTrigger>
+                        <AccordionContent className='pb-0'>
+                            <div className="">
+                                {item.switches.map((switchItem) => (
+                                    <div
+                                        key={switchItem.id}
+                                        className="flex items-center justify-between py-4 italic">
+                                        <Label htmlFor={switchItem.id}>{
+                                            switchItem.name
+                                        }</Label>
+                                        <Switch
+                                            className='data-[state=unchecked]:!bg-gray-400'
+                                            id={switchItem.id}
+                                            checked={switchStates[switchItem.id] || false}
+                                            onCheckedChange={(checked) => handleSwitchChange(switchItem.id, checked)}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
+
+            <Button onClick={handleSend} className="w-[6rem] ms-1">Send</Button>
+
+            {activeItems.length > 0 && (
+                <div className="mt-4 p-4 border rounded-md">
+                    <h3 className="text-lg font-semibold mb-2">Active Switches:</h3>
+                    <ul className="list-disc pl-5">
+                        {activeItems.map((id) => {
+                            const item = items.find(accordion => accordion.switches.some(s => s.id === id))
+                            const switchItem = item?.switches.find(s => s.id === id)
+                            return (
+                                <li key={id}>
+                                    {switchItem?.name} (ID: {id})
+                                </li>
+                            )
+                        })}
+                    </ul>
+                </div>
+            )}
+        </div>
+    )
+}
