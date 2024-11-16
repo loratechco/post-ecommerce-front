@@ -5,15 +5,15 @@ import ChangePassword from "./ChangeUserPassword";
 // this is token context
 // import { useSession } from "@/lib/auth/useSession";
 import Link from "next/link";
-import Permission from "./PermissionAccordion";
+import Permission from "./permissionTab/PermissionAccordion";
 
 function TabsListProfile() {
     return (
-        <Tabs defaultValue="account" className="w-full px-3">
-            <TabsList>
-                <TabsTrigger value="account">Account</TabsTrigger>
-                <TabsTrigger value="Permission">Permission</TabsTrigger>
-                <TabsTrigger value="change-password">Change Password</TabsTrigger>
+        <Tabs defaultValue="account" className="w-full px-3 ">
+            <TabsList className="">
+                <TabsTrigger className="w-[70%]" value="account">Account</TabsTrigger>
+                <TabsTrigger className="w-[70%]" value="Permission">Permission</TabsTrigger>
+                <TabsTrigger className="w-[70%] max-sm:my-2" value="change-password">Password</TabsTrigger>
             </TabsList>
 
             <TabsContent value="account">

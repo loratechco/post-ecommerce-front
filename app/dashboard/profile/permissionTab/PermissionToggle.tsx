@@ -15,18 +15,34 @@ import {
     FormLabel,
 } from "@/components/ui/form"
 import { Switch } from "@/components/ui/switch"
+import React from "react"
 
-function PermissionToggle({ form, fomrLabel, id, formDescription }: { form: any, fomrLabel: string, formDescription: string, id: number | string, }) {
+interface Props {
+    form: any;
+    fomrLabel: string;
+    formDescription: string;
+    id: number | string;
+    checkedValue: boolean;
+}
+
+function PermissionToggle(
+    {
+        form,
+        fomrLabel,
+        id,
+        formDescription,
+        checkedValue
+    }: Props) {
 
     return (
 
-        <div className="space-y-3">
+        <div className="space-y-3" key={id + 'div'}>
             <FormField
-                key={id}
+
                 control={form.control}
-                name="marketing_emails"
+                name={fomrLabel}
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between p-3 border-b">
+                    <FormItem className="flex flex-row items-center justify-between w-full py-3 px-2 border-b">
                         <div className="space-y-0.5">
                             <FormLabel>{fomrLabel}</FormLabel>
                             <FormDescription>
@@ -36,7 +52,14 @@ function PermissionToggle({ form, fomrLabel, id, formDescription }: { form: any,
                         <FormControl>
                             <Switch
                                 checked={field.value}
-                                onCheckedChange={field.onChange}
+                                defaultChecked={checkedValue}
+                                onCheckedChange={(checked) => {
+                                    field.onChange(checked);
+                                    console.log(field.name);
+                                    console.log(field.value);
+                                }}
+
+                                id={id}
                             />
                         </FormControl>
                     </FormItem>
@@ -47,4 +70,4 @@ function PermissionToggle({ form, fomrLabel, id, formDescription }: { form: any,
     );
 }
 
-export default PermissionToggle;
+export default React.memo(PermissionToggle);

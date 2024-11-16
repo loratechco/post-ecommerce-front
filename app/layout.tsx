@@ -34,7 +34,7 @@ export default async function RootLayout({
           inter.variable
         )}
       >
-       
+
         <SessionProvider session={session}>
           {children}
           <Toaster />

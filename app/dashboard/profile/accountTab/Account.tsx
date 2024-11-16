@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
-import useImagePreview from "../useImagePrwie";
+import useImagePreview from "./useImagePrwie";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -193,8 +193,8 @@ function Account() {
 
                 <div className="flex items-center space-x-2">
                     <Switch
-                        defaultChecked={false}
-                        checked={switchState}
+                        defaultChecked={switchState}
+                        // checked={}
                         // disabled={true}
                         onCheckedChange={(checked) => {
                             setSwitchState(checked);
@@ -216,7 +216,6 @@ function Account() {
                 </div>
 
             </form>
-
         </>
     );
 }

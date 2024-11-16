@@ -5,6 +5,25 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+/*   
+::-webkit-scrollbar {
+  width: 9px; 
+  background: transparent;
+} */
+/* 
+::-webkit-scrollbar-thumb {
+  background: #272727; 
+  border-radius: 4px; 
+  height: 8px; 
+} */
+
+/* ::-webkit-scrollbar-thumb:hover {
+  background: #131313; 
+} */
+
+/* html, body {
+  scroll-behavior: smooth; 
+} */
 
 @layer base {
   :root {
