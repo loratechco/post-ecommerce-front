@@ -81,7 +81,7 @@ export default function Permission({ items = testAccordionData }: { items?: Acco
         <div className="w-full pt-3">
             <Accordion type="single" collapsible className="w-full">
                 {items.map((item) => (
-                    <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-zinc-100'>
+                    <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'>
                         <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>{item.title}</AccordionTrigger>
                         <AccordionContent className='pb-0'>
                             <div className="">
@@ -89,7 +89,7 @@ export default function Permission({ items = testAccordionData }: { items?: Acco
                                     <div
                                         key={switchItem.id}
                                         className="flex items-center justify-between py-4 italic">
-                                        <Label htmlFor={switchItem.id}>{
+                                        <Label htmlFor={switchItem.id} className='cursor-pointer select-none'>{
                                             switchItem.name
                                         }</Label>
                                         <Switch

@@ -24,6 +24,9 @@ const formSchema = z.object({
 }).refine((data) => data.newPassword === data.confirmation, {
     message: "Confirmation Password does not match New Password.",
     path: ["confirmation"],
+}).refine((data) => data.oldPassword !== data.newPassword, {
+    message: "You have already registered this password",
+    path: ["newPassword"],
 });
 
 export { formSchema };

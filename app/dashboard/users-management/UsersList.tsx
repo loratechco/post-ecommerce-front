@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+
 import {
     Table,
     TableBody,
@@ -28,7 +29,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { MoreHorizontal, Search, Filter } from 'lucide-react'
+import { MoreHorizontal, Search, Filter, ArrowRight, CloudCog } from 'lucide-react'
+import Link from 'next/link'
 
 type User = {
     id: string
@@ -48,7 +50,8 @@ const initialUsers: User[] = [
 
 type FilterType = 'recent' | 'older' | 'a-m' | 'n-z' | null
 
-export default function UserList() {
+export default function UserList({ userId, userData }: { userId: string, userData: object[] }) {
+
     const [users] = useState<User[]>(initialUsers)
     const [searchTerm, setSearchTerm] = useState('')
     const [editingUser, setEditingUser] = useState<User | null>(null)
@@ -91,18 +94,40 @@ export default function UserList() {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="w-full">
             <h1 className="text-2xl font-bold mb-4">User Management</h1>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
                 <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <Input
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8"
-                    />
+
+                    <div className="space-y-2">
+                        <div className="relative">
+                            <Input
+                                id="input-26"
+                                className="peer pe-9 ps-9"
+                                placeholder="Search..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                type="search" />
+                            <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 text-muted-foreground/80 peer-disabled:opacity-50">
+                                <Search size={16} strokeWidth={2}
+                                />
+                            </div>
+                            <button
+                                className="absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-lg text-muted-foreground/80 ring-offset-background transition-shadow hover:text-foreground focus-visible:border focus-visible:border-ring focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-label="Submit search"
+                                type="submit"
+                            >
+                                <ArrowRight
+                                    size={16}
+                                    strokeWidth={2}
+                                    aria-hidden="true"
+                                    onClick={() => setSearchTerm('')}
+                                />
+
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -136,8 +161,9 @@ export default function UserList() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <div className="overflow-x-auto">
-                <Table>
+
+            <section className="overflow-auto w-full">
+                <Table className='w-full'>
                     <TableHeader>
                         <TableRow>
                             <TableHead>Email</TableHead>
@@ -147,14 +173,14 @@ export default function UserList() {
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className='max-sm:text-xs'>
                         {filteredUsers.map((user) => (
                             <TableRow key={user.id}>
-                                <TableCell className="font-medium">{user.email}</TableCell>
-                                <TableCell>{user.firstName}</TableCell>
-                                <TableCell>{user.lastName}</TableCell>
-                                <TableCell>{user.lastLogin}</TableCell>
-                                <TableCell className="text-right">
+                                <TableCell className="font-medium max-sm:px-0.5">{user.email}</TableCell>
+                                <TableCell className='max-sm:px-0.5' >{user.firstName}</TableCell>
+                                <TableCell className='max-sm:px-0.5' >{user.lastName}</TableCell>
+                                <TableCell className='max-sm:px-0.5' >{user.lastLogin}</TableCell>
+                                <TableCell className="text-right max-sm:px-0">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -162,10 +188,15 @@ export default function UserList() {
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
+                                        <DropdownMenuContent align="end" className="p-0">
+                                            {/* <DropdownMenuLabel>Actions</DropdownMenuLabel> */}
+
+                                            <Link href={`/dashboard/users-management/${1}`}>
+                                                <DropdownMenuItem className='cursor-pointer rounded-none p-3 font-semibold'>Edit</DropdownMenuItem>
+                                            </Link>
+
+                                            <DropdownMenuItem className=' cursor-pointer border-t border-t-gray-300 p-3 font-semibold rounded-none'
+                                                onClick={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -173,7 +204,7 @@ export default function UserList() {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+            </section>
             <Dialog open={editingUser !== null} onOpenChange={() => setEditingUser(null)}>
                 <DialogContent>
                     <DialogHeader>

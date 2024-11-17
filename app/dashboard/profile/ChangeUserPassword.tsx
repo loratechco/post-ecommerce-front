@@ -7,8 +7,44 @@ import ErrorToast from "@/components/ErrorToast";
 import FormInput from "@/components/FormInput";
 import { formSchema } from "./passwordShema";
 
+import useSWR from "swr";
+import axios from "axios";
+import { useSession } from "@/lib/auth/useSession";
+import { useEffect } from "react";
+
+const fetcher = async ([url, token]) => {
+    const res = await axios.get(url, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+    return res;
+}
+
 export default function ChangePassword() {
     type FormData = z.infer<typeof formSchema>;
+    const token = useSession()
+    // const { data, error } = useSWR(
+    //     ['http://app.api/api/profile/change-password', token]
+    //     , fetcher
+    // )
+
+    axios.get('http://app.api/api/profile/change-password', {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }).then(res => {
+        console.log(res);
+    }).catch(error => {
+        console.log(error.response);
+    })
+
+    // useEffect(() => {
+    //     if (data) {
+    //         console.log("🚀 ~ useEffect ~ data:", data)
+
+    //     }
+    // }, [data, token])
 
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -21,7 +57,7 @@ export default function ChangePassword() {
     ]
 
     const onSubmit = (data: FormData) => {
-       
+
         console.log("🚀 ~ onSubmit ~ userData:", data)
 
     };
@@ -48,8 +84,9 @@ export default function ChangePassword() {
                         type='password'
                         nameLabel={field?.nameLabel}
                         register={field?.register}
-                        className="w-full lg:w-1/2 border-gray-400"
-                        placeholder=""
+                        className="border-none"
+                        placeholder="least 6 characters long"
+                        classNameParentPasswordInput='w-full lg:w-1/2'
                     />
                 ))}
             </div>

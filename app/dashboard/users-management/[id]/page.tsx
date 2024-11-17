@@ -13,7 +13,7 @@ import useImagePreview from "./useImagePrwie";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import formSchema from "./schemaEditProfile";
+import formSchema from "../../profile/accountTab/schemaEditProfile";
 
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
@@ -21,7 +21,11 @@ import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSess
 import useSWR from 'swr'
 const fetcher = (token) => getUserAccount(token);
 
-function Account() {
+interface Props {
+    params: { id: string }
+}
+
+export default function ({ params: { id } }: Props) {
 
     const userToken = useSession();  // گرفتن توکن کاربر از useSession
 
@@ -70,28 +74,6 @@ function Account() {
         }
     }, [data])
 
-    // //GET User Data
-    // useEffect(() => {
-    //     getUserAccount(userToken, reset).then((res) => {
-    //         console.log("🚀 ~ getUserAccount ~ res:", res)
-
-    //         const { name, last_name, email, phone } = res
-    //         setSwitchState(res?.business_customer);
-    //         setUserData(res);
-    //         reset({
-    //             name: name,
-    //             lastname: last_name,
-    //             email: email,
-    //             phoneNumber: phone,
-    //             image: userData?.avatar,
-    //         });
-    //     }).catch((error) => {
-
-    //         setFetchError(error);
-    //     })
-    // }, [])
-
-    //PUT User Data
     const onSubmit = async (data: FormData) => {
 
         const file = userAvatar[0];
@@ -103,7 +85,7 @@ function Account() {
 
         const { name, lastname, email, phoneNumber } = data;
         const userData = {
-            name: data?.name,
+            name: id | data?.name,
             last_name: data?.lastname,
             email: data?.email,
             phone: data?.phoneNumber,
@@ -145,6 +127,7 @@ function Account() {
         errors?.phoneNumber?.message,
         errors?.image?.message,
     ];
+
 
     return (
         <>
@@ -216,7 +199,5 @@ function Account() {
 
             </form>
         </>
-    );
+    )
 }
-
-export default React.memo(Account);

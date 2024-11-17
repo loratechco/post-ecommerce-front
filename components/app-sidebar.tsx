@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings2,
   User2,
+  Users2,
   Wallet,
 } from "lucide-react"
 
@@ -29,6 +30,8 @@ import { Session } from "inspector/promises"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Image from "next/image"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 
 const BASE_ROUTE = '/dashboard'
 
@@ -50,6 +53,11 @@ const data = {
       icon: User2,
     },
     {
+      title: 'User Management',
+      url: BASE_ROUTE + "/users-management",
+      icon: Users2,
+    },
+    {
       title: "Settings",
       url: "#",
       icon: Settings2,
@@ -63,8 +71,12 @@ interface Props {
 }
 
 export function AppSidebar({ userData }: Props) {
+
+
   return (
-    <Sidebar variant="inset" className="h-full">
+    <Sidebar variant="inset"
+      className={`h-full`}
+    >
       <ScrollArea className="flex-1">
 
 
