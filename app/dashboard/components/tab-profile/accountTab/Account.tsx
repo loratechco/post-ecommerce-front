@@ -18,14 +18,17 @@ import formSchema from "./schemaEditProfile";
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
 // تابع fetcher که با SWR استفاده می‌شود
-import useSWR from 'swr'
+import useSWR, { mutate } from 'swr'
 const fetcher = (token) => getUserAccount(token);
 
 function Account() {
 
     const userToken = useSession();  // گرفتن توکن کاربر از useSession
 
-    const { data, error } = useSWR(userToken, fetcher);  // دریافت داده‌ها از API
+    const { data, error } = useSWR(
+        userToken ? ['account-data', userToken] : null,
+        ([_, token]) => fetcher(token) // ترتیب پارامترها مطابق تعریف
+    );
 
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
@@ -38,9 +41,9 @@ function Account() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
-            lastname: '',
+            last_name: '',
             email: '',
-            phoneNumber: '',
+            phone: '',
         },
     });
 
@@ -49,9 +52,9 @@ function Account() {
 
     const formFields = [
         { id: "name", register: register("name"), placeholder: "Json", type: "text", nameLabel: "Name" },
-        { id: "lastname", register: register("lastname"), placeholder: "Json", type: "text", nameLabel: "Last Name" },
+        { id: "last_name", register: register("last_name"), placeholder: "Json", type: "text", nameLabel: "Last Name" },
         { id: "email", register: register("email"), placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
-        { id: "phoneNumber", register: register("phoneNumber"), placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
+        { id: "phone", register: register("phone"), placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
     ]
 
     useEffect(() => {
@@ -61,88 +64,72 @@ function Account() {
             setSwitchState(data?.business_customer);  // به‌روزرسانی وضعیت سوییچ
             setUserData(data);  // ذخیره داده‌ها در وضعیت
             reset({
-                name: name,
-                lastname: last_name,
-                email: email,
-                phoneNumber: phone,
+                ...data,
                 image: data?.avatar,
             });
         }
     }, [data])
 
-    // //GET User Data
-    // useEffect(() => {
-    //     getUserAccount(userToken, reset).then((res) => {
-    //         console.log("🚀 ~ getUserAccount ~ res:", res)
-
-    //         const { name, last_name, email, phone } = res
-    //         setSwitchState(res?.business_customer);
-    //         setUserData(res);
-    //         reset({
-    //             name: name,
-    //             lastname: last_name,
-    //             email: email,
-    //             phoneNumber: phone,
-    //             image: userData?.avatar,
-    //         });
-    //     }).catch((error) => {
-
-    //         setFetchError(error);
-    //     })
-    // }, [])
-
     //PUT User Data
     const onSubmit = async (data: FormData) => {
-
-        const file = userAvatar[0];
+        // ایجاد یک FormData برای ارسال داده‌ها
         const formData = new FormData();
-        formData.append("avatar", file);
 
-        console.log("🚀 ~ onSubmit ~ formData:", formData)
-        console.log(userAvatar[0]);
-
-        const { name, lastname, email, phoneNumber } = data;
-        const userData = {
-            name: data?.name,
-            last_name: data?.lastname,
-            email: data?.email,
-            phone: data?.phoneNumber,
-            avatar: formData || null,
-            business_customer: switchState || false,
-            is_administrator: true,
-            password: "1234567",
-            password_confirmation: "1234567",
+        // افزودن تصویر (در صورت وجود) به FormData
+        if (userAvatar?.[0]) {
+            formData.append("avatar", userAvatar[0]);
         }
 
+        // افزودن سایر داده‌های فرم به صورت جداگانه
+        formData.append("name", data?.name);
+        formData.append("last_name", data?.last_name);
+        formData.append("email", data?.email);
+        formData.append("phone", data?.phone);
+        formData.append("business_customer", '0');
+        formData.append("is_administrator", '0');
+
+        // چاپ محتویات FormData برای بررسی
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ": " + pair[1]);
+        }
+
+        // console.log(formData);
         try {
             console.log(userToken);
-            const res = await axios.put("https://post-eco-api.liara.run/api/profile",
-                userData,
+
+            // ارسال درخواست به بک‌اند
+            const res = await axios.put(
+                "http://app.api/api/profile",
+                formData,
                 {
                     headers: {
-                        Authorization: `Bearer ${userToken}`,
-                    },
+                        "Authorization": `Bearer ${userToken}`,
+                        "Content-Type": "multipart/form-data",
+                    }
                 }
-            )
+            );
 
-            console.log("🚀 ~ onSubmit ~ res:", res)
+            console.log("🚀 ~ onSubmit ~ res:", res);
 
-            if (res.status !== 200)
-                throw res;
+            // پاک‌سازی کش و دریافت دوباره اطلاعات
+            mutate(userToken);
 
+            if (res.status !== 200) throw res;
         } catch (error) {
-            setFetchError(error?.response?.data?.message)
-            console.log(error?.response?.data?.message);
+            // مدیریت خطاها
+            setFetchError(error?.response?.data?.message);
+            console.log(error?.response);
         }
     };
+
 
     const errorMessages = [
         fetchError,
         previewError, // استفاده از پیام خطا از استیت مشترک
         errors?.name?.message,
-        errors?.lastname?.message,
+        errors?.last_name?.message,
         errors?.email?.message,
-        errors?.phoneNumber?.message,
+        errors?.phone?.message,
         errors?.image?.message,
     ];
 

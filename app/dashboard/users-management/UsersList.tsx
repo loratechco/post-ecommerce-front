@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import {
     Table,
     TableBody,
+    TableCaption,
     TableCell,
+    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -31,63 +33,66 @@ import {
 import { Label } from "@/components/ui/label"
 import { MoreHorizontal, Search, Filter, ArrowRight, CloudCog } from 'lucide-react'
 import Link from 'next/link'
-
-type User = {
-    id: string
-    email: string
-    firstName: string
-    lastName: string
-    lastLogin: string
-}
-
-const initialUsers: User[] = [
-    { id: '1', email: 'john@example.com', firstName: 'John', lastName: 'Doe', lastLogin: '2023-05-01 10:30 AM' },
-    { id: '2', email: 'jane@example.com', firstName: 'Jane', lastName: 'Smith', lastLogin: '2023-05-02 2:45 PM' },
-    { id: '3', email: 'bob@example.com', firstName: 'Bob', lastName: 'Johnson', lastLogin: '2023-05-03 9:15 AM' },
-    { id: '4', email: 'alice@example.com', firstName: 'Alice', lastName: 'Williams', lastLogin: '2023-05-04 11:20 AM' },
-    { id: '5', email: 'charlie@example.com', firstName: 'Charlie', lastName: 'Brown', lastLogin: '2023-05-05 3:00 PM' },
-]
+import axios from 'axios'
+import { useSession } from '@/lib/auth/useSession'
 
 type FilterType = 'recent' | 'older' | 'a-m' | 'n-z' | null
 
-export default function UserList({ userId, userData }: { userId: string, userData: object[] }) {
+export default function UserList({ userData }: { userData: object[] }) {
+    const [userListData, setUserListData] = useState<object[]>([])
+    const token = useSession();
 
-    const [users] = useState<User[]>(initialUsers)
+    useEffect(() => setUserListData(userData), [])
+
     const [searchTerm, setSearchTerm] = useState('')
-    const [editingUser, setEditingUser] = useState<User | null>(null)
+    const [editingUser, setEditingUser] = useState<null>(null)
     const [filterType, setFilterType] = useState<FilterType>(null)
 
-    const filteredUsers = useMemo(() => {
-        return users.filter(user => {
-            const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+    // const filteredUsers = useMemo(() => {
+    //     return userListData.filter(user => {
+    //         const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    //             user.lastName.toLowerCase().includes(searchTerm.toLowerCase())
 
-            const loginDate = new Date(user.lastLogin)
-            const oneWeekAgo = new Date()
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
+    //         const loginDate = new Date(user.lastLogin)
+    //         const oneWeekAgo = new Date()
+    //         oneWeekAgo.setDate(oneWeekAgo.getDate() - 7)
 
-            const matchesFilter =
-                !filterType ||
-                (filterType === 'recent' && loginDate > oneWeekAgo) ||
-                (filterType === 'older' && loginDate <= oneWeekAgo) ||
-                (filterType === 'a-m' && user.lastName.toLowerCase() < 'n') ||
-                (filterType === 'n-z' && user.lastName.toLowerCase() >= 'n')
+    //         const matchesFilter =
+    //             !filterType ||
+    //             (filterType === 'recent' && loginDate > oneWeekAgo) ||
+    //             (filterType === 'older' && loginDate <= oneWeekAgo) ||
+    //             (filterType === 'a-m' && user.lastName.toLowerCase() < 'n') ||
+    //             (filterType === 'n-z' && user.lastName.toLowerCase() >= 'n')
 
-            return matchesSearch && matchesFilter
-        })
-    }, [users, searchTerm, filterType])
+    //         return matchesSearch && matchesFilter
+    //     })
+    // }, [userListData, searchTerm, filterType])
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async (id: string) => {
         // In a real application, you would delete the user from the backend here
-        console.log(`Deleting user with id: ${id}`)
+
+        try {
+            const res = await axios.delete(`http://app.api/api/users/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
+            });
+            console.log(res);
+            const newUserList = userListData.filter((item) => item?.id !== id);
+
+            setUserListData(newUserList);
+            console.log(userListData);
+        } catch (error) {
+            console.log("🚀 ~ handleDelete ~ error:", error?.response?.data?.message)
+        }
     }
 
-    const handleEdit = (user: User) => {
+    const handleEdit = (user) => {
         setEditingUser(user)
     }
 
-    const handleSaveEdit = (editedUser: User) => {
+    const handleSaveEdit = (editedUser) => {
         // In a real application, you would update the user in the backend here
         console.log('Saving edited user:', editedUser)
         setEditingUser(null)
@@ -163,24 +168,31 @@ export default function UserList({ userId, userData }: { userId: string, userDat
             </div>
 
             <section className="overflow-auto w-full">
-                <Table className='w-full'>
+                <Table className="w-full px-0">
+                    {/* Caption */}
+                    <TableCaption>A list of your users.</TableCaption>
+
+                    {/* Header */}
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Email</TableHead>
+                            <TableHead className="w-[150px]">Email</TableHead>
                             <TableHead>First Name</TableHead>
                             <TableHead>Last Name</TableHead>
-                            <TableHead>Last Login</TableHead>
+                            <TableHead className="text-right">Last Login</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody className='max-sm:text-xs'>
-                        {filteredUsers.map((user) => (
-                            <TableRow key={user.id}>
-                                <TableCell className="font-medium max-sm:px-0.5">{user.email}</TableCell>
-                                <TableCell className='max-sm:px-0.5' >{user.firstName}</TableCell>
-                                <TableCell className='max-sm:px-0.5' >{user.lastName}</TableCell>
-                                <TableCell className='max-sm:px-0.5' >{user.lastLogin}</TableCell>
-                                <TableCell className="text-right max-sm:px-0">
+
+                    {/* Body */}
+                    <TableBody className='px-0'>
+                        {userListData?.map((user) => (
+                            <TableRow key={user?.id}>
+                                <TableCell className="font-medium">{user?.email}</TableCell>
+                                <TableCell>{user?.firstName}</TableCell>
+                                <TableCell>{user?.lastName}</TableCell>
+                                <TableCell className="text-right">{user?.lastLogin}</TableCell>
+                                <TableCell className="text-right">
+                                    {/* Actions: Edit/Delete */}
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -188,15 +200,14 @@ export default function UserList({ userId, userData }: { userId: string, userDat
                                                 <MoreHorizontal className="h-4 w-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" className="p-0">
-                                            {/* <DropdownMenuLabel>Actions</DropdownMenuLabel> */}
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
-                                            <Link href={`/dashboard/users-management/${1}`}>
-                                                <DropdownMenuItem className='cursor-pointer rounded-none p-3 font-semibold'>Edit</DropdownMenuItem>
+                                            <Link href={`/dashboard/users-management/${user?.id}`}>
+                                                <DropdownMenuItem >Edit</DropdownMenuItem>
                                             </Link>
 
-                                            <DropdownMenuItem className=' cursor-pointer border-t border-t-gray-300 p-3 font-semibold rounded-none'
-                                                onClick={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => handleDelete(user?.id)}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TableCell>
@@ -232,7 +243,7 @@ export default function UserList({ userId, userData }: { userId: string, userDat
                                 </Label>
                                 <Input
                                     id="edit-firstName"
-                                    value={editingUser.firstName}
+                                    value={editingUser?.firstName}
                                     onChange={(e) => setEditingUser({ ...editingUser, firstName: e.target.value })}
                                     className="col-span-3"
                                 />
@@ -243,7 +254,7 @@ export default function UserList({ userId, userData }: { userId: string, userDat
                                 </Label>
                                 <Input
                                     id="edit-lastName"
-                                    value={editingUser.lastName}
+                                    value={editingUser?.lastName}
                                     onChange={(e) => setEditingUser({ ...editingUser, lastName: e.target.value })}
                                     className="col-span-3"
                                 />
@@ -255,6 +266,7 @@ export default function UserList({ userId, userData }: { userId: string, userDat
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </div>
     )
 }

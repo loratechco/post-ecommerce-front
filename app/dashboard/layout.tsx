@@ -21,13 +21,14 @@ function DashboardLayout({
 
                 <AppSidebar />
 
-                <SidebarInset >
+                <SidebarInset>
                     <HeaderDasboard />
                     <Suspense fallback={<Skeleton />}>
-                        {children}
+                        <section className="px-5">
+                            {children}
+                        </section>
                     </Suspense>
                 </SidebarInset>
-
             </SidebarProvider>
         </>
     );

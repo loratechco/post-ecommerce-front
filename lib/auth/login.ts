@@ -5,7 +5,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { saveSession } from "./storage";
 
-const BACKEND_URL = "https://post-eco-api.liara.run";
+const BACKEND_URL = "http://app.api";
 
 export async function singIn({
     redirectTo = "/dashboard",
@@ -23,12 +23,12 @@ export async function singIn({
         },
         body: JSON.stringify(credentials),
     });
-    
+
     const { status, statusText } = res;
-    
-    
-    if (!res.ok) 
-        return { status, statusText, res:res.json() };
+
+
+    if (!res.ok)
+        return { status, statusText, res: res.json() };
 
     const { token } = await res.json();
 

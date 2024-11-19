@@ -12,41 +12,15 @@ import axios from "axios";
 import { useSession } from "@/lib/auth/useSession";
 import { useEffect } from "react";
 
-const fetcher = async ([url, token]) => {
-    const res = await axios.get(url, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    })
-    return res;
-}
 
-export default function ChangePassword() {
+import { useToast } from "@/hooks/use-toast";
+export default function ChangePassword({ userId, userToken }) {
     type FormData = z.infer<typeof formSchema>;
     const token = useSession()
-    // const { data, error } = useSWR(
-    //     ['http://app.api/api/profile/change-password', token]
-    //     , fetcher
-    // )
+    const { toast } = useToast();
 
-    axios.get('http://app.api/api/profile/change-password', {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    }).then(res => {
-        console.log(res);
-    }).catch(error => {
-        console.log(error.response);
-    })
 
-    // useEffect(() => {
-    //     if (data) {
-    //         console.log("🚀 ~ useEffect ~ data:", data)
-
-    //     }
-    // }, [data, token])
-
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
     });
 
@@ -56,16 +30,47 @@ export default function ChangePassword() {
         { id: "confirmation", register: register("confirmation"), nameLabel: "Confirmation Password" },
     ]
 
-    const onSubmit = (data: FormData) => {
+    const onSubmit = async ({
+        confirmation: password_confirmation,
+        newPassword: password,
+        oldPassword: old_password
 
-        console.log("🚀 ~ onSubmit ~ userData:", data)
+    }: FormData) => {
+
+        try {
+            const res = await axios.put('http://app.api/api/profile/change-password',
+                {
+                    old_password,
+                    password,
+                    password_confirmation
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+
+            toast({
+                description: res?.data?.message,
+                duration: 3000,
+                className: "bg-green-400 text-green-950",
+            });
+            console.log(res.data);
+
+        } catch (error) {
+            toast({
+                description: error?.response?.data?.message,
+                duration: 3000,
+                className: "bg-red-200 text-red-800",
+            });
+        }
 
     };
 
     const errorMessages = [
-        errors?.oldPassword?.message,
-        errors?.newPassword?.message,
         errors?.confirmation?.message,
+        errors?.newPassword?.message,
+        errors?.oldPassword?.message,
     ]
     return (
 
@@ -91,7 +96,7 @@ export default function ChangePassword() {
                 ))}
             </div>
 
-            <Button type="submit" variant='default' className="mt-5">
+            <Button type="submit" variant='default' className="mt-5" disabled={isSubmitting}>
                 Save Changes
             </Button>
         </form>

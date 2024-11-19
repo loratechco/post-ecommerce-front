@@ -26,7 +26,7 @@ function SignUp() {
 
         try {
             const res = await axios.post(
-                "https://post-eco-api.liara.run/api/register",
+                "http://app.api/api/register",
                 { email, password, name, password_confirmation }
             );
 

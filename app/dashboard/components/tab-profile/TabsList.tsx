@@ -1,3 +1,4 @@
+"use client"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Account from "./accountTab/Account";
 
@@ -8,8 +9,11 @@ import Link from "next/link";
 import Permission from "./permissionTab/PermissionAccordion";
 
 function TabsListProfile() {
+
+    // console.log("🚀 ~ findRoute ~ findRoute:", tabApis[0].getApi)
+
     return (
-        <Tabs defaultValue="account" className="w-full px-3 ">
+        <Tabs defaultValue="account" className="w-full">
             <TabsList className="">
                 <TabsTrigger className="w-[70%]" value="account">Account</TabsTrigger>
                 <TabsTrigger className="w-[70%]" value="Permission">Permission</TabsTrigger>

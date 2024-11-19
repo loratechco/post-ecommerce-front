@@ -4,7 +4,7 @@ import axios from "axios";
 
 const getUserAccount = async (userToken) => {
     try {
-        const res = await axios.get("https://post-eco-api.liara.run/api/profile", {
+        const res = await axios.get("http://app.api/api/profile", {
             headers: {
                 Authorization: `Bearer ${userToken}`,
             },

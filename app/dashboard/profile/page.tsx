@@ -1,4 +1,4 @@
-import TabsListProfile from "./TabsList";
+import TabsListProfile from "../components/tab-profile/TabsList";
 function Profile() {
 
     return (
