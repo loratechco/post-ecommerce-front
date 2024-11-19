@@ -40,7 +40,6 @@ const dataFetcher = async (userToken) => {
     }
 }
 
-
 // The main component
 export default function Permission({ userId, userToken }) {
     const { toast } = useToast();

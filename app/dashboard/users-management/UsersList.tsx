@@ -167,32 +167,45 @@ export default function UserList({ userData }: { userData: object[] }) {
                 </DropdownMenu>
             </div>
 
-            <section className="overflow-auto w-full">
-                <Table className="w-full px-0">
+            <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     {/* Caption */}
                     <TableCaption>A list of your users.</TableCaption>
 
                     {/* Header */}
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[150px]">Email</TableHead>
-                            <TableHead>First Name</TableHead>
-                            <TableHead>Last Name</TableHead>
-                            <TableHead className="text-right">Last Login</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-
+                    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" className="px-6 py-3">
+                                First Name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Last Name
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Last Login
+                            </th>
+                            <th scope="col" className="px-6 py-3">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
                     {/* Body */}
-                    <TableBody className='px-0'>
+                    <tbody>
                         {userListData?.map((user) => (
-                            <TableRow key={user?.id}>
-                                <TableCell className="font-medium">{user?.email}</TableCell>
-                                <TableCell>{user?.firstName}</TableCell>
-                                <TableCell>{user?.lastName}</TableCell>
-                                <TableCell className="text-right">{user?.lastLogin}</TableCell>
-                                <TableCell className="text-right">
-                                    {/* Actions: Edit/Delete */}
+                            <tr key={user?.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    {user?.email}
+                                </th>
+                                <td className="px-6 py-4">
+                                    {user?.firstName}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {user?.lastName}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {user?.lastLogin}
+                                </td>
+                                <td className="px-6 py-4">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -210,12 +223,12 @@ export default function UserList({ userData }: { userData: object[] }) {
                                             <DropdownMenuItem onClick={() => handleDelete(user?.id)}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
+                                </td>
+                            </tr>
                         ))}
-                    </TableBody>
-                </Table>
-            </section>
+                    </tbody>
+                </table>
+            </div>
             <Dialog open={editingUser !== null} onOpenChange={() => setEditingUser(null)}>
                 <DialogContent>
                     <DialogHeader>
