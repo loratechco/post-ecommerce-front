@@ -32,7 +32,8 @@ const formSchema = z.object({
     last_name: z.string().min(2, "نام خانوادگی باید حداقل 2 کاراکتر باشد"),
     email: z.string().email("ایمیل نامعتبر است"),
     phone: z.string().min(10, "شماره تلفن باید حداقل 10 رقم باشد"),
-    password: z.string().min(6, "رمز عبور باید حداقل 6 کاراکتر باشد")
+    password: z.string().min(6, "رمز عبور باید حداقل 6 کاراکتر باشد"),
+    search: z.string(),
 });
 type FormData = z.infer<typeof formSchema>;
 
@@ -45,18 +46,47 @@ const addUserFields: { id: string; type?: string; nameLabel: string; placeholder
 ]
 
 export default function UserList({ userData }: { userData: object[] }) {
-    const [userListData, setUserListData] = useState<object[]>([])
+
     const token = useSession();
+    const [userListData, setUserListData] = useState<object[]>([])
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => setUserListData(userData), [])
 
-    const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    const { register, setValue, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema)
     });
 
-    const handleAddUser = async ({ data, setUserListData, token }: { data: FormData, setUserListData: () => void, token: string }) => {
+    const query = watch('search');
 
+    useEffect(() => {
+
+        const timeOuteId = setTimeout(() => {
+            const search = async () => {
+                try {
+                    const { data } = await axios.get(`http://app.api/api/users?search=${query}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                    });
+                    console.log(data);
+                    setUserListData(data?.data)
+
+                } catch (error) {
+                    toast({
+                        description: error?.data?.message,
+                        className: 'bg-red-300 text-red-950'
+                    })
+                }
+            }
+            search();
+        }, 1000)
+
+        return () => clearTimeout(timeOuteId);
+    }, [query])
+
+    const handleAddUser = async ({ data, setUserListData, token }: { data: FormData, setUserListData: () => void, token: string }) => {
         console.log(data);
         try {
             const res = await axios.post(`http://app.api/api/users`, data, {
@@ -95,9 +125,8 @@ export default function UserList({ userData }: { userData: object[] }) {
                             <Input
                                 id="input-26"
                                 className="peer border-none focus-visible:ring-0 w-full "
-                                placeholder="جستجو..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                placeholder="Search..."
+                                {...register('search')}
                                 type="search"
                             />
                             <button
@@ -109,7 +138,7 @@ export default function UserList({ userData }: { userData: object[] }) {
                                     size={16}
                                     strokeWidth={2}
                                     aria-hidden="true"
-                                    onClick={() => setSearchTerm('')}
+                                    onClick={() => setValue("search", '')}
                                 />
                             </button>
                         </div>

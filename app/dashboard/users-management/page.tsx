@@ -18,7 +18,7 @@ const getUserList = async (token: string | null) => {
 
         if (res.status === 500) {
             console.log(res);
-            return []
+            return [];
         }
 
         console.log("🚀 ~ getUserList ~ result:", result)

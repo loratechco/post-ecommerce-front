@@ -28,9 +28,7 @@ export function CardTable({ children }: Child) {
 export function WrapContent({ children }: Child) {
     return (
         <span className="block text-gray-600 truncate">
-
             {children}
-
         </span>
     )
 }
