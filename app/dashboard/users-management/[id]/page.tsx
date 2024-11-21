@@ -1,14 +1,14 @@
 import { string } from "zod";
 import TabsListProfile from "./tab-profile/TabsList";
 
-
-interface Params {
-    id: string
+interface Props {
+    params: {
+        id: string
+    }
 }
 
-function EditePofile(
-    { id }: Params
-) {
+async function EditePofile({ params }: Props) {
+    const { id } = await params;
     return (
         <TabsListProfile userId={id} />
     );

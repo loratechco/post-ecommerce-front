@@ -59,7 +59,7 @@ function FormInput(
                     {...register}
                     className={cn(
                         className,
-                        { " focus-visible:ring-0": isPasswordType },
+                        { " focus-visible:ring-0 border-none": isPasswordType },
                         "w-full"
                     )}
 

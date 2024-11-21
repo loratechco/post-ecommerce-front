@@ -26,26 +26,11 @@ type AccordionItemData = {
     switches: SwitchItem[]
 }
 
-const dataFetcher = async (userToken) => {
-    try {
-        const res = await axios.get('http://app.api/api/permissions', {
-            headers: {
-                Authorization: `Bearer ${userToken}`,
-            },
-        })
-
-        return res.data;
-    } catch (error) {
-        console.log(error);
-    }
-}
-
 // The main component
 export default function Permission({ userId, userToken }) {
     const { toast } = useToast();
 
     const token = useSession();
-
 
     const [accordionItemComponent, setAccordionItemComponent] = useState<JSX.Element[] | null>(null)
     // State to keep track of switch statuses

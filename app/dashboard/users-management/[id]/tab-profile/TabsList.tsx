@@ -13,6 +13,8 @@ function TabsListProfile({ userId }) {
 
     const token = useSession()
 
+    console.log("🚀 ~ TabsListProfile ~ userId:", userId)
+
     // console.log("🚀 ~ findRoute ~ findRoute:", tabApis[0].getApi)
 
     return (
@@ -20,7 +22,6 @@ function TabsListProfile({ userId }) {
             <TabsList className="">
                 <TabsTrigger className="w-[70%]" value="account">Account</TabsTrigger>
                 <TabsTrigger className="w-[70%]" value="Permission">Permission</TabsTrigger>
-                <TabsTrigger className="w-[70%] max-sm:my-2" value="change-password">Password</TabsTrigger>
             </TabsList>
 
             <TabsContent value="account">
@@ -29,10 +30,6 @@ function TabsListProfile({ userId }) {
 
             <TabsContent value="Permission">
                 <Permission userId={userId} userToken={token} />
-            </TabsContent>
-
-            <TabsContent value="change-password">
-                <ChangePassword userId={userId} userToken={token} />
             </TabsContent>
         </Tabs>
     );

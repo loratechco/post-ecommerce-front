@@ -19,7 +19,20 @@ import { getUserAccount } from './useFetch'; // وارد کردن تابع getUs
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
 // تابع fetcher که با SWR استفاده می‌شود
 import useSWR, { mutate } from 'swr'
+import { toast } from "@/hooks/use-toast";
 const fetcher = (token) => getUserAccount(token);
+
+
+const formFields = [
+    { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
+    { id: "last_name", placeholder: "Json", type: "text", nameLabel: "Last Name" },
+    { id: "email", placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
+    { id: "phone", placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
+]
+const formFieldsPassword = [
+    { id: "newPassword", placeholder: "least 6 characters long", type: "password", nameLabel: "New Password" },
+    { id: "confirmation", placeholder: "least 6 characters long", type: "password", nameLabel: "Confirmation Password" }
+]
 
 function Account() {
 
@@ -50,13 +63,7 @@ function Account() {
     const userAvatar = watch("image")
     const { preview, previewError } = useImagePreview(userAvatar);
 
-    const formFields = [
-        { id: "name", register: register("name"), placeholder: "Json", type: "text", nameLabel: "Name" },
-        { id: "last_name", register: register("last_name"), placeholder: "Json", type: "text", nameLabel: "Last Name" },
-        { id: "email", register: register("email"), placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
-        { id: "phone", register: register("phone"), placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
-    ]
-
+    // get data from api
     useEffect(() => {
         console.log(error);
         if (data) {
@@ -70,55 +77,59 @@ function Account() {
         }
     }, [data])
 
+
     //PUT User Data
     const onSubmit = async (data: FormData) => {
-        // ایجاد یک FormData برای ارسال داده‌ها
+        // Create FormData instance
         const formData = new FormData();
 
-        // افزودن تصویر (در صورت وجود) به FormData
+        // Handle avatar upload
         if (userAvatar?.[0]) {
             formData.append("avatar", userAvatar[0]);
         }
 
-        // افزودن سایر داده‌های فرم به صورت جداگانه
-        formData.append("name", data?.name);
-        formData.append("last_name", data?.last_name);
-        formData.append("email", data?.email);
-        formData.append("phone", data?.phone);
-        formData.append("business_customer", '0');
-        formData.append("is_administrator", '0');
+        // Add form data fields
+        Object.entries({
+            name: data.name,
+            last_name: data.last_name,
+            email: data.email,
+            phone: data.phone,
+            business_customer: switchState ? '1' : '0',
+            is_administrator: '0'
+        }).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
 
-        // چاپ محتویات FormData برای بررسی
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ": " + pair[1]);
-        }
-
-        // console.log(formData);
+        formData.append('_method', 'PUT');
         try {
-            console.log(userToken);
-
-            // ارسال درخواست به بک‌اند
-            const res = await axios.put(
-                "http://app.api/api/profile",
-                formData,
-                {
-                    headers: {
-                        "Authorization": `Bearer ${userToken}`,
-                        "Content-Type": "multipart/form-data",
-                    }
+            const res = await axios.put('http://app.api/api/profile', formData, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`,
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
                 }
-            );
+            });
 
             console.log("🚀 ~ onSubmit ~ res:", res);
 
-            // پاک‌سازی کش و دریافت دوباره اطلاعات
+            // Show success message
+            toast({
+                description: res?.data?.message || "Profile updated successfully",
+                className: "bg-green-300 text-green-950 font-semibold",
+            });
+
+            // Refresh data
             mutate(userToken);
 
-            if (res.status !== 200) throw res;
-        } catch (error) {
-            // مدیریت خطاها
-            setFetchError(error?.response?.data?.message);
-            console.log(error?.response);
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message || "Error updating profile";
+            setFetchError(errorMessage);
+            console.log("🚀 ~ onSubmit ~ error:", error?.response?.data);
+
+            toast({
+                description: errorMessage,
+                className: "bg-red-300 text-red-950 font-semibold",
+            });
         }
     };
 
@@ -148,7 +159,6 @@ function Account() {
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
                         type="file"
                         accept="image/*"
-                        {...register("image")}
                     />
 
                     <Avatar className="cursor-pointer relative z-0 size-full">
@@ -163,14 +173,14 @@ function Account() {
                 </div>
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
-                    {formFields.map((field) => (
+                    {formFields?.map((field) => (
                         <FormInput
                             key={field?.id}
                             id={field?.id}
                             placeholder={field?.placeholder}
                             type={field?.type}
                             nameLabel={field?.nameLabel}
-                            register={field?.register}
+                            register={register(field?.id)}
                             className="w-full border-gray-400"
                         />
                     ))

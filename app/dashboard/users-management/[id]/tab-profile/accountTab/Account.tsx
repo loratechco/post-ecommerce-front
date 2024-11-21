@@ -17,9 +17,19 @@ import formSchema from "./schemaEditProfile";
 
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
+import { toast } from "@/hooks/use-toast";
 // تابع fetcher که با SWR استفاده می‌شود
 
-function Account({ userId, userToken }) {
+const formFields = [
+    { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
+    { id: "last_name", placeholder: "Json", type: "text", nameLabel: "Last Name" },
+    { id: "email", placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
+    { id: "phone", placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" },
+    { id: "newPassword", nameLabel: "New Password", type: 'password' },
+    { id: "confirmation", nameLabel: "Confirmation Password", type: 'password' },
+]
+
+function Account({ userId, userToken }: { userId: string, userToken: string }) {
 
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
@@ -41,13 +51,10 @@ function Account({ userId, userToken }) {
     const userAvatar = watch("image")
     const { preview, previewError } = useImagePreview(userAvatar);
 
-    const formFields = [
-        { id: "name", register: register("name"), placeholder: "Json", type: "text", nameLabel: "Name" },
-        { id: "last_name", register: register("last_name"), placeholder: "Json", type: "text", nameLabel: "Last Name" },
-        { id: "email", register: register("email"), placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
-        { id: "phone", register: register("phone"), placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
-    ]
+    console.log("🚀 ~ useEffect ~ userId:", userId)
 
+
+    // get user data
     useEffect(() => {
 
         const getUser = async () => {
@@ -61,12 +68,15 @@ function Account({ userId, userToken }) {
 
                 console.log("🚀 ~ getUser ~ res:", data)
 
-                setSwitchState(data?.business_customer);  // به‌روزرسانی وضعیت سوییچ
+                const { business_customer } = data?.data;
+
+                setSwitchState(business_customer == 1 && true || false);  // به‌روزرسانی وضعیت سوییچ
+
                 setUserData(data);  // ذخیره داده‌ها در وضعیت
                 reset({
-                    ...data,
-                    image: data?.avatar,
+                    ...data?.data
                 });
+
             } catch (error) {
                 console.log(error);
                 console.log("🚀 ~ getUser ~ error:", error.response.data.message)
@@ -77,56 +87,61 @@ function Account({ userId, userToken }) {
 
     //PUT User Data
     const onSubmit = async (data: FormData) => {
-        // ایجاد یک FormData برای ارسال داده‌ها
         const formData = new FormData();
 
-        // افزودن تصویر (در صورت وجود) به FormData
+        console.log(data);
+        // افزودن آواتار
         if (userAvatar?.[0]) {
             formData.append("avatar", userAvatar[0]);
         }
+        console.log(formData);
 
-        // افزودن سایر داده‌های فرم به صورت جداگانه
-        formData.append("name", data?.name);
-        formData.append("last_name", data?.last_name);
-        formData.append("email", data?.email);
-        formData.append("phone", data?.phone);
-        formData.append("business_customer", '0');
-        formData.append("is_administrator", '0');
+        // افزودن سایر داده‌ها
+        Object.entries({
+            name: data.name,
+            last_name: data.last_name,
+            email: data.email,
+            phone: data.phone,
+            business_customer: switchState ? '1' : '0',
+            is_administrator: '0',
+        }).forEach(([key, value]) => {
+            formData.append(key, value);
+        });
 
-        // چاپ محتویات FormData برای بررسی
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ": " + pair[1]);
-        }
-
-        // console.log(formData);
         try {
-            console.log(userToken);
-
-            // ارسال درخواست به بک‌اند
-            const res = await axios.put(
-                "http://app.api/api/profile",
+            // از متد POST استفاده می‌کنیم، اما _method: PUT را می‌فرستیم
+            const res = await axios.post(
+                `http://app.api/api/users/${userId}`,
                 formData,
                 {
                     headers: {
                         "Authorization": `Bearer ${userToken}`,
                         "Content-Type": "multipart/form-data",
+                        "Accept": "application/json"
                     }
                 }
             );
 
-            console.log("🚀 ~ onSubmit ~ res:", res);
+            toast({
+                description: res?.data?.message || "پروفایل با موفقیت بروزرسانی شد",
+                className: "bg-green-300 text-green-950 font-semibold",
+            });
 
-            if (res.status !== 200) throw res;
-        } catch (error) {
+            console.log(res);
 
-            setFetchError(error?.response?.data?.message);
-            console.log(error?.response);
+        } catch (error: any) {
+            const errorMessage = error?.response?.data?.message || "خطا در بروزرسانی پروفایل";
+            setFetchError(errorMessage);
+            console.error("خطای دریافتی:", error.response?.data);
+
+            toast({
+                description: errorMessage,
+                className: "bg-red-300 text-red-950 font-semibold",
+            });
         }
     };
-
-
+    console.log(switchState);
     const errorMessages = [
-        fetchError,
         previewError, // استفاده از پیام خطا از استیت مشترک
         errors?.name?.message,
         errors?.last_name?.message,
@@ -134,6 +149,8 @@ function Account({ userId, userToken }) {
         errors?.phone?.message,
         errors?.image?.message,
     ];
+
+    console.log(userData?.data?.avatar);
 
     return (
         <>
@@ -150,14 +167,13 @@ function Account({ userId, userToken }) {
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
                         type="file"
                         accept="image/*"
-                        {...register("image")}
                     />
 
                     <Avatar className="cursor-pointer relative z-0 size-full">
                         <AvatarImage
                             src=
                             {
-                                `${userData?.avatar || preview || 'https://github.com/shadcn.png'}`
+                                `${userData?.data?.avatar || preview || 'https://github.com/shadcn.png'}`
                             }
                             className="object-cover" />
                         <AvatarFallback>JS</AvatarFallback>
@@ -172,8 +188,8 @@ function Account({ userId, userToken }) {
                             placeholder={field?.placeholder}
                             type={field?.type}
                             nameLabel={field?.nameLabel}
-                            register={field?.register}
-                            className="w-full border-gray-400"
+                            register={register(field?.id as "name" | "last_name" | "email" | "phone")}
+                            className="w-full"
                         />
                     ))
                     }
@@ -181,8 +197,8 @@ function Account({ userId, userToken }) {
 
                 <div className="flex items-center space-x-2">
                     <Switch
-                        defaultChecked={switchState}
-                        // checked={}
+                        // defaultChecked={switchState}
+                        checked={switchState}
                         // disabled={true}
                         onCheckedChange={(checked) => {
                             setSwitchState(checked);

@@ -9,6 +9,7 @@ const getUserList = async (token: string | null) => {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
             },
+            cache: "no-cache"
         })
 
         console.log("this res ====>", res);
@@ -35,7 +36,7 @@ export default async function UserManagementPage() {
     console.log("🚀 ~ UserManagementPage ~ res:", res?.data)
 
     return (
-        <div className="w-full px-3 overflow-x-hidden">
+        <div className="w-full">
             <UserList
                 userData={res?.data}
             />
