@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 
 import {
@@ -10,7 +9,6 @@ import {
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuTrigger,
-    DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
 import { Search, Filter, ArrowRight, MoreHorizontal, UserRoundPlusIcon, PlusIcon } from 'lucide-react'
@@ -19,7 +17,7 @@ import { useSession } from '@/lib/auth/useSession'
 import TableDesc, { TbodyDesc, TdDesc, ThDesc, TheadDesc, TrDesc } from '@/components/table-responsive/TableDesc'
 import TableCardsMobile, { ActionBtn, CardTable, ContentTable, WrapContent } from '@/components/table-responsive/TableCardsMobile'
 import Link from 'next/link'
-import { DrawerDialogAddUser, DrawerDialogDemo } from "@/components/DialogDrawer"
+import { DrawerDialogAddUser } from "@/components/DialogDrawer"
 
 type FilterType = 'recent' | 'older' | 'a-m' | 'n-z' | null
 
@@ -28,6 +26,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { handleDelete } from './api/fetch'
 const formSchema = z.object({
     name: z.string().min(2, "نام باید حداقل 2 کاراکتر باشد"),
     last_name: z.string().min(2, "نام خانوادگی باید حداقل 2 کاراکتر باشد"),
@@ -37,10 +36,17 @@ const formSchema = z.object({
 });
 type FormData = z.infer<typeof formSchema>;
 
+const addUserFields: { id: string; type?: string; nameLabel: string; placeholder: string; }[] = [
+    { id: "name", type: "text", nameLabel: "Name", placeholder: "John" },
+    { id: "last_name", type: "text", nameLabel: "Last Name", placeholder: "Smith" },
+    { id: "email", nameLabel: "Email", placeholder: "example@gmail.com" },
+    { id: "phone", nameLabel: "Phone Number", placeholder: "090300048" },
+    { id: "password", type: "password", nameLabel: "Password", placeholder: "******" }
+]
+
 export default function UserList({ userData }: { userData: object[] }) {
     const [userListData, setUserListData] = useState<object[]>([])
     const token = useSession();
-    const [open, setOpen] = React.useState(false)
     const [searchTerm, setSearchTerm] = useState('')
 
     useEffect(() => setUserListData(userData), [])
@@ -49,65 +55,30 @@ export default function UserList({ userData }: { userData: object[] }) {
         resolver: zodResolver(formSchema)
     });
 
-    const addUserFields = [
-        { id: "name", type: "text", nameLabel: "Name", placeholder: "John" },
-        { id: "last_name", type: "text", nameLabel: "Last Name", placeholder: "Smith" },
-        { id: "email", nameLabel: "Email", placeholder: "example@gmail.com" },
-        { id: "phone", nameLabel: "Phone Number", placeholder: "090300048" },
-        { id: "password", type: "password", nameLabel: "Password", placeholder: "******" }
-    ]
-
-    const handleEnable = async (data: FormData) => {
+    const handleAddUser = async ({ data, setUserListData, token }: { data: FormData, setUserListData: () => void, token: string }) => {
 
         console.log(data);
-
         try {
-            const res = await axios.put(`http://app.api/api/users/enable/${userId}`, data, {
+            const res = await axios.post(`http://app.api/api/users`, data, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 }
             });
 
-            // بروزرسانی وضعیت کاربر در لیست
-            const updatedUsers = userListData.map(user => {
-                if (user.id === userId) {
-                    return { ...user, is_enabled: !user.is_enabled };
-                }
-                return user;
-            });
-
-            setUserListData(updatedUsers);
+            setUserListData(prev => [...prev, res.data.user]);
 
             toast({
-                description: res?.data?.message || "وضعیت کاربر با موفقیت تغییر کرد",
+                description: "کاربر با موفقیت اضافه شد",
                 className: "bg-green-300 text-green-950 font-semibold",
             });
 
         } catch (error) {
-            const errorMessage = error?.response?.data?.message || "خطا در تغییر وضعیت کاربر";
-            console.log("🚀 ~ handleEnable ~ error:", errorMessage);
-
+            const errorMessage = error?.response?.data?.message || "خطا در افزودن کاربر";
+            console.log("🚀 ~ handleAddUser ~ error:", error)
             toast({
                 description: errorMessage,
                 className: "bg-red-300 text-red-950 font-semibold",
             });
-        }
-    }
-
-    const handleDelete = async (id: string) => {
-        try {
-            const res = await axios.delete(`http://app.api/api/users/${id}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                }
-            });
-            console.log(res);
-            const newUserList = userListData.filter((item) => item?.id !== id);
-
-            setUserListData(newUserList);
-            console.log(userListData);
-        } catch (error) {
-            console.log("🚀 ~ handleDelete ~ error:", error?.response?.data?.message)
         }
     }
 
@@ -144,7 +115,16 @@ export default function UserList({ userData }: { userData: object[] }) {
                         </div>
                     </div>
                 </div>
-                <DrawerDialogAddUser />
+                <DrawerDialogAddUser
+                    onSubmit={handleSubmit((data) => handleAddUser({
+                        data,
+                        setUserListData,
+                        token
+                    }))}
+                    fields={addUserFields}
+                    register={register}
+                    errors={errors}
+                />
             </div>
 
             {/* table for desctop  */}
@@ -186,7 +166,10 @@ export default function UserList({ userData }: { userData: object[] }) {
                                         <Link href={`/dashboard/users-management/${person?.id}`}>
                                             <DropdownMenuItem>Edit</DropdownMenuItem>
                                         </Link>
-                                        <DropdownMenuItem onClick={() => handleDelete(person?.id)}>Delete</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleDelete({
+                                            id: person?.id,
+                                            token
+                                        })}>Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TdDesc>
@@ -208,7 +191,7 @@ export default function UserList({ userData }: { userData: object[] }) {
                             />
                         </WrapContent>
                         <ActionBtn
-                            handleDelete={handleDelete}
+                            handleDelete={(id) => handleDelete({ id, token })}
                             hrefEdit={'/dashboard/users-management'}
                             userId={person?.id}
                         />

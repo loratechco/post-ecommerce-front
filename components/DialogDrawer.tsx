@@ -23,8 +23,51 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import FormInput from "./FormInput"
 
-export function DrawerDialogAddUser() {
+interface ProfileFormProps extends React.ComponentProps<"form"> {
+    onSubmit: (data: any) => void;
+    fields: {
+        id: string;
+        type: string;
+        nameLabel: string;
+        placeholder?: string;
+    }[];
+    register: any;
+    errors: any;
+}
+
+function ProfileForm({ className, onSubmit, fields, register, errors }: ProfileFormProps) {
+    return (
+        <form onSubmit={onSubmit} className={cn("grid items-start gap-4", className)}>
+            {fields.map((field) => (
+                <FormInput
+                    key={field.id}
+                    id={field.id}
+                    type={field.type || "text"}
+                    nameLabel={field.nameLabel}
+                    placeholder={field.placeholder}
+                    register={register(field.id)}
+                />
+            ))}
+            <Button type="submit">ذخیره تغییرات</Button>
+        </form>
+    )
+}
+
+interface DrawerDialogAddUserProps {
+    onSubmit: (data: any) => void;
+    fields: {
+        id: string;
+        type: string;
+        nameLabel: string;
+        placeholder?: string;
+    }[];
+    register: any;
+    errors: any;
+}
+
+export function DrawerDialogAddUser({ onSubmit, fields, register, errors }: DrawerDialogAddUserProps) {
     const [open, setOpen] = React.useState(false)
     const isDesktop = useMediaQuery("(min-width: 768px)")
 
@@ -32,16 +75,21 @@ export function DrawerDialogAddUser() {
         return (
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">create user</Button>
+                    <Button variant="outline">ایجاد کاربر جدید</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>Create new user</DialogTitle>
+                        <DialogTitle>ایجاد کاربر جدید</DialogTitle>
                         <DialogDescription>
-                            Make changes to your profile here. Click save when you're done.
+                            لطفا اطلاعات کاربر جدید را وارد کنید
                         </DialogDescription>
                     </DialogHeader>
-                    <ProfileForm />
+                    <ProfileForm
+                        onSubmit={onSubmit}
+                        fields={fields}
+                        register={register}
+                        errors={errors}
+                    />
                 </DialogContent>
             </Dialog>
         )
@@ -59,7 +107,13 @@ export function DrawerDialogAddUser() {
                         Make changes to your profile here. Click save when you're done.
                     </DrawerDescription>
                 </DrawerHeader>
-                <ProfileForm className="px-4" />
+                <ProfileForm
+                    className="px-4"
+                    onSubmit={onSubmit}
+                    fields={fields}
+                    register={register}
+                    errors={errors}
+                />
                 <DrawerFooter className="pt-2">
                     <DrawerClose asChild>
                         <Button variant="outline">Cancel</Button>
@@ -70,18 +124,3 @@ export function DrawerDialogAddUser() {
     )
 }
 
-function ProfileForm({ className }: React.ComponentProps<"form">) {
-    return (
-        <form className={cn("grid items-start gap-4", className)}>
-            <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input type="email" id="email" defaultValue="shadcn@example.com" />
-            </div>
-            <div className="grid gap-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" defaultValue="@shadcn" />
-            </div>
-            <Button type="submit">Save changes</Button>
-        </form>
-    )
-}
