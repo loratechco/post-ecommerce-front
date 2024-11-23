@@ -12,7 +12,7 @@ const formSchema = z.object({
     email: z.string()
         .email({ message: "Please enter a valid email address" }),
 
-    "phone": z.string()
+    phone: z.string()
         .regex(/^09\d{9}$/, { message: "Phone number must be in the format 09XXXXXXXXX" }),
 
 });

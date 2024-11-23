@@ -71,7 +71,7 @@ export function ActionBtn({
 
 export default function TableCardsMobile({ children }: Child) {
     return (
-        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center px-3 pt-5">
+        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center pt-5">
             {children}
         </div>
     );

@@ -2,10 +2,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Account from "./accountTab/Account";
 
-import ChangePassword from "./ChangeUserPassword";
-// this is token context
-// import { useSession } from "@/lib/auth/useSession";
-import Link from "next/link";
 import Permission from "./permissionTab/PermissionAccordion";
 import { useSession } from "@/lib/auth/useSession";
 

@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   Home,
   LogOut,
+  MessagesSquare,
   Settings2,
   User2,
   Users2,
@@ -56,6 +57,11 @@ const data = {
       title: 'User Management',
       url: BASE_ROUTE + "/users-management",
       icon: Users2,
+    },
+    {
+      title: 'Tickets',
+      url: BASE_ROUTE + "/ticketing",
+      icon: MessagesSquare,
     },
     {
       title: "Settings",

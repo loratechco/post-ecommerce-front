@@ -189,8 +189,7 @@ function Account() {
 
                 <div className="flex items-center space-x-2">
                     <Switch
-                        defaultChecked={switchState}
-                        // checked={}
+                        checked={switchState}
                         // disabled={true}
                         onCheckedChange={(checked) => {
                             setSwitchState(checked);

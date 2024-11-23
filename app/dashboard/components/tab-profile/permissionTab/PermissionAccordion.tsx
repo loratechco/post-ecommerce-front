@@ -14,21 +14,13 @@ import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import useSWR, { mutate } from 'swr'
 import { useToast } from "@/hooks/use-toast";
-// Define the types for our data structure
-type SwitchItem = {
-    id: string
-    name: string
-}
 
-type AccordionItemData = {
-    id: string
-    title: string
-    switches: SwitchItem[]
-}
+const dataFetcher = async (url: string, userToken: string) => {
 
-const dataFetcher = async (url, userToken) => {
+    console.log(userToken);
     try {
-        const res = await axios.get(url, {
+        const res = await axios.post(url, { user_id: 0 }, {
+
             headers: {
                 Authorization: `Bearer ${userToken}`,
             },
@@ -41,7 +33,6 @@ const dataFetcher = async (url, userToken) => {
     }
 };
 
-
 // The main component
 export default function Permission() {
     const { toast } = useToast();
@@ -51,15 +42,16 @@ export default function Permission() {
 
     const { data, error, isLoading } = useSWR(
         token ? ['permission-data', `http://app.api/api/permissions`] : null,
-        ([_, url]) => dataFetcher(url, token)
+        ([_, url]) => dataFetcher(url, token),
+        {
+            errorRetryCount: 2
+        }
     );
 
-    console.log("🚀 ~ Permission ~ data:", error, 'data ====>>')
+    console.log("🚀 ~ Permission ~ data:", error, 'isLoading ====>>', isLoading)
 
     const [accordionItemComponent, setAccordionItemComponent] = useState<JSX.Element[] | null>(null)
-    // State to keep track of switch statuses
     const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({})
-    // State to store the result of active switches
     const [activeItems, setActiveItems] = useState<string[]>([])
 
     const [activeInit, setActiveInit] = useState([])
@@ -71,6 +63,8 @@ export default function Permission() {
 
     // Handle send button click
     const handleSend = useCallback(async () => {
+
+        console.log(switchStates);
         const active = Object.entries(switchStates)
             .filter(([, isActive]) => isActive)
             .map(([id]) => id)
@@ -101,7 +95,7 @@ export default function Permission() {
 
         } catch (error) {
             toast({
-                description: error?.response?.data?.message || "this error",
+                description: error?.response?.data?.message || "Failed to assign permissions. Please try again.",
                 duration: 3000,
                 className: "bg-red-200 text-red-800",
             });
@@ -113,10 +107,9 @@ export default function Permission() {
 
     useEffect(() => {
         if (data) {
-            // پیمایش آرایه اصلی و استخراج سوییچ‌هایی که can آن‌ها برابر با true است
-            data.forEach(item => {
+            data?.forEach(item => {
                 const activeSwitchIds = item.switches
-                    .filter(switchObj => switchObj.can === true)  // فیلتر کردن سوییچ‌های فعال
+                    .filter(switchObj => switchObj.can === true)
                     .map(switchObj => switchObj.id);
 
                 // لاگ گرفتن سوییچ‌های فعال
@@ -128,22 +121,6 @@ export default function Permission() {
             });
         }
     }, [data]);
-
-
-
-    // Initialize switch states when data is loaded
-    // useEffect(() => {
-    //     if (data) {
-    //         const initialStates = {};
-    //         data?.forEach(item => {
-    //             item?.switches?.forEach(switchItem => {
-    //                 initialStates[switchItem?.id] = switchItem?.can;
-    //             });
-    //         });
-    //         setSwitchStates(initialStates);
-    //     }
-    // }, [data]);
-
 
     const dynamicAccordionItem = useMemo(() => {
 
@@ -168,7 +145,7 @@ export default function Permission() {
                                         className='data-[state=unchecked]:!bg-gray-400'
                                         id={switchItem.id}
                                         defaultChecked={switchItem?.can || false}
-                                        onCheckedChange={(checked) => handleSwitchChange(switchItem.id, checked)}
+                                        onCheckedChange={(checked) => handleSwitchChange(switchItem?.id, checked)}
                                     />
                                 </div>
                             ))}

@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Search, Filter, ArrowRight, MoreHorizontal, UserRoundPlusIcon, PlusIcon } from 'lucide-react'
+import { Search, ArrowRight, MoreHorizontal, } from 'lucide-react'
 import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import TableDesc, { TbodyDesc, TdDesc, ThDesc, TheadDesc, TrDesc } from '@/components/table-responsive/TableDesc'
@@ -19,46 +19,51 @@ import TableCardsMobile, { ActionBtn, CardTable, ContentTable, WrapContent } fro
 import Link from 'next/link'
 import { DrawerDialogAddUser } from "@/components/DialogDrawer"
 
-type FilterType = 'recent' | 'older' | 'a-m' | 'n-z' | null
-
 import * as React from "react"
 import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
-import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { handleDelete } from './api/fetch'
-const formSchema = z.object({
-    name: z.string().min(2, "نام باید حداقل 2 کاراکتر باشد"),
-    last_name: z.string().min(2, "نام خانوادگی باید حداقل 2 کاراکتر باشد"),
-    email: z.string().email("ایمیل نامعتبر است"),
-    phone: z.string().min(10, "شماره تلفن باید حداقل 10 رقم باشد"),
-    password: z.string().min(6, "رمز عبور باید حداقل 6 کاراکتر باشد"),
-    search: z.string(),
-});
-type FormData = z.infer<typeof formSchema>;
+import { PaginationComponent } from '@/components/pagination'
+import { handleDelete, getUserList } from '@/app/actions/userActions'
+import formSchema, { FormData } from './schema'
+import { addUserFields, FormField } from './formFields'
+import ErrorToast from '@/components/ErrorToast'
 
-const addUserFields: { id: string; type?: string; nameLabel: string; placeholder: string; }[] = [
-    { id: "name", type: "text", nameLabel: "Name", placeholder: "John" },
-    { id: "last_name", type: "text", nameLabel: "Last Name", placeholder: "Smith" },
-    { id: "email", nameLabel: "Email", placeholder: "example@gmail.com" },
-    { id: "phone", nameLabel: "Phone Number", placeholder: "090300048" },
-    { id: "password", type: "password", nameLabel: "Password", placeholder: "******" }
-]
-
-export default function UserList({ userData }: { userData: object[] }) {
+export default function UserList() {
 
     const token = useSession();
     const [userListData, setUserListData] = useState<object[]>([])
-    const [searchTerm, setSearchTerm] = useState('')
 
-    useEffect(() => setUserListData(userData), [])
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const { success, data, error } = await getUserList(token);
+            if (success) {
+                setUserListData(data);
+            }
+
+            if (error) {
+                toast({
+                    description: error,
+                    className: 'bg-red-300 text-red-950'
+                });
+            }
+        };
+
+        fetchUsers();
+    }, [token]);
 
     const { register, setValue, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema)
     });
+    // toast value
+    const { duration, successClass, errorClass } = {
+        successClass: "bg-green-300 text-green-950 font-semibold",
+        errorClass: "bg-red-300 text-red-950 font-semibold",
+        duration: 3000,
+    }
 
     const query = watch('search');
-
+    // search handler 
     useEffect(() => {
 
         const timeOuteId = setTimeout(() => {
@@ -98,23 +103,66 @@ export default function UserList({ userData }: { userData: object[] }) {
             setUserListData(prev => [...prev, res.data.user]);
 
             toast({
-                description: "کاربر با موفقیت اضافه شد",
-                className: "bg-green-300 text-green-950 font-semibold",
+                description: "User added successfully",
+                className: successClass,
+                duration,
             });
 
         } catch (error) {
-            const errorMessage = error?.response?.data?.message || "خطا در افزودن کاربر";
+            const errorMessage = error?.response?.data?.message || "Error adding user";
             console.log("🚀 ~ handleAddUser ~ error:", error)
             toast({
                 description: errorMessage,
-                className: "bg-red-300 text-red-950 font-semibold",
+                className: errorClass,
+                duration,
             });
         }
     }
 
+    const deleteUser = async (person: object) => {
+        try {
+            const {
+                success,
+                error,
+                data
+            } = await handleDelete({ id: person?.id, token });
+
+            if (!success) throw new Error(error);
+            setUserListData(data);
+
+            toast({
+                title: "Successful",
+                description: "User deleted successfully",
+                className: successClass,
+                duration,
+            });
+        } catch (error) {
+            toast({
+                title: "Unsuccessful",
+                description: error?.message || "An error occurred while deleting the user",
+                className: errorClass,
+                duration,
+            });
+            console.log("🚀 ~ deleteUser ~ error:", error);
+        }
+    }
+
+    const errorArray = [
+        errors?.name?.message,
+        errors?.last_name?.message,
+        errors?.email?.message,
+        errors?.phone?.message,
+    ]
+
     return (
         <section className="w-full">
-            <h1 className="text-2xl font-bold mb-4">مدیریت کاربران</h1>
+
+            <ErrorToast
+                dependency={errors}
+                errorMessagesArray={errorArray}
+            />
+
+            <h1 className="text-2xl font-bold mb-4">Users Management</h1>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-4">
                 <div className="relative w-full sm:w-64">
                     <div className="space-y-2">
@@ -145,11 +193,13 @@ export default function UserList({ userData }: { userData: object[] }) {
                     </div>
                 </div>
                 <DrawerDialogAddUser
-                    onSubmit={handleSubmit((data) => handleAddUser({
-                        data,
-                        setUserListData,
-                        token
-                    }))}
+                    onSubmit={handleSubmit((data) =>
+                        handleAddUser({
+                            data,
+                            setUserListData,
+                            token
+                        }))}
+
                     fields={addUserFields}
                     register={register}
                     errors={errors}
@@ -173,15 +223,12 @@ export default function UserList({ userData }: { userData: object[] }) {
                             <TdDesc>
                                 <p>{person?.name}</p>
                             </TdDesc>
-
                             <TdDesc>
                                 <p>{person?.email}</p>
                             </TdDesc>
-
                             <TdDesc>
                                 <p>{person?.phone}</p>
                             </TdDesc>
-
                             <TdDesc>
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild >
@@ -195,10 +242,7 @@ export default function UserList({ userData }: { userData: object[] }) {
                                         <Link href={`/dashboard/users-management/${person?.id}`}>
                                             <DropdownMenuItem>Edit</DropdownMenuItem>
                                         </Link>
-                                        <DropdownMenuItem onClick={() => handleDelete({
-                                            id: person?.id,
-                                            token
-                                        })}>Delete</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </TdDesc>
@@ -220,13 +264,22 @@ export default function UserList({ userData }: { userData: object[] }) {
                             />
                         </WrapContent>
                         <ActionBtn
-                            handleDelete={(id) => handleDelete({ id, token })}
+                            handleDelete={() => deleteUser(person)}
                             hrefEdit={'/dashboard/users-management'}
                             userId={person?.id}
                         />
                     </CardTable>
                 ))}
             </TableCardsMobile>
+
+
+            {/* Pagination */}
+
+            <div className="pt-7">
+                <PaginationComponent
+                    mapData={userListData || []}
+                />
+            </div>
         </section >
     )
 }

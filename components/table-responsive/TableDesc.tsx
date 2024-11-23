@@ -1,16 +1,6 @@
 import { ReactNode } from "react";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
-import { Button } from "../ui/button";
-import Link from "next/link";
+
 // ScrollArea from ShadCn/ui
 
 type TbodyProps = {
@@ -36,7 +26,7 @@ export function TheadDesc({ children }: Child) {
     )
 }
 
-// TRow for wrap all conten 
+// TRow for wrap all content
 export function TrDesc({ children }: Child) {
 
     return (
@@ -82,13 +72,13 @@ export function TdDesc({ children }: Child) {
 
 export default function TableDesc({ children }: Child) {
     return (
-        <div className="hidden lg:flex lg:flex-col overflow-x-auto w-full px-2 lg:px-4">
+        <div className="hidden lg:flex lg:flex-col overflow-x-auto w-full pt-5 ">
 
-            <ScrollArea className='bg-[#e2e2e7] p-3 rounded-lg' >
+            <ScrollArea className='bg-[#e2e2e7] px-3 rounded-lg' >
                 <div className="sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full sm:px-5 lg:px-4">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full text-left text-sm font-light">
+                            <table className="min-w-full text-center text-sm font-light">
                                 {children}
                             </table>
                         </div>

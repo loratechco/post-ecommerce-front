@@ -7,11 +7,14 @@ import ErrorToast from "@/components/ErrorToast";
 import FormInput from "@/components/FormInput";
 import { formSchema } from "./passwordShema";
 
-import useSWR from "swr";
 import axios from "axios";
 import { useSession } from "@/lib/auth/useSession";
-import { useEffect } from "react";
 
+const formFields = [
+    { id: "oldPassword", nameLabel: "Old Password" },
+    { id: "newPassword", nameLabel: "New Password" },
+    { id: "confirmation", nameLabel: "Confirmation Password" },
+]
 
 import { useToast } from "@/hooks/use-toast";
 export default function ChangePassword() {
@@ -19,16 +22,9 @@ export default function ChangePassword() {
     const token = useSession()
     const { toast } = useToast();
 
-
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
     });
-
-    const formFields = [
-        { id: "oldPassword", register: register("oldPassword"), nameLabel: "Old Password" },
-        { id: "newPassword", register: register("newPassword"), nameLabel: "New Password" },
-        { id: "confirmation", register: register("confirmation"), nameLabel: "Confirmation Password" },
-    ]
 
     const onSubmit = async ({
         confirmation: password_confirmation,
@@ -88,10 +84,10 @@ export default function ChangePassword() {
                         id={field?.id}
                         type='password'
                         nameLabel={field?.nameLabel}
-                        register={field?.register}
-                        className="border-none"
-                        placeholder="least 6 characters long"
-                        classNameParentPasswordInput='w-full lg:w-1/2'
+                        register={...register(field?.id)}
+                className="border-none"
+                placeholder="least 6 characters long"
+                classNameParentPasswordInput='w-full lg:w-1/2'
                     />
                 ))}
             </div>

@@ -39,13 +39,13 @@ export default function TicketChat() {
     }
 
     return (
-        <div className="flex flex-col h-[calc(100vh-4rem)] w-full mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className=" flex flex-col size-full bg-white overflow-hidden">
             {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className="flex-1 w-full max-sm:text-xs px-4">
                 {messages.map((message) => (
                     <div key={message.id} className={`flex mb-4 ${message.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`flex items-start ${message.sender === 'admin' ? 'flex-row-reverse' : ''}`}>
-                            <Avatar className="w-8 h-8">
+                            <Avatar className="size-8">
                                 <AvatarFallback>{message.sender === 'admin' ? 'A' : 'C'}</AvatarFallback>
                             </Avatar>
                             <div className={`mx-2 ${message.sender === 'admin' ? 'text-right' : 'text-left'}`}>
@@ -60,20 +60,19 @@ export default function TicketChat() {
             </ScrollArea>
 
             {/* Message Input */}
-            <div className="border-t rounded-xl p-4 overflow-hidden bg-gray-300">
-                <div className="flex items-center">
+            <div className="rounded-md p-3.5 bg-zinc-200 overflow-hidden ">
+                <div className="flex items-center max-sm:text-xs">
                     <Input
                         type="text"
                         placeholder="Type your message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                        className="flex-1 mr-2"
-                        
+                        className="flex-1 mr-2 focus:outline-none border-zinc-400 py-5 focus-visible:border-zinc-600 focus-visible:ring-0"
                     />
-                    <Button onClick={handleSendMessage} size="sm">
+                    <Button onClick={handleSendMessage} size="sm" className='py-5 max-sm:text-xs'>
                         <Send className="h-4 w-4 mr-1" />
-                        Send
+                        <p className='text-sm'>Send</p>
                     </Button>
                 </div>
             </div>

@@ -24,7 +24,7 @@ function DashboardLayout({
                 <SidebarInset>
                     <HeaderDasboard />
                     <Suspense fallback={<Skeleton />}>
-                        <section className="">
+                        <section className="px-5">
                             {children}
                         </section>
                     </Suspense>
