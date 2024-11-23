@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -24,9 +24,21 @@ export default function TicketChat() {
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [newMessage, setNewMessage] = useState('')
 
+
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
+
+    // اسکرول به پایین هر زمان که پیام‌ها تغییر می‌کنند
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages])
+
     const handleSendMessage = () => {
         if (newMessage.trim() === '') return
-
+        scrollToBottom()
         const message: Message = {
             id: Date.now().toString(),
             sender: 'admin',
@@ -41,15 +53,16 @@ export default function TicketChat() {
     return (
         <div className=" flex flex-col size-full bg-white overflow-hidden">
             {/* Messages */}
-            <ScrollArea className="flex-1 w-full max-sm:text-xs px-4">
+            <ScrollArea className="flex-1 w-full max-sm:text-xs px-4" >
                 {messages.map((message) => (
-                    <div key={message.id} className={`flex mb-4 ${message.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
+                    <div key={message.id} ref={messagesEndRef} className={`flex mb-7 ${message.sender === 'admin' ? 'justify-end' : 'justify-start'}`}>
                         <div className={`flex items-start ${message.sender === 'admin' ? 'flex-row-reverse' : ''}`}>
                             <Avatar className="size-8">
                                 <AvatarFallback>{message.sender === 'admin' ? 'A' : 'C'}</AvatarFallback>
                             </Avatar>
                             <div className={`mx-2 ${message.sender === 'admin' ? 'text-right' : 'text-left'}`}>
-                                <div className={`p-2 rounded-lg shadow ${message.sender === 'admin' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
+
+                                <div className={`px-2 py-2.5 rounded-lg shadow ${message.sender === 'admin' ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
                                     {message.content}
                                 </div>
                                 <p className="text-xs text-gray-500 mt-1">{message.timestamp}</p>

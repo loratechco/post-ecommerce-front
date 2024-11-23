@@ -57,17 +57,18 @@ function Account() {
             last_name: '',
             email: '',
             phone: '',
+            image: null,
         },
     });
 
     const userAvatar = watch("image")
     const { preview, previewError } = useImagePreview(userAvatar);
 
+
     // get data from api
     useEffect(() => {
-        console.log(error);
+        console.log(error, data);
         if (data) {
-            const { name, last_name, email, phone } = data;
             setSwitchState(data?.business_customer);  // به‌روزرسانی وضعیت سوییچ
             setUserData(data);  // ذخیره داده‌ها در وضعیت
             reset({
@@ -77,9 +78,9 @@ function Account() {
         }
     }, [data])
 
-
     //PUT User Data
     const onSubmit = async (data: FormData) => {
+        console.log(userAvatar[0]);
         // Create FormData instance
         const formData = new FormData();
 
@@ -100,9 +101,8 @@ function Account() {
             formData.append(key, value);
         });
 
-        formData.append('_method', 'PUT');
         try {
-            const res = await axios.put('http://app.api/api/profile', formData, {
+            const res = await axios.post('http://app.api/api/profile', formData, {
                 headers: {
                     'Authorization': `Bearer ${userToken}`,
                     'Content-Type': 'multipart/form-data',
@@ -110,7 +110,6 @@ function Account() {
                 }
             });
 
-            console.log("🚀 ~ onSubmit ~ res:", res);
 
             // Show success message
             toast({
@@ -133,7 +132,6 @@ function Account() {
         }
     };
 
-
     const errorMessages = [
         fetchError,
         previewError, // استفاده از پیام خطا از استیت مشترک
@@ -143,6 +141,7 @@ function Account() {
         errors?.phone?.message,
         errors?.image?.message,
     ];
+
 
     return (
         <>
@@ -159,14 +158,15 @@ function Account() {
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
                         type="file"
                         accept="image/*"
+                        {...register("image")}
                     />
 
                     <Avatar className="cursor-pointer relative z-0 size-full">
                         <AvatarImage
-                            src=
-                            {
-                                `${userData?.avatar || preview || 'https://github.com/shadcn.png'}`
+                            src={
+                                `${preview || 'http://app.api/' + userData?.avatar || 'https://github.com/shadcn.png'}`
                             }
+
                             className="object-cover" />
                         <AvatarFallback>JS</AvatarFallback>
                     </Avatar>

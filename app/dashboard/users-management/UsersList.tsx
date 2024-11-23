@@ -127,7 +127,11 @@ export default function UserList() {
                 data
             } = await handleDelete({ id: person?.id, token });
 
-            if (!success) throw new Error(error);
+            if (!success) {
+
+
+                throw new Error(error)
+            };
             setUserListData(data);
 
             toast({
@@ -271,7 +275,6 @@ export default function UserList() {
                     </CardTable>
                 ))}
             </TableCardsMobile>
-
 
             {/* Pagination */}
 

@@ -12,7 +12,14 @@ function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData
     });
 
     useEffect(() => {
-        if (!fileInput || !fileInput[0]) return;
+        console.log('fileInput', fileInput);
+        if (!fileInput || !fileInput[0]) {
+            setImageData({
+                preview: null,
+                previewError: null,
+            });
+            return;
+        }
 
         const file = fileInput[0];
         if (file.size <= maxSizeMB * 1024 * 1024) {
@@ -23,14 +30,14 @@ function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData
             });
         } else {
             setImageData({
-                preview: null, // حفظ پیش‌نمایش قبلی در صورت خطا
+                preview: null,
                 previewError: `File size is too large. Please select an image smaller than ${maxSizeMB} MB.`,
             });
         }
 
         return () => {
             if (fileInput && fileInput[0]) {
-                URL.revokeObjectURL(fileInput[0]);
+                URL.revokeObjectURL(imageData.preview!);
             }
         };
     }, [fileInput, maxSizeMB]);
