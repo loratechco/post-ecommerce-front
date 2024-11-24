@@ -9,6 +9,5 @@ export function useSession() {
   if (session === undefined)
     throw new Error("useSession must be used within a SessionProvider");
 
-
   return session;
 }

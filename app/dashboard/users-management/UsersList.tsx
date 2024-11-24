@@ -24,7 +24,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PaginationComponent } from '@/components/pagination'
-import { handleDelete, getUserList } from '@/app/actions/userActions'
+import { handleDelete, userListFetch } from '@/app/actions/userActions'
 import formSchema, { FormData } from './schema'
 import { addUserFields, FormField } from './formFields'
 import ErrorToast from '@/components/ErrorToast'
@@ -36,9 +36,27 @@ export default function UserList() {
 
     useEffect(() => {
         const fetchUsers = async () => {
-            const { success, data, error } = await getUserList(token);
+            const { success, data, error } = await userListFetch();
+            // this structher user list data
+            //     from: 1, …
+            // }
+            // current_page: 1
+            // data: Array(10)[{… }, {… }, {… }, … ]
+            // first_page_url: "http://app.api/api/users?page=1"
+            // from: 1
+            // last_page: 4
+            // last_page_url: "http://app.api/api/users?page=4"
+            // links: Array(6)[{… }, {… }, {… }, … ]
+            // next_page_url: "http://app.api/api/users?page=2"
+            // path: "http://app.api/api/users"
+            // per_page: 10
+            // prev_page_url: null
+            // to: 10
+            // total: 32
+            console.log(data);
             if (success) {
-                setUserListData(data);
+                setUserListData(data?.data);
+                console.log('userListData ==>', userListData, success, data);
             }
 
             if (error) {
@@ -53,7 +71,8 @@ export default function UserList() {
     }, [token]);
 
     const { register, setValue, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
-        resolver: zodResolver(formSchema)
+        resolver: zodResolver(formSchema),
+
     });
     // toast value
     const { duration, successClass, errorClass } = {
@@ -65,23 +84,24 @@ export default function UserList() {
     const query = watch('search');
     // search handler 
     useEffect(() => {
-
         const timeOuteId = setTimeout(() => {
             const search = async () => {
                 try {
-                    const { data } = await axios.get(`http://app.api/api/users?search=${query}`, {
+                    const { data: { data: { data } }, status } = await axios.get(`http://app.api/api/users?search=${query}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             "Content-Type": "application/json"
                         },
                     });
-                    console.log(data);
-                    setUserListData(data?.data)
+                    setUserListData(data)
+
+                    console.log('data', data);
 
                 } catch (error) {
                     toast({
                         description: error?.data?.message,
-                        className: 'bg-red-300 text-red-950'
+                        className: 'bg-red-300 text-red-950',
+                        duration
                     })
                 }
             }
@@ -92,7 +112,6 @@ export default function UserList() {
     }, [query])
 
     const handleAddUser = async ({ data, setUserListData, token }: { data: FormData, setUserListData: () => void, token: string }) => {
-        console.log(data);
         try {
             const res = await axios.post(`http://app.api/api/users`, data, {
                 headers: {
@@ -125,13 +144,9 @@ export default function UserList() {
                 success,
                 error,
                 data
-            } = await handleDelete({ id: person?.id, token });
+            } = await handleDelete({ id: person?.id });
 
-            if (!success) {
-
-
-                throw new Error(error)
-            };
+            if (!success) throw new Error(error)
             setUserListData(data);
 
             toast({

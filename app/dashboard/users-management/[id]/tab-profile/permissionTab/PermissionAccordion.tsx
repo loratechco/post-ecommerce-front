@@ -12,30 +12,17 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
-import useSWR, { mutate } from 'swr'
 import { useToast } from "@/hooks/use-toast";
-// Define the types for our data structure
-type SwitchItem = {
-    id: string
-    name: string
-}
+import { getUserPermissions } from '@/app/actions/userActions'
 
-type AccordionItemData = {
-    id: string
-    title: string
-    switches: SwitchItem[]
-}
 
 // The main component
-export default function Permission({ userId, userToken }) {
+export default function Permission({ userId }: { userId: string }) {
     const { toast } = useToast();
-
     const token = useSession();
 
-    const [accordionItemComponent, setAccordionItemComponent] = useState<JSX.Element[] | null>(null)
-    // State to keep track of switch statuses
+    const [accordionData, setAccordionData] = useState<JSX.Element[] | null>(null)
     const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({})
-    // State to store the result of active switches
     const [activeItems, setActiveItems] = useState<string[]>([])
 
     // Handle switch toggle
@@ -84,44 +71,50 @@ export default function Permission({ userId, userToken }) {
 
     }, [switchStates])
 
+    useEffect(() => {
+        getUserPermissions(userId)
+            .then((data) => setAccordionData(data));
+    }, [userId]);
 
-    // const dynamicAccordionItem = useMemo(() => {
+    console.log(accordionData);
 
-    //     if (data) {
-    //         console.log(activeItems);
-    //         console.log(data);
-    //         return data.map((item) => (
-    //             <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'>
-    //                 <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>{item.title}</AccordionTrigger>
-    //                 <AccordionContent className='pb-0'>
-    //                     <div className="">
-    //                         {item?.switches.map((switchItem) => (
-    //                             <div
-    //                                 key={switchItem.id}
-    //                                 className="flex items-center justify-between py-4 italic">
-    //                                 <Label htmlFor={switchItem.id} className='cursor-pointer select-none'>{
-    //                                     switchItem.name
-    //                                 }</Label>
-    //                                 <Switch
-    //                                     className='data-[state=unchecked]:!bg-gray-400'
-    //                                     id={switchItem.id}
-    //                                     // checked={switchStates[switchItem.id] || false}
-    //                                     onCheckedChange={(checked) => handleSwitchChange(switchItem.id, checked)}
-    //                                 />
-    //                             </div>
-    //                         ))}
-    //                     </div>
-    //                 </AccordionContent>
-    //             </AccordionItem>
-    //         ))
-    //     }
+    const dynamicAccordionItem = useMemo(() => {
 
-    // }, [data, handleSwitchChange])
+        if (accordionData) {
+            console.log(activeItems);
+            console.log(accordionData);
+            return accordionData?.map((item) => (
+                <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'>
+                    <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>{item.title}</AccordionTrigger>
+                    <AccordionContent className='pb-0'>
+                        <div className="">
+                            {item?.switches.map((switchItem) => (
+                                <div
+                                    key={switchItem.id}
+                                    className="flex items-center justify-between py-4 italic">
+                                    <Label htmlFor={switchItem.id} className='cursor-pointer select-none'>{
+                                        switchItem.name
+                                    }</Label>
+                                    <Switch
+                                        className='data-[state=unchecked]:!bg-gray-400'
+                                        id={switchItem.id}
+                                        // checked={switchStates[switchItem.id] || false}
+                                        onCheckedChange={(checked) => handleSwitchChange(switchItem.id, checked)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            ))
+        }
+
+    }, [accordionData, handleSwitchChange])
 
     return (
         <div className="w-full pt-3">
             <Accordion type="single" collapsible className="w-full">
-                {/* {dynamicAccordionItem} */}
+                {dynamicAccordionItem}
             </Accordion>
 
             <Button onClick={handleSend} className="w-[6rem] mt-3">Send</Button>

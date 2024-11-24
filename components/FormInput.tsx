@@ -44,13 +44,12 @@ function FormInput(
         >
 
             <Label
-
                 key={(id + "lable")}
                 htmlFor={id}>{nameLabel}</Label>
-
             <div
                 className={cn(
                     classNameParentPasswordInput,
+                    'mt-1',
                     { "flex items-center justify-between border rounded-md px-2 border-gray-400": isPasswordType },
                 )}>
                 <Input
