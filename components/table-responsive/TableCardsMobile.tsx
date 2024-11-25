@@ -10,15 +10,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface Child {
     children: ReactNode;
 }
 
-export function CardTable({ children }: Child) {
+export function CardTable({ children, className }: Child & { className?: string }) {
 
     return (
-        <div className="w-full flex items-center justify-between rounded-lg min-h-20 py-2 px-4 bg-gray-300 shadow-md">
+        <div className={
+            cn(
+                'w-full flex items-center justify-between rounded-lg min-h-20 py-2 px-4 bg-gray-300 shadow-md',
+                className
+            )
+        }>
             {children}
         </div>
     )

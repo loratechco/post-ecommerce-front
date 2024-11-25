@@ -24,13 +24,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from '@/hooks/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PaginationComponent } from '@/components/pagination'
-import { handleDelete, userListFetch } from '@/app/actions/userActions'
+import { handleDelete, userListFetch } from '@/app/actions/userListActions'
 import formSchema, { FormData } from './schema'
 import { addUserFields, FormField } from './formFields'
 import ErrorToast from '@/components/ErrorToast'
+import { usePermissions } from '@/lib/user-permissions/PermissionsProvider'
 
 export default function UserList() {
-
     const token = useSession();
     const [userListData, setUserListData] = useState<object[]>([])
 
@@ -60,6 +60,7 @@ export default function UserList() {
             }
 
             if (error) {
+                console.log('error ==>', error);
                 toast({
                     description: error,
                     className: 'bg-red-300 text-red-950'
@@ -111,7 +112,7 @@ export default function UserList() {
         return () => clearTimeout(timeOuteId);
     }, [query])
 
-    const handleAddUser = async ({ data, setUserListData, token }: { data: FormData, setUserListData: () => void, token: string }) => {
+    const handleAddUser = async ({ data, setUserListData }: { data: FormData, setUserListData: () => void }) => {
         try {
             const res = await axios.post(`http://app.api/api/users`, data, {
                 headers: {
@@ -120,6 +121,9 @@ export default function UserList() {
             });
 
             setUserListData(prev => [...prev, res.data.user]);
+
+            // رفرش کردن پرمیشن‌ها بعد از اضافه کردن کاربر
+            await refreshPermissions();
 
             toast({
                 description: "User added successfully",
@@ -148,6 +152,9 @@ export default function UserList() {
 
             if (!success) throw new Error(error)
             setUserListData(data);
+
+            // رفرش کردن پرمیشن‌ها بعد از حذف کاربر
+            await refreshPermissions();
 
             toast({
                 title: "Successful",
@@ -216,7 +223,6 @@ export default function UserList() {
                         handleAddUser({
                             data,
                             setUserListData,
-                            token
                         }))}
 
                     fields={addUserFields}

@@ -4,7 +4,7 @@ import "server-only";
 
 import { redirect } from "next/navigation";
 import { saveSession } from "./storage";
-import { fetchPermissions } from "../user-permissions/fetchPermissions";
+import { refreshPermissionCookie } from "@/lib/user-permissions/fetchPermissions";
 
 const BACKEND_URL = "http://app.api";
 
@@ -34,9 +34,13 @@ export async function singIn({
             return { status, statusText };
         }
 
-        const permissions = await fetchPermissions(token);
-        console.log('Permissions:', permissions);
         saveSession(token);
+
+        const { success, error } = await refreshPermissionCookie(token);
+        if (!success) {
+            console.error('Failed to set permission cookie:', error);
+        }
+
         redirect(redirectTo);
     }
 

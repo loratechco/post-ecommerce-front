@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 
 import getSession from "@/lib/auth/getSession"
 import { SessionProvider } from "@/lib/auth/SessionProvider"
-import Link from "next/link"
+import { PermissioinsProvider } from "@/lib/user-permissions/PermissionsProvider"
+import getPermissions from "@/lib/user-permissions/getPermissions"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +27,8 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const session = await getSession()
+  const permissions = await getPermissions()
+
   return (
     <html lang="en">
       <body
@@ -34,10 +37,11 @@ export default async function RootLayout({
           inter.variable
         )}
       >
-
         <SessionProvider session={session}>
-          {children}
-          <Toaster />
+          <PermissioinsProvider userPermissions={permissions}>
+            {children}
+            <Toaster />
+          </PermissioinsProvider>
         </SessionProvider>
       </body>
     </html>

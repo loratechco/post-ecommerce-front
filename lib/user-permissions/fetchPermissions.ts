@@ -1,24 +1,27 @@
 'use server'
-import axios from "axios";
 import { cookies } from 'next/headers';
-import { cookieName } from '../auth/storage';
+import axios from 'axios';
 
+const PERMISSION_COOKIE_NAME = 'USER_PERMISSIONS';
 
-export const savePermissions = async (permissionsData: object[]) => {
-    const cookieStore = await cookies();
-    const userData = JSON.stringify(permissionsData);
-    cookieStore.set('USER_PERMISSIONS', userData, {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-        maxAge: 14 * 24 * 60 * 60, // 30 days
-    });
+type RefreshPermissionResponse = {
+    success: boolean;
+    data: any | null;
+    error?: string;
 }
 
-export const fetchPermissions = async (token?: string) => {
+export async function refreshPermissionCookie(token: string): Promise<RefreshPermissionResponse> {
     try {
-        console.log('Fetching permissions with token:', token);
+        if (!token) {
+            return {
+                success: false,
+                data: null,
+                error: 'Token not provided'
+            };
+        }
 
-        const { data } = await axios.get(
+        // دریافت پرمیشن‌های جدید از API
+        const response = await axios.get(
             'http://app.api/api/permissions/my-permissions',
             {
                 headers: {
@@ -28,16 +31,33 @@ export const fetchPermissions = async (token?: string) => {
             }
         );
 
-        if (data) {
-            console.log('Permissions received:', JSON.stringify(data));
-            await savePermissions(data);
-            return data;
+        if (!response?.data) {
+            return {
+                success: false,
+                data: null,
+                error: 'No permissions data received'
+            };
         }
 
-        console.log('No permissions data received', data);
-        return null;
+        // به‌روزرسانی کوکی با پرمیشن‌های جدید
+        const { set } = await cookies();
+        set(PERMISSION_COOKIE_NAME, JSON.stringify(response.data), {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+            maxAge: undefined, // بدون انقضا
+        });
+
+        return {
+            success: true,
+            data: response.data
+        };
+
     } catch (error: any) {
-        console.error("Error fetching permissions:", error.response?.data?.message);
-        return null;
+        console.error('Error refreshing permission cookie:', error);
+        return {
+            success: false,
+            data: null,
+            error: error?.response?.data?.message || 'Failed to refresh permissions'
+        };
     }
 }

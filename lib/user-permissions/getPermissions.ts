@@ -1,15 +1,19 @@
-'use client'
+import "server-only"
 
-import { useContext } from "react";
-import { PermissionsContext } from "./permissionsProvider";
+import { cookies } from "next/headers"
 
-function getPermissions() {
-    const permission = useContext(PermissionsContext)
+export default async function getPermissions(): Promise<string | null> {
+    const { get } = await cookies()
+    const permissionsData = get('USER_PERMISSIONS')
 
-    if (permission === null)
-        throw new Error('The permission Context is null')
+    if (!permissionsData?.value) {
+        return null;
+    }
 
-    return permission;
+    try {
+        return JSON.parse(permissionsData.value);
+    } catch (error) {
+        console.error('Error parsing permissions:', error);
+        return null;
+    }
 }
-
-export default getPermissions;

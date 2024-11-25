@@ -4,29 +4,35 @@ import Account from "./accountTab/Account";
 
 import Permission from "./permissionTab/PermissionAccordion";
 import { useSession } from "@/lib/auth/useSession";
+import { usePermissions } from "@/lib/user-permissions/PermissionsProvider";
 
-function TabsListProfile({ userId }) {
+function TabsListProfile({ userId }: { userId: string }) {
+    const { permissions, refreshPermissions } = usePermissions();
 
-    const token = useSession()
+    console.log('Current permissions:', permissions);
+    const token = useSession() as string;
 
     console.log("🚀 ~ TabsListProfile ~ userId:", userId)
 
-    // console.log("🚀 ~ findRoute ~ findRoute:", tabApis[0].getApi)
-
+    const accessPermission = permissions?.permissions.includes('change-users-permissions')
     return (
         <Tabs defaultValue="account" className="w-full">
             <TabsList className="">
-                <TabsTrigger className="w-[70%]" value="account">Account</TabsTrigger>
-                <TabsTrigger className="w-[70%]" value="Permission">Permission</TabsTrigger>
+                <TabsTrigger value="account">Account</TabsTrigger>
+
+                <TabsTrigger value="Permission">Permission</TabsTrigger>
+
             </TabsList>
 
             <TabsContent value="account">
                 <Account userId={userId} userToken={token} />
             </TabsContent>
 
+
             <TabsContent value="Permission">
-                <Permission userId={userId} userToken={token} />
+                <Permission userId={userId} />
             </TabsContent>
+
         </Tabs>
     );
 }

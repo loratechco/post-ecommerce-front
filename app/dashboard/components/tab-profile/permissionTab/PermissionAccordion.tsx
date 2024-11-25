@@ -12,15 +12,26 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
-import useSWR, { mutate } from 'swr'
-import { useToast } from "@/hooks/use-toast";
+import useSWR from 'swr'
+import { useToast } from "@/hooks/use-toast"
+import AccardionSkeleton from '@/components/skeletons/AccardionSkeleton'
+
+// تعریف تایپ‌ها
+type SwitchItem = {
+    id: string;
+    name: string;
+    can: boolean;
+}
+
+type AccordionItem = {
+    id: string;
+    title: string;
+    switches: SwitchItem[];
+}
 
 const dataFetcher = async (url: string, userToken: string) => {
-
-    console.log(userToken);
     try {
         const res = await axios.post(url, { user_id: 0 }, {
-
             headers: {
                 Authorization: `Bearer ${userToken}`,
             },
@@ -29,141 +40,146 @@ const dataFetcher = async (url: string, userToken: string) => {
         return res.data;
     } catch (error) {
         console.error("Error fetching data:", error);
-        throw error; // بازگرداندن خطا برای مدیریت توسط SWR
+        throw error;
     }
 };
 
-// The main component
 export default function Permission() {
     const { toast } = useToast();
-
     const token = useSession();
-    console.log("🚀 ~ Permission ~ token:", token)
 
-    const { data, error, isLoading } = useSWR(
+    const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
+    const [initialStateSet, setInitialStateSet] = useState(false);
+    const [activeInit, setActiveInit] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const { data: accordionData, error } = useSWR<AccordionItem[]>(
         token ? ['permission-data', `http://app.api/api/permissions`] : null,
         ([_, url]) => dataFetcher(url, token),
         {
-            errorRetryCount: 2
+            errorRetryCount: 2,
+            onSuccess: () => setIsLoading(false)
         }
     );
 
-    console.log("🚀 ~ Permission ~ data:", error, 'isLoading ====>>', isLoading)
+    // تنظیم وضعیت اولیه سوییچ‌ها
+    useEffect(() => {
+        if (!initialStateSet && accordionData && Array.isArray(accordionData)) {
+            const initialSwitchStates: Record<string, boolean> = {};
 
-    const [accordionItemComponent, setAccordionItemComponent] = useState<JSX.Element[] | null>(null)
-    const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({})
-    const [activeItems, setActiveItems] = useState<string[]>([])
+            accordionData?.forEach(item => {
+                if (!Array.isArray(item?.switches)) return;
 
-    const [activeInit, setActiveInit] = useState([])
+                item?.switches?.forEach(switchItem => {
+                    initialSwitchStates[switchItem.id] = switchItem?.can || false;
+                });
+            });
+
+            setSwitchStates(initialSwitchStates);
+            setInitialStateSet(true);
+
+            console.log('Initial switch states:', initialSwitchStates);
+        }
+    }, [accordionData, initialStateSet]);
 
     // Handle switch toggle
-    const handleSwitchChange = useCallback((id: string, checked: boolean) => {
-        setSwitchStates(prev => ({ ...prev, [id]: checked }))
-    }, [])
+    const handleSwitchChange = (id: string, checked: boolean) => {
+        setSwitchStates(prev => {
+            const newState = { ...prev, [id]: checked };
+            return newState;
+        });
+    }
 
     // Handle send button click
     const handleSend = useCallback(async () => {
-
-        console.log(switchStates);
-        const active = Object.entries(switchStates)
+        const activePermissions = Object.entries(switchStates)
             .filter(([, isActive]) => isActive)
-            .map(([id]) => id)
-        setActiveItems(active)
+            .map(([id]) => id);
 
-        const activeToggle = active.map((id) => {
-            return id;
-        })
-        console.log("🚀 ~ activeToggle ~ activeToggle:", ...activeInit)
+        console.log("Active permissions to send:", activePermissions);
+
         try {
             const res = await axios.post('http://app.api/api/permissions/assign-to-user',
                 {
-                    permissions: [...activeToggle, ...activeInit]
+                    permissions: activePermissions
                 },
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json'
                     }
-                })
-
+                });
 
             toast({
                 description: res?.data?.message || 'oky',
-                duration: 3000, // نمایش به مدت ۳ ثانیه
-                className: "bg-green-200 text-green-800", // استایل توستر
+                duration: 3000,
+                className: "bg-green-200 text-green-800",
             });
 
-        } catch (error) {
+        } catch (error: any) {
             toast({
-                description: error?.response?.data?.message || "Failed to assign permissions. Please try again.",
+                description: error?.response?.data?.message || "Failed to assign permissions",
                 duration: 3000,
                 className: "bg-red-200 text-red-800",
             });
-            console.log(error);
+            console.error(error);
         }
-
-    }, [switchStates, activeInit])
-
-
-    useEffect(() => {
-        if (data) {
-            data?.forEach(item => {
-                const activeSwitchIds = item.switches
-                    .filter(switchObj => switchObj.can === true)
-                    .map(switchObj => switchObj.id);
-
-                // لاگ گرفتن سوییچ‌های فعال
-                if (activeSwitchIds.length > 0) {
-                    console.log(`Active switches for item ${item.id}:`, activeSwitchIds);
-
-                    setActiveInit(activeSwitchIds)
-                }
-            });
-        }
-    }, [data]);
+    }, [switchStates, token, toast]);
 
     const dynamicAccordionItem = useMemo(() => {
+        if (!accordionData) return null;
 
-        console.log(data, error);
+        return accordionData.map((item) => (
+            <AccordionItem
+                key={item.id}
+                value={item.id}
+                className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'
+            >
+                <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>
+                    {item.title}
+                </AccordionTrigger>
+                <AccordionContent className='pb-0'>
+                    <div className="">
+                        {item?.switches?.map((switchItem) => (
+                            <div
+                                key={switchItem?.id}
+                                className="flex items-center justify-between py-4 italic"
+                            >
+                                <Label
+                                    htmlFor={switchItem?.id}
+                                    className='cursor-pointer select-none'
+                                >
+                                    {switchItem?.name}
+                                </Label>
+                                <Switch
+                                    className='data-[state=unchecked]:!bg-gray-400'
+                                    id={switchItem.id}
+                                    checked={switchStates[switchItem.id] ?? false}
+                                    onCheckedChange={(checked) =>
+                                        handleSwitchChange(switchItem.id, checked)
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        ));
+    }, [accordionData, switchStates, handleSwitchChange]);
 
-        if (data) {
-            console.log(activeItems);
-            console.log(data);
-            return data?.map((item) => (
-                <AccordionItem key={item.id} value={item.id} className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'>
-                    <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>{item.title}</AccordionTrigger>
-                    <AccordionContent className='pb-0'>
-                        <div className="">
-                            {item?.switches?.map((switchItem) => (
-                                <div
-                                    key={switchItem?.id}
-                                    className="flex items-center justify-between py-4 italic">
-                                    <Label htmlFor={switchItem?.id} className='cursor-pointer select-none'>{
-                                        switchItem?.name
-                                    }</Label>
-                                    <Switch
-                                        className='data-[state=unchecked]:!bg-gray-400'
-                                        id={switchItem.id}
-                                        defaultChecked={switchItem?.can || false}
-                                        onCheckedChange={(checked) => handleSwitchChange(switchItem?.id, checked)}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            ))
-        }
-
-    }, [data, handleSwitchChange])
 
     return (
         <div className="w-full pt-3">
             <Accordion type="single" collapsible className="w-full">
-                {dynamicAccordionItem}
+                {isLoading ? <AccardionSkeleton /> : dynamicAccordionItem}
             </Accordion>
-
-            <Button onClick={handleSend} className="w-[6rem] mt-3">Send</Button>
+            <Button
+                onClick={handleSend}
+                className="w-[6rem] mt-3"
+                disabled={isLoading || !initialStateSet}
+            >
+                Send
+            </Button>
         </div>
-    )
+    );
 }

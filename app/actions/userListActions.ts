@@ -3,16 +3,13 @@
 import { cookieName } from "@/lib/auth/storage";
 import { cookies } from "next/headers";
 
-
 const getToken = async () => {
     const cookie = await cookies();
     return cookie.get(cookieName)?.value;
 }
 
-const token = getToken().then((token) => token);
-
-console.log('token ==>', token);
 const userListFetch = async () => {
+    const token = await getToken();
 
     try {
         const res = await fetch("http://app.api/api/users", {
@@ -23,13 +20,8 @@ const userListFetch = async () => {
             cache: "no-cache"
         });
 
-        const result = await res.json();
-
-        if (res.status === 500) {
-            return { success: false, data: [], error: 'خطا در دریافت لیست کاربران' };
-        }
-
-        return { success: true, data: result.data };
+        const result = res.json();
+        return { success: true, data: result?.data };
 
     } catch (error) {
         console.log("===>> getUserList ~ error:", error);
@@ -38,6 +30,8 @@ const userListFetch = async () => {
 }
 
 const handleDelete = async ({ id }: { id: string }) => {
+    const token = await getToken();
+
     try {
         const res = await fetch(`http://app.api/api/users/${id}`, {
             method: 'DELETE',
@@ -72,7 +66,7 @@ const handleDelete = async ({ id }: { id: string }) => {
 
 const createUserActions = () => {
     const getToken = async () => {
-        const cookie = cookies();
+        const cookie = await cookies();
         return cookie.get(cookieName)?.value;
     }
 
