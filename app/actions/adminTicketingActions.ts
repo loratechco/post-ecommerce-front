@@ -3,9 +3,9 @@
 
 const API_URL = 'http://app.api/api';
 
-const adminTicketingActions = async () => {
+const getUserListTickets = async ({ token }: { token: string }) => {
 
-    const getUserListTickets = async ({ token }: { token: string }) => {
+    try {
         const response = await fetch(`${API_URL}/tickets`, {
             method: 'GET',
             headers: {
@@ -13,13 +13,33 @@ const adminTicketingActions = async () => {
                 'Content-Type': 'application/json'
             }
         })
-        if (!response.ok)
-            throw new Error('Failed to fetch tickets');
+        if (!response.ok) return []
 
         return response.json();
-    }
 
-    return { getUserListTickets };
+    } catch (error) {
+        console.log(error);
+        return error as string || 'An error occurred';
+    }
 }
 
-export const { getUserListTickets } = await adminTicketingActions();
+const createTicket = async ({ token, title, description }: { token: string, title: string, description: string }) => {
+
+    try {
+        const response = await fetch(`${API_URL}/tickets`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!response.ok) return { createTicketError: response.statusText }
+
+        return { createTicketError: null, data: response.json() };
+    } catch (error) {
+        console.log(error);
+        return error as string || 'An error occurred';
+    }
+}
+
+export { getUserListTickets, createTicket };

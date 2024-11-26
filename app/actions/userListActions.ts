@@ -8,11 +8,12 @@ const getToken = async () => {
     return cookie.get(cookieName)?.value;
 }
 
-const userListFetch = async () => {
+const userListFetch = async ({ pageQuery = '', query = '' }: { pageQuery?: string, query?: string }) => {
     const token = await getToken();
 
     try {
-        const res = await fetch("http://app.api/api/users", {
+        console.log('pageQuery', pageQuery)
+        const res = await fetch(`http://app.api/api/users?page=${pageQuery}&search=${query}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json"
@@ -20,7 +21,8 @@ const userListFetch = async () => {
             cache: "no-cache"
         });
 
-        const result = res.json();
+        const result = await res.json();
+        console.log(result.data)
         return { success: true, data: result?.data };
 
     } catch (error) {

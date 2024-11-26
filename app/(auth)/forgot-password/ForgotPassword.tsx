@@ -1,8 +1,8 @@
 "use client"
 import { usePathname } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card"
-import AuthCardheader from "../../../components/auth-componetns/AuthCardHeader"
-import AuthToggle from "../components/AuthToggle "
+import AuthCardheader from "@/app/(auth)/components/AuthCardHeader"
+import AuthToggle from "@/app/(auth)/components/AuthToggle "
 import AuthBtn from "@/app/(auth)/components/AuthBtn";
 import AuthInput from "@/components/FormInput";
 
@@ -26,7 +26,7 @@ function ForgotPassword() {
                     placeholder="example@gmail.com"
                     nameLabel="Email"
                     className="mb-3"
-                    {...register("email")}
+                    register={register("email")}
                 />
 
                 <div className="space-y-3 mt-3">

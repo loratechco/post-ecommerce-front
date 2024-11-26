@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // اگر توکن وجود دارد ولی پرمیشن‌ها وجود ندارند، ریدایرکت به صفحه لاگین
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     console.log('userPermissions', JSON.parse(userPermissions || '[]'));
-    if (accessToken && !userPermissions) {
+    if (!accessToken) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }

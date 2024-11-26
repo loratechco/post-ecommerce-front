@@ -38,18 +38,18 @@ async function TicketListPage() {
     const cookie = await cookies();
     const token = cookie.get(cookieName)?.value as string;
 
-    const fetchTickets = async () => {
-        const res = await getUserListTickets({ token });
-        console.log('res======>>:)', res);
-    }
-    const data: any = await fetchTickets() as any || [];
+    const data = await getUserListTickets({ token });
 
+    console.log('data=>>>', data);
+    const validData = (data && data.length > 0);
 
     return (
         <div className='relative size-full'>
 
             <section className='pt-16'>
-                <AddTicketing />
+                <AddTicketing
+                    token={token}
+                />
                 <TableDesc>
                     <TheadDesc>
                         <TrDesc>
@@ -62,7 +62,7 @@ async function TicketListPage() {
                     </TheadDesc>
 
                     <TbodyDesc>
-                        {data.length > 0 ? data?.map((person: any) => (
+                        {validData ? data?.map((person: any) => (
                             <TrDesc key={person?.id}>
                                 <TdDesc>
                                     <p>{person?.name}</p>
@@ -75,13 +75,16 @@ async function TicketListPage() {
                                 </TdDesc>
                             </TrDesc>
                         ))
-                            : (<CardTable className="bg-transparent">
-                                <WrapContent>
-                                    <div className="text-black font-semibold ps-5">
+                            : (
+                                <TrDesc>
+                                    <TdDesc >
+                                    </TdDesc>
+                                    <TdDesc >
+                                    </TdDesc>
+                                    <TdDesc >
                                         There are no tickets yet
-                                    </div>
-                                </WrapContent>
-                            </CardTable>
+                                    </TdDesc>
+                                </TrDesc>
                             )}
                     </TbodyDesc>
                 </TableDesc>
@@ -89,7 +92,7 @@ async function TicketListPage() {
 
                 {/* card box for mobile size  */}
                 <TableCardsMobile >
-                    {data.length > 0 ? data?.map((person: any) => (
+                    {validData ? data?.map((person: any) => (
                         <CardTable key={person?.id}>
                             <WrapContent>
                                 <ContentTable
@@ -101,13 +104,14 @@ async function TicketListPage() {
                             </WrapContent>
                         </CardTable>
                     ))
-                        : (<CardTable className="bg-zinc-100">
+                        : (<CardTable className="bg-zinc-200">
                             <WrapContent>
                                 <div className="text-black font-semibold">
                                     There are no tickets yet
                                 </div>
                             </WrapContent>
-                        </CardTable>)
+                        </CardTable>
+                        )
                     }
                 </TableCardsMobile>
 

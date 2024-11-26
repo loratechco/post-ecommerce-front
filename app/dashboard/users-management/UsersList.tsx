@@ -28,15 +28,20 @@ import { handleDelete, userListFetch } from '@/app/actions/userListActions'
 import formSchema, { FormData } from './schema'
 import { addUserFields, FormField } from './formFields'
 import ErrorToast from '@/components/ErrorToast'
-import { usePermissions } from '@/lib/user-permissions/PermissionsProvider'
+import { object } from 'zod'
 
-export default function UserList() {
+export default function UserList({ pageQuery }: { pageQuery: string }) {
     const token = useSession();
-    const [userListData, setUserListData] = useState<object[]>([])
+    const [userListData, setUserListData] = useState<{ data: object[], totalPages: number, totalUsers: number, firstPage: number }>({
+        data: [],
+        totalPages: 1,
+        firstPage: 1,
+        totalUsers: 0,
+    })
 
     useEffect(() => {
         const fetchUsers = async () => {
-            const { success, data, error } = await userListFetch();
+            const { success, data, error } = await userListFetch({ pageQuery });
             // this structher user list data
             //     from: 1, …
             // }
@@ -55,25 +60,28 @@ export default function UserList() {
             // total: 32
             console.log(data);
             if (success) {
-                setUserListData(data?.data);
-                console.log('userListData ==>', userListData, success, data);
+                setUserListData({
+                    data: data?.data,
+                    totalPages: data?.last_page,
+                    totalUsers: data?.total,
+                    firstPage: data?.from,
+                });
             }
 
             if (error) {
                 console.log('error ==>', error);
                 toast({
-                    description: error,
+                    description: error || 'users invalid',
                     className: 'bg-red-300 text-red-950'
                 });
             }
         };
 
         fetchUsers();
-    }, [token]);
+    }, [pageQuery]);
 
     const { register, setValue, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
-
     });
     // toast value
     const { duration, successClass, errorClass } = {
@@ -85,22 +93,18 @@ export default function UserList() {
     const query = watch('search');
     // search handler 
     useEffect(() => {
+        if (!query) return;
         const timeOuteId = setTimeout(() => {
             const search = async () => {
                 try {
-                    const { data: { data: { data } }, status } = await axios.get(`http://app.api/api/users?search=${query}`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        },
-                    });
-                    setUserListData(data)
+                    const { data: { data } } = await userListFetch({ query });
+                    setUserListData(data?.data)
 
                     console.log('data', data);
 
                 } catch (error) {
                     toast({
-                        description: error?.data?.message,
+                        description: error?.data?.message || 'error',
                         className: 'bg-red-300 text-red-950',
                         duration
                     })
@@ -121,9 +125,6 @@ export default function UserList() {
             });
 
             setUserListData(prev => [...prev, res.data.user]);
-
-            // رفرش کردن پرمیشن‌ها بعد از اضافه کردن کاربر
-            await refreshPermissions();
 
             toast({
                 description: "User added successfully",
@@ -152,9 +153,6 @@ export default function UserList() {
 
             if (!success) throw new Error(error)
             setUserListData(data);
-
-            // رفرش کردن پرمیشن‌ها بعد از حذف کاربر
-            await refreshPermissions();
 
             toast({
                 title: "Successful",
@@ -243,7 +241,7 @@ export default function UserList() {
                 </TheadDesc>
 
                 <TbodyDesc>
-                    {userListData?.map((person) => (
+                    {userListData?.data?.map((person) => (
                         <TrDesc key={person?.id}>
                             <TdDesc>
                                 <p>{person?.name}</p>
@@ -278,7 +276,7 @@ export default function UserList() {
 
             {/* card box for mobile size  */}
             <TableCardsMobile >
-                {userListData?.map((person) => (
+                {userListData?.data?.map((person) => (
                     <CardTable key={person?.id}>
                         <WrapContent>
                             <ContentTable
@@ -301,7 +299,8 @@ export default function UserList() {
 
             <div className="pt-7">
                 <PaginationComponent
-                    mapData={userListData || []}
+                    pages={userListData?.totalPages || []}
+                    firstPage={userListData?.firstPage}
                 />
             </div>
         </section >
