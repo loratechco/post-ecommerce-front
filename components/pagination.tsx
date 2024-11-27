@@ -1,96 +1,115 @@
 "use client"
+
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import {
     Pagination,
     PaginationContent,
-    PaginationEllipsis,
     PaginationItem,
     PaginationLink,
     PaginationNext,
     PaginationPrevious,
+    PaginationEllipsis,
 } from "@/components/ui/pagination"
 import { cn } from "@/lib/utils";
-import axios from "axios";
-import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
 
 interface Props {
-    pages: object[];
+    pages: number;
 }
 
-export function PaginationComponent({ pages = 1, }: Props) {
-    const searchParams = useSearchParams();
-    const currentPage = Number(searchParams.get("page")) || 1;
+export function PaginationComponent({ pages = 1 }: Props) {
+
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentPage = Number(searchParams.get("page")) || 1;
 
-    const handlePageChange = (pageNumber: number) => {
-        if (pageNumber === currentPage) return;
-        router.push(`${pathname}?page=${pageNumber}`);
+    // تولید آرایه شماره صفحات برای نمایش
+    const getPageNumbers = () => {
+        const maxPagesToShow = 5;
+        const start = Math.max(1, currentPage - 2);
+        const end = Math.min(pages, start + maxPagesToShow - 1);
+        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     };
-    const maxPages = Math.min(Number(pages), 3);
-    const totalPages = Array.from({ length: maxPages }, (_, index) => index + 1);
-    const pagesIndex = Array.from({ length: pages }, (_, index) => index + 1);
 
-    console.log(pagesIndex);
+    const handlePageChange = (page: number) => {
+        if (page === currentPage || page < 1 || page > pages) return;
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("page", page.toString());
+        router.push(`${pathname}?${params.toString()}`);
+    };
+
 
     return (
-        <Pagination className="mb-6">
+        <Pagination>
             <PaginationContent>
-                <PaginationItem className="cursor-pointer">
-                    {/* By pressing this button, the current value of the page is reduced by one,
-                    and it is given to the function as the page requested by the user*/}
+                {/* دکمه قبلی */}
+                <PaginationItem>
                     <PaginationPrevious
-                        onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-                        className={currentPage <= 1 ? " opacity-60" : ""}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        className={cn(
+                            "cursor-pointer",
+                            currentPage <= 1 && "opacity-50 pointer-events-none"
+                        )}
                     />
                 </PaginationItem>
 
-                {totalPages?.map((_, page) => (
-                    <PaginationItem key={page} className="cursor-pointer">
+                {/* صفحه اول */}
+                {currentPage > 3 && (
+                    <>
+                        <PaginationItem>
+                            <PaginationLink
+                                onClick={() => handlePageChange(1)}
+                                className="cursor-pointer"
+                            >
+                                1
+                            </PaginationLink>
+                        </PaginationItem>
+                        <PaginationEllipsis />
+                    </>
+                )}
+
+                {/* شماره صفحات */}
+                {getPageNumbers().map((pageNumber) => (
+                    <PaginationItem key={pageNumber}>
                         <PaginationLink
+                            onClick={() => handlePageChange(pageNumber)}
+                            isActive={currentPage === pageNumber}
                             className={cn(
-                                'font-semibold',
-                                { 'border-zinc-500': currentPage === page + 1 }
+                                "cursor-pointer",
+                                currentPage === pageNumber && "border-primary"
                             )}
-                            onClick={() => handlePageChange(page + 1)}
-                            isActive={currentPage === page + 1}
                         >
-                            {page + 1}
+                            {pageNumber}
                         </PaginationLink>
                     </PaginationItem>
                 ))}
 
-                {
-                    pagesIndex.length > 2 && (
+                {/* صفحه آخر */}
+                {currentPage < pages - 2 && (
+                    <>
+                        <PaginationEllipsis />
                         <PaginationItem>
-                            <PaginationEllipsis />
+                            <PaginationLink
+                                onClick={() => handlePageChange(pages)}
+                                className="cursor-pointer"
+                            >
+                                {pages}
+                            </PaginationLink>
                         </PaginationItem>
-                    )
-                }
+                    </>
+                )}
 
-
-                <PaginationItem className="cursor-pointer">
-                    <PaginationLink
-                        className={cn(
-                            'font-semibold',
-                            { 'border-zinc-500': currentPage === pages }
-                        )}
-                        onClick={() => handlePageChange(pages)}
-                        isActive={currentPage === pages}
-                    >
-                        {pages}
-                    </PaginationLink>
-                </PaginationItem>
-
-                <PaginationItem className="cursor-pointer">
+                {/* دکمه بعدی */}
+                <PaginationItem>
                     <PaginationNext
-                        onClick={() => currentPage < pagesIndex.length && handlePageChange(currentPage + 1)}
-                        className={currentPage >= pagesIndex.length ? " opacity-60" : ""}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        className={cn(
+                            "cursor-pointer",
+                            currentPage >= pages && "opacity-50 pointer-events-none"
+                        )}
                     />
                 </PaginationItem>
-
             </PaginationContent>
         </Pagination>
-    )
+    );
 }

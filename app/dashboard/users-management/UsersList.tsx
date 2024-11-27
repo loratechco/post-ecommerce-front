@@ -2,6 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
 
 import {
     DropdownMenu,
@@ -26,7 +38,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PaginationComponent } from '@/components/pagination'
 import { handleDelete, userListFetch } from '@/app/actions/userListActions'
 import formSchema, { FormData } from './schema'
-import { addUserFields, FormField } from './formFields'
+import { addUserFields } from './formFields'
 import ErrorToast from '@/components/ErrorToast'
 import { object } from 'zod'
 
@@ -40,41 +52,27 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
     })
 
     useEffect(() => {
+        if (!token) return;
         const fetchUsers = async () => {
             const { success, data, error } = await userListFetch({ pageQuery });
-            // this structher user list data
-            //     from: 1, …
-            // }
-            // current_page: 1
-            // data: Array(10)[{… }, {… }, {… }, … ]
-            // first_page_url: "http://app.api/api/users?page=1"
-            // from: 1
-            // last_page: 4
-            // last_page_url: "http://app.api/api/users?page=4"
-            // links: Array(6)[{… }, {… }, {… }, … ]
-            // next_page_url: "http://app.api/api/users?page=2"
-            // path: "http://app.api/api/users"
-            // per_page: 10
-            // prev_page_url: null
-            // to: 10
-            // total: 32
-            console.log(data);
-            if (success) {
-                setUserListData({
-                    data: data?.data,
-                    totalPages: data?.last_page,
-                    totalUsers: data?.total,
-                    firstPage: data?.from,
-                });
-            }
+            console.log(success);
 
             if (error) {
                 console.log('error ==>', error);
                 toast({
+                    title: 'Error',
                     description: error || 'users invalid',
-                    className: 'bg-red-300 text-red-950'
+                    className: 'bg-red-300 text-red-900'
                 });
+                return;
             }
+
+            setUserListData({
+                data: data?.data,
+                totalPages: data?.last_page,
+                totalUsers: data?.total,
+                firstPage: data?.from,
+            });
         };
 
         fetchUsers();
@@ -171,19 +169,19 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
         }
     }
 
-    const errorArray = [
-        errors?.name?.message,
-        errors?.last_name?.message,
-        errors?.email?.message,
-        errors?.phone?.message,
-    ]
+    const validData = (userListData?.data && userListData?.data.length > 0);
 
     return (
         <section className="w-full">
 
             <ErrorToast
                 dependency={errors}
-                errorMessagesArray={errorArray}
+                errorMessagesArray={[
+                    errors?.name?.message,
+                    errors?.last_name?.message,
+                    errors?.email?.message,
+                    errors?.phone?.message,
+                ]}
             />
 
             <h1 className="text-2xl font-bold mb-4">Users Management</h1>
@@ -216,17 +214,10 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                         </div>
                     </div>
                 </div>
-                <DrawerDialogAddUser
-                    onSubmit={handleSubmit((data) =>
-                        handleAddUser({
-                            data,
-                            setUserListData,
-                        }))}
+                <Link href={'/dashboard/users-management/create-user'}>
+                    <Button variant="outline">Add User</Button>
+                </Link>
 
-                    fields={addUserFields}
-                    register={register}
-                    errors={errors}
-                />
             </div>
 
             {/* table for desctop  */}
@@ -241,42 +232,51 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                 </TheadDesc>
 
                 <TbodyDesc>
-                    {userListData?.data?.map((person) => (
-                        <TrDesc key={person?.id}>
+                    {
+                        validData
+                        && userListData?.data?.map((person) => (
+                            <TrDesc key={person?.id}>
+                                <TdDesc>
+                                    <p>{person?.name}</p>
+                                </TdDesc>
+                                <TdDesc>
+                                    <p>{person?.email}</p>
+                                </TdDesc>
+                                <TdDesc>
+                                    <p>{person?.phone}</p>
+                                </TdDesc>
+                                <TdDesc>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild >
+                                            <button type='button' className="h-8 w-8 p-0 ">
+                                                <span className="sr-only">Open menu</span>
+                                                <MoreHorizontal className="h-4 w-4 bg-transparent" />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                            <Link href={`/dashboard/users-management/${person?.id}`}>
+                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                            </Link>
+                                            <DropdownMenuItem onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </TdDesc>
+                            </TrDesc>
+                        )) ||
+                        (<TrDesc>
+                            <TdDesc></TdDesc>
                             <TdDesc>
-                                <p>{person?.name}</p>
+                                <p className='font-semibold text- px-3'>user not found</p>
                             </TdDesc>
-                            <TdDesc>
-                                <p>{person?.email}</p>
-                            </TdDesc>
-                            <TdDesc>
-                                <p>{person?.phone}</p>
-                            </TdDesc>
-                            <TdDesc>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild >
-                                        <button type='button' className="h-8 w-8 p-0 ">
-                                            <span className="sr-only">Open menu</span>
-                                            <MoreHorizontal className="h-4 w-4 bg-transparent" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                        <Link href={`/dashboard/users-management/${person?.id}`}>
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                        </Link>
-                                        <DropdownMenuItem onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </TdDesc>
-                        </TrDesc>
-                    ))}
+                        </TrDesc>)
+                    }
                 </TbodyDesc>
             </TableDesc>
 
             {/* card box for mobile size  */}
             <TableCardsMobile >
-                {userListData?.data?.map((person) => (
+                {validData && userListData?.data?.map((person) => (
                     <CardTable key={person?.id}>
                         <WrapContent>
                             <ContentTable
@@ -292,15 +292,23 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                             userId={person?.id}
                         />
                     </CardTable>
-                ))}
+                )) || (
+                        <CardTable >
+                            <WrapContent>
+                                <ContentTable
+                                    content={'user not found'}
+                                />
+                            </WrapContent>
+                        </CardTable>
+                    )
+                }
             </TableCardsMobile>
 
             {/* Pagination */}
 
             <div className="pt-7">
                 <PaginationComponent
-                    pages={userListData?.totalPages || []}
-                    firstPage={userListData?.firstPage}
+                    pages={userListData?.totalPages || 1}
                 />
             </div>
         </section >

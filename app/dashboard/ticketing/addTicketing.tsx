@@ -120,6 +120,7 @@ function AddTicketing({ token }: { token: string }) {
                                 Title
                             </Label>
                             <Input
+                                name="title"
                                 id="title"
                                 placeholder='Write your title'
                                 className="ring-0 focus-visible:ring-0 col-span-3 outline-none outline-1 outline-zinc-400 focus-visible:outline-zinc-500 rounded-sm border-none"
@@ -130,6 +131,7 @@ function AddTicketing({ token }: { token: string }) {
                                 Description
                             </Label>
                             <TextareaAutosize
+                                name="description"
                                 id="description"
                                 className="p-2 col-span-3 outline-none outline-1 outline-zinc-400 focus-visible:outline-zinc-500 rounded-sm"
                                 placeholder='Write your description'

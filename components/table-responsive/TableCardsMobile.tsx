@@ -30,10 +30,9 @@ export function CardTable({ children, className }: Child & { className?: string 
     )
 }
 
-
 export function WrapContent({ children }: Child) {
     return (
-        <span className="block text-gray-600 truncate">
+        <span className="block text-gray-600">
             {children}
         </span>
     )

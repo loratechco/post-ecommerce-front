@@ -27,7 +27,7 @@ const userListFetch = async ({ pageQuery = '', query = '' }: { pageQuery?: strin
 
     } catch (error) {
         console.log("===>> getUserList ~ error:", error);
-        return { success: false, data: [], error: 'خطا در دریافت لیست کاربران' };
+        return { success: false, data: [], error: 'Error in receiving user list' };
     }
 }
 

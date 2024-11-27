@@ -33,7 +33,7 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
 
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
-    const [userData, setUserData] = useState<[] | Promise<void> | null>(null)
+    const [userData, setUserData] = useState<[] | Promise<void> | null>([])
 
     useEffect(() => setFetchError(null), [fetchError])
 
@@ -45,6 +45,8 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             last_name: '',
             email: '',
             phone: '',
+            newPassword: '',
+            confirmation: '',
         },
     });
 
@@ -53,10 +55,12 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
 
     console.log("🚀 ~ useEffect ~ userId:", userId)
 
-
     // get user data
     useEffect(() => {
-
+        if (userId === 'create-user') {
+            setUserData([]);
+            return
+        };
         const getUser = async () => {
 
             try {
@@ -85,16 +89,13 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
         getUser();
     }, [])
 
-    //PUT User Data
     const onSubmit = async (data: FormData) => {
         const formData = new FormData();
 
-        console.log(data);
         // افزودن آواتار
         if (userAvatar?.[0]) {
             formData.append("avatar", userAvatar[0]);
         }
-        console.log(formData);
 
         // افزودن سایر داده‌ها
         Object.entries({
@@ -102,19 +103,28 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
+            password: data.newPassword,
+            password_confirmation: data.confirmation,
             business_customer: switchState ? '1' : '0',
             is_administrator: '0',
         }).forEach(([key, value]) => {
             formData.append(key, value);
         });
 
+        // برای اطمینان از محتویات formData
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]);
+        }
+
         try {
-            // از متد POST استفاده می‌کنیم، اما _method: PUT را می‌فرستیم
+            const endpoint = (userId === 'create-user' ? '' : `/${userId}`);
+            console.log("🚀 ~ onSubmit ~ endpoint:", endpoint)
             const res = await axios.post(
-                `http://app.api/api/users/${userId}`,
+                `http://app.api/api/users${endpoint}`,
                 formData,
                 {
                     headers: {
+                        method: 'POST',
                         "Authorization": `Bearer ${userToken}`,
                         "Content-Type": "multipart/form-data",
                         "Accept": "application/json"
@@ -161,7 +171,7 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             />
             <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
 
-                <div className="relative size-14 ">
+                {!(userId === 'create-user') && (<div className="relative size-14 ">
 
                     <input
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
@@ -178,7 +188,7 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
                             className="object-cover" />
                         <AvatarFallback>JS</AvatarFallback>
                     </Avatar>
-                </div>
+                </div>)}
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
                     {formFields.map((field) => (
