@@ -51,17 +51,14 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
         totalUsers: 0,
     })
 
-    useEffect(() => {
-        if (!token) return;
-        const fetchUsers = async () => {
-            const { success, data, error } = await userListFetch({ pageQuery });
-            console.log(success);
+    const fetchUsers = React.useCallback(async (params: { pageQuery?: string, query?: string }) => {
+        try {
+            const { success, data, error } = await userListFetch(params);
 
             if (error) {
-                console.log('error ==>', error);
                 toast({
-                    title: 'Error',
-                    description: error || 'users invalid',
+                    title: 'خطا',
+                    description: error || 'خطا در دریافت کاربران',
                     className: 'bg-red-300 text-red-900'
                 });
                 return;
@@ -73,14 +70,35 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                 totalUsers: data?.total,
                 firstPage: data?.from,
             });
-        };
-
-        fetchUsers();
-    }, [pageQuery]);
+        } catch (error) {
+            toast({
+                description: error?.data?.message || 'خطا',
+                className: 'bg-red-300 text-red-950',
+                duration
+            });
+        }
+    }, []);
 
     const { register, setValue, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
     });
+    const query = watch('search');
+
+    React.useEffect(() => {
+        if (!token) return;
+        fetchUsers({ pageQuery });
+    }, [pageQuery, token, fetchUsers]);
+
+    // مدیریت جستجو
+    useEffect(() => {
+        const timeOutId = setTimeout(() => {
+            if (!query) return;
+            fetchUsers({ query });
+        }, 1000);
+
+        return () => clearTimeout(timeOutId);
+    }, [query, fetchUsers]);
+
     // toast value
     const { duration, successClass, errorClass } = {
         successClass: "bg-green-300 text-green-950 font-semibold",
@@ -88,69 +106,22 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
         duration: 3000,
     }
 
-    const query = watch('search');
-    // search handler 
-    useEffect(() => {
-        if (!query) return;
-        const timeOuteId = setTimeout(() => {
-            const search = async () => {
-                try {
-                    const { data: { data } } = await userListFetch({ query });
-                    setUserListData(data?.data)
-
-                    console.log('data', data);
-
-                } catch (error) {
-                    toast({
-                        description: error?.data?.message || 'error',
-                        className: 'bg-red-300 text-red-950',
-                        duration
-                    })
-                }
-            }
-            search();
-        }, 1000)
-
-        return () => clearTimeout(timeOuteId);
-    }, [query])
-
-    const handleAddUser = async ({ data, setUserListData }: { data: FormData, setUserListData: () => void }) => {
-        try {
-            const res = await axios.post(`http://app.api/api/users`, data, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                }
-            });
-
-            setUserListData(prev => [...prev, res.data.user]);
-
-            toast({
-                description: "User added successfully",
-                className: successClass,
-                duration,
-            });
-
-        } catch (error) {
-            const errorMessage = error?.response?.data?.message || "Error adding user";
-            console.log("🚀 ~ handleAddUser ~ error:", error)
-            toast({
-                description: errorMessage,
-                className: errorClass,
-                duration,
-            });
-        }
-    }
-
-    const deleteUser = async (person: object) => {
+    const deleteUser = async (person: any) => {
         try {
             const {
                 success,
                 error,
                 data
-            } = await handleDelete({ id: person?.id });
+            } = await handleDelete({ id: person?.id, pageQuery });
 
-            if (!success) throw new Error(error)
-            setUserListData(data);
+            if (!success)
+                throw new Error(error)
+            setUserListData({
+                data: data?.data,
+                totalPages: userListData?.totalPages,
+                totalUsers: userListData?.totalUsers,
+                firstPage: userListData?.firstPage,
+            });
 
             toast({
                 title: "Successful",
@@ -165,11 +136,40 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                 className: errorClass,
                 duration,
             });
-            console.log("🚀 ~ deleteUser ~ error:", error);
         }
     }
 
     const validData = (userListData?.data && userListData?.data.length > 0);
+
+    const handleSearchReset = async () => {
+        setValue("search", ''); // پاک کردن مقدار سرچ
+        // دریافت مجدد لیست کاربران
+        try {
+            const { success, data, error } = await userListFetch({ pageQuery });
+
+            if (error) {
+                toast({
+                    title: 'Error',
+                    description: error || 'users invalid',
+                    className: 'bg-red-300 text-red-900'
+                });
+                return;
+            }
+
+            setUserListData({
+                data: data?.data,
+                totalPages: data?.last_page,
+                totalUsers: data?.total,
+                firstPage: data?.from,
+            });
+        } catch (error) {
+            toast({
+                description: error?.message || 'error',
+                className: 'bg-red-300 text-red-950',
+                duration
+            });
+        }
+    };
 
     return (
         <section className="w-full">
@@ -200,20 +200,21 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                                 type="search"
                             />
                             <button
-                                className="items-center justify-center rounded-e-lg text-muted-foreground/80 ring-offset-background transition-shadow hover:text-foreground focus-visible:border focus-visible:border-ring focus-visible:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-                                aria-label="Submit search"
-                                type="submit"
+                                className="items-center justify-center rounded-e-lg text-muted-foreground/80 ring-offset-background transition-shadow hover:text-foreground focus-visible:outline-none disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                                aria-label="Reset search"
+                                type="button"
+                                onClick={handleSearchReset}
                             >
                                 <ArrowRight
                                     size={16}
                                     strokeWidth={2}
                                     aria-hidden="true"
-                                    onClick={() => setValue("search", '')}
                                 />
                             </button>
                         </div>
                     </div>
                 </div>
+                {/* create new user */}
                 <Link href={'/dashboard/users-management/create-user'}>
                     <Button variant="outline">Add User</Button>
                 </Link>
@@ -237,13 +238,13 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                         && userListData?.data?.map((person) => (
                             <TrDesc key={person?.id}>
                                 <TdDesc>
-                                    <p>{person?.name}</p>
+                                    <p className='text-[14px] font-medium'>{person?.name}</p>
                                 </TdDesc>
                                 <TdDesc>
-                                    <p>{person?.email}</p>
+                                    <p className='text-[14px] font-medium'>{person?.email}</p>
                                 </TdDesc>
                                 <TdDesc>
-                                    <p>{person?.phone}</p>
+                                    <p className='text-[14px] font-medium'>{person?.phone}</p>
                                 </TdDesc>
                                 <TdDesc>
                                     <DropdownMenu>
@@ -256,9 +257,9 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                             <Link href={`/dashboard/users-management/${person?.id}`}>
-                                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                <DropdownMenuItem className='cursor-pointer'>Edit</DropdownMenuItem>
                                             </Link>
-                                            <DropdownMenuItem onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
+                                            <DropdownMenuItem className='cursor-pointer' onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </TdDesc>

@@ -38,9 +38,9 @@ export function WrapContent({ children }: Child) {
     )
 }
 
-export function ContentTable({ content }: { content: string }) {
+export function ContentTable({ content, className }: { content: string, className?: string }) {
     return (
-        <p className='first:text-gray-800'>
+        <p className={cn('first:text-gray-800', className)}>
             {content}
         </p>
     )

@@ -2,9 +2,11 @@ import { cookies } from "next/headers";
 
 export const cookieName = "USER_SESSION";
 
-export async function saveSession(accessToken: string) {
+export async function saveSession({ sessionData }: { sessionData: object }) {
     const cookie = await cookies();
-    cookie.set(cookieName, accessToken, {
+    const data = JSON.stringify(sessionData);
+
+    cookie.set(cookieName, data, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         maxAge: 14 * 24 * 60 * 60, // 2 هفته بر حسب ثانیه

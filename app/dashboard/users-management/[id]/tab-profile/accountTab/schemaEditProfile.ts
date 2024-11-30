@@ -16,21 +16,22 @@ const formSchema = z.object({
         .regex(/^09\d{9}$/, { message: "Phone number must be in the format 09XXXXXXXXX" }),
 
     newPassword: z.string()
-        .min(8, { message: "Password must be at least 8 characters long" })
-        .optional(),
+        .min(6, { message: "Password must be at least 6 characters" })
+        .optional()
+        .or(z.literal('')),
 
     confirmation: z.string()
-        .min(8, { message: "Password must be at least 8 characters long" })
+        .min(6, { message: "Confirmation password must be at least 6 characters" })
         .optional()
+        .or(z.literal(''))
 }).refine((data) => {
     if (data.newPassword || data.confirmation) {
         return data.newPassword === data.confirmation;
     }
     return true;
 }, {
-    message: "پسورد و تایید آن باید یکسان باشند",
+    message: "Password and confirmation must be the same",
     path: ["confirmation"]
 });
-
 
 export default formSchema;

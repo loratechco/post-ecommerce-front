@@ -14,21 +14,54 @@ import { cn } from "@/lib/utils";
 
 interface Props {
     pages: number;
+    className?: string;
 }
 
-export function PaginationComponent({ pages = 1 }: Props) {
-
+export function PaginationComponent({ pages = 1, className }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get("page")) || 1;
 
-    // تولید آرایه شماره صفحات برای نمایش
-    const getPageNumbers = () => {
-        const maxPagesToShow = 5;
-        const start = Math.max(1, currentPage - 2);
-        const end = Math.min(pages, start + maxPagesToShow - 1);
-        return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    const DOTS = "...";
+
+    // محاسبه محدوده صفحات قابل نمایش
+    const getVisiblePages = () => {
+        const siblingCount = 1;
+        const totalPageNumbers = siblingCount + 5;
+
+        // اگر تعداد کل صفحات کمتر از محدوده مورد نیاز است
+        if (pages <= totalPageNumbers) {
+            return Array.from({ length: pages }, (_, i) => i + 1);
+        }
+
+        const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
+        const rightSiblingIndex = Math.min(currentPage + siblingCount, pages);
+
+        const shouldShowLeftDots = leftSiblingIndex > 2;
+        const shouldShowRightDots = rightSiblingIndex < pages - 2;
+
+        // حالت‌های مختلف نمایش
+        if (!shouldShowLeftDots && shouldShowRightDots) {
+            const leftRange = Array.from({ length: 3 }, (_, i) => i + 1);
+            return [...leftRange, DOTS, pages];
+        }
+
+        if (shouldShowLeftDots && !shouldShowRightDots) {
+            const rightRange = Array.from(
+                { length: 3 },
+                (_, i) => pages - 2 + i
+            );
+            return [1, DOTS, ...rightRange];
+        }
+
+        if (shouldShowLeftDots && shouldShowRightDots) {
+            const middleRange = Array.from(
+                { length: rightSiblingIndex - leftSiblingIndex + 1 },
+                (_, i) => leftSiblingIndex + i
+            );
+            return [1, DOTS, ...middleRange, DOTS, pages];
+        }
     };
 
     const handlePageChange = (page: number) => {
@@ -38,68 +71,39 @@ export function PaginationComponent({ pages = 1 }: Props) {
         router.push(`${pathname}?${params.toString()}`);
     };
 
-
     return (
         <Pagination>
             <PaginationContent>
-                {/* دکمه قبلی */}
                 <PaginationItem>
                     <PaginationPrevious
                         onClick={() => handlePageChange(currentPage - 1)}
                         className={cn(
                             "cursor-pointer",
-                            currentPage <= 1 && "opacity-50 pointer-events-none"
+                            currentPage <= 1 && "opacity-50 pointer-events-none",
+
                         )}
                     />
                 </PaginationItem>
 
-                {/* صفحه اول */}
-                {currentPage > 3 && (
-                    <>
-                        <PaginationItem>
+                {getVisiblePages()?.map((pageNumber, idx) => (
+                    <PaginationItem key={idx}>
+                        {pageNumber === DOTS ? (
+                            <PaginationEllipsis />
+                        ) : (
                             <PaginationLink
-                                onClick={() => handlePageChange(1)}
-                                className="cursor-pointer"
+                                onClick={() => handlePageChange(Number(pageNumber))}
+                                isActive={currentPage === pageNumber}
+                                className={cn(
+                                    "cursor-pointer",
+                                    currentPage === pageNumber && "border-primary"
+                                )}
                             >
-                                1
+                                {pageNumber}
                             </PaginationLink>
-                        </PaginationItem>
-                        <PaginationEllipsis />
-                    </>
-                )}
-
-                {/* شماره صفحات */}
-                {getPageNumbers().map((pageNumber) => (
-                    <PaginationItem key={pageNumber}>
-                        <PaginationLink
-                            onClick={() => handlePageChange(pageNumber)}
-                            isActive={currentPage === pageNumber}
-                            className={cn(
-                                "cursor-pointer",
-                                currentPage === pageNumber && "border-primary"
-                            )}
-                        >
-                            {pageNumber}
-                        </PaginationLink>
+                        )}
                     </PaginationItem>
                 ))}
 
-                {/* صفحه آخر */}
-                {currentPage < pages - 2 && (
-                    <>
-                        <PaginationEllipsis />
-                        <PaginationItem>
-                            <PaginationLink
-                                onClick={() => handlePageChange(pages)}
-                                className="cursor-pointer"
-                            >
-                                {pages}
-                            </PaginationLink>
-                        </PaginationItem>
-                    </>
-                )}
-
-                {/* دکمه بعدی */}
                 <PaginationItem>
                     <PaginationNext
                         onClick={() => handlePageChange(currentPage + 1)}

@@ -28,7 +28,6 @@ export default async function RootLayout({
 }>) {
   const session = await getSession()
   const permissions = await getPermissions()
-
   return (
     <html lang="en">
       <body
@@ -37,8 +36,8 @@ export default async function RootLayout({
           inter.variable
         )}
       >
-        <SessionProvider session={session}>
-          <PermissioinsProvider userPermissions={permissions}>
+        <SessionProvider session={JSON.parse(session)}>
+          <PermissioinsProvider userPermissions={permissions} initUserData={null}>
             {children}
             <Toaster />
           </PermissioinsProvider>

@@ -18,7 +18,6 @@ import formSchema from "./schemaEditProfile";
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
 import { toast } from "@/hooks/use-toast";
-// تابع fetcher که با SWR استفاده می‌شود
 
 const formFields = [
     { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -35,10 +34,11 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
     const [fetchError, setFetchError] = useState<null | string>(null)
     const [userData, setUserData] = useState<[] | Promise<void> | null>([])
 
+    const idCondition = (userId === 'create-user')
     useEffect(() => setFetchError(null), [fetchError])
 
     type FormData = z.infer<typeof formSchema>;
-    const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, watch, reset, getValues, formState: { errors, isSubmitting }, control } = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
@@ -89,35 +89,53 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
         getUser();
     }, [])
 
+    console.log(getValues("newPassword"));
+
     const onSubmit = async (data: FormData) => {
+        console.log("فرم سابمیت شد:", data);
         const formData = new FormData();
 
+        console.log("آواتار:", userAvatar);
         // افزودن آواتار
         if (userAvatar?.[0]) {
             formData.append("avatar", userAvatar[0]);
         }
 
-        // افزودن سایر داده‌ها
-        Object.entries({
+        // ایجاد آبجکت اولیه با فیلدهای اجباری
+        const formDataObject: Record<string, string> = {
             name: data.name,
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
-            password: data.newPassword,
-            password_confirmation: data.confirmation,
             business_customer: switchState ? '1' : '0',
             is_administrator: '0',
-        }).forEach(([key, value]) => {
-            formData.append(key, value);
+        };
+
+        // فقط اگر پسورد جدید وارد شده و خالی نباشد، آن را اضافه کن
+        if (data.newPassword && data.confirmation) {
+            console.log("پسورد اضافه شد به فرم");
+            formDataObject.password = data.newPassword;
+            formDataObject.password_confirmation = data.confirmation;
+        }
+
+        console.log(formDataObject);
+        // افزودن داده‌ها به formData
+        Object.entries(formDataObject).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                formData.append(key, value);
+            }
         });
 
-        // برای اطمینان از محتویات formData
+        // برای دیباگ
         for (let pair of formData.entries()) {
             console.log(pair[0] + ': ' + pair[1]);
         }
 
+        console.log("پسورد:", data.newPassword);
+        console.log("تایید پسورد:", data.confirmation);
+
         try {
-            const endpoint = (userId === 'create-user' ? '' : `/${userId}`);
+            const endpoint = (idCondition ? '' : `/${userId}`);
             console.log("🚀 ~ onSubmit ~ endpoint:", endpoint)
             const res = await axios.post(
                 `http://app.api/api/users${endpoint}`,
@@ -133,7 +151,8 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             );
 
             toast({
-                description: res?.data?.message || "پروفایل با موفقیت بروزرسانی شد",
+                title: "Successfully",
+                description: res?.data?.message || "Profile updated successfully",
                 className: "bg-green-300 text-green-950 font-semibold",
             });
 
@@ -150,45 +169,53 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             });
         }
     };
-    console.log(switchState);
-    const errorMessages = [
-        previewError, // استفاده از پیام خطا از استیت مشترک
-        errors?.name?.message,
-        errors?.last_name?.message,
-        errors?.email?.message,
-        errors?.phone?.message,
-        errors?.image?.message,
-    ];
 
     console.log(userData?.data?.avatar);
 
     return (
         <>
             <ErrorToast
-                errorMessagesArray={errorMessages}
+                errorMessagesArray={[
+                    previewError,
+                    errors?.name?.message,
+                    errors?.last_name?.message,
+                    errors?.email?.message,
+                    errors?.phone?.message,
+                    errors?.newPassword?.message,
+                    errors?.confirmation?.message,
+                ]}
                 dependency={errors}
                 dependencyOption={previewError || fetchError}
             />
             <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
 
-                {!(userId === 'create-user') && (<div className="relative size-14 ">
+                {
+                    idCondition && (
+                        <div className="">
+                            <h1 className="text-2xl font-semibold">Create new User</h1>
+                        </div>
+                    )
+                }
+                {!idCondition && (
+                    <div className="relative size-14 ">
 
-                    <input
-                        className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
-                        type="file"
-                        accept="image/*"
-                    />
+                        <input
+                            className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
+                            type="file"
+                            accept="image/*"
+                            {...register("image")}
+                        />
 
-                    <Avatar className="cursor-pointer relative z-0 size-full">
-                        <AvatarImage
-                            src=
-                            {
-                                `${userData?.data?.avatar || preview || 'https://github.com/shadcn.png'}`
-                            }
-                            className="object-cover" />
-                        <AvatarFallback>JS</AvatarFallback>
-                    </Avatar>
-                </div>)}
+                        <Avatar className="cursor-pointer relative z-0 size-full">
+                            <AvatarImage
+                                src=
+                                {
+                                    `${userData?.data?.avatar || preview || 'https://github.com/shadcn.png'}`
+                                }
+                                className="object-cover" />
+                            <AvatarFallback>JS</AvatarFallback>
+                        </Avatar>
+                    </div>)}
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
                     {formFields.map((field) => (

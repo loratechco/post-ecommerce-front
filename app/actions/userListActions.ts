@@ -31,7 +31,7 @@ const userListFetch = async ({ pageQuery = '', query = '' }: { pageQuery?: strin
     }
 }
 
-const handleDelete = async ({ id }: { id: string }) => {
+const handleDelete = async ({ id, pageQuery }: { id: string, pageQuery: string }) => {
     const token = await getToken();
 
     try {
@@ -51,11 +51,12 @@ const handleDelete = async ({ id }: { id: string }) => {
             };
         }
 
-        const updatedList = await userListFetch();
+        const updatedList = await userListFetch({ pageQuery });
 
+        console.log(updatedList.data.data);
         return {
             success: true,
-            data: updatedList.data
+            data: updatedList?.data
         };
     } catch (error: any) {
         console.log("🚀 ~ handleDelete ~ error:", error);

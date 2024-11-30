@@ -18,77 +18,70 @@ import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
 import { createTicket } from "@/app/actions/adminTicketingActions";
 
+import { useRouter } from "next/navigation";
+
 const schema = z.object({
     title: z
         .string()
-        .min(3, { message: "Title must be at least 5 characters long" })
-        .max(100, { message: "Title must be less than 100 characters" }),
-    description: z
-        .string()
-        .min(5, { message: "Description must be at least 10 characters long" })
-        .max(500, { message: "Description must be less than 500 characters" }),
+        .min(3, { message: "Title must be at least 3 characters long" })
+        .max(60, { message: "Title must be less than 60 characters" }),
 });
 
 function AddTicketing({ token }: { token: string }) {
 
+    const router = useRouter();
+
     const [formError, setFormError] = useState<object>({
         title: '',
-        description: '',
     });
 
+    // submit handler
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const { title, description } = e.target as HTMLFormElement;
+        const { title: { value } } = e.target as HTMLFormElement;
 
-
+        console.log('title=>>>', value);
         const { success, error } = schema.safeParse({
-            title: title.value,
-            description: description.value
+            title: value,
         });
-        // error handling
+        // error handling fornt side
         if (!success) {
             const zodError = error?.flatten().fieldErrors;
             setFormError({
                 title: zodError?.title?.[0] || '',
-                description: zodError?.description?.[0] || '',
             });
             return;
         }
 
-        setFormError({
-            title: '',
-            description: '',
-        });
-
+        setFormError({ title: '' });
+        // create ticket handler
         const { createTicketError, data } = await createTicket({
             token: token,
-            title: title.value,
-            description: description.value
+            title: value,
         });
 
+        console.log('data=>>>', data);
+        // redirect to ticket chat
+        router.push(`/dashboard/ticketing/${data?.id}`);
+        // check error backend side
         if (createTicketError) {
             toast({
                 title: 'Error',
                 className: 'bg-red-300 text-950',
                 duration: 3000,
-                description: createTicketError || 'Something went wrong'
             })
             return;
         }
-
-        console.log(data);
     }
 
     // toast error
     useEffect(() => {
-        if (!formError.title && !formError.description) return;
+        if (!formError?.title) return;
         toast({
             title: 'Unsuccessful',
             className: 'bg-red-300 text-950 font-semibold',
             duration: 3000,
-            description: formError?.title
-                || formError?.description
-                || 'Something went wrong',
+            description: formError?.title || 'Something went wrong',
         })
     }, [formError])
 
@@ -120,22 +113,11 @@ function AddTicketing({ token }: { token: string }) {
                                 Title
                             </Label>
                             <Input
+                                maxLength={60}
                                 name="title"
                                 id="title"
                                 placeholder='Write your title'
                                 className="ring-0 focus-visible:ring-0 col-span-3 outline-none outline-1 outline-zinc-400 focus-visible:outline-zinc-500 rounded-sm border-none"
-                            />
-                        </div>
-                        <div className="grid grid-cols-3 items-center gap-4">
-                            <Label htmlFor="description" className="block">
-                                Description
-                            </Label>
-                            <TextareaAutosize
-                                name="description"
-                                id="description"
-                                className="p-2 col-span-3 outline-none outline-1 outline-zinc-400 focus-visible:outline-zinc-500 rounded-sm"
-                                placeholder='Write your description'
-                                maxRows={6}
                             />
                         </div>
 

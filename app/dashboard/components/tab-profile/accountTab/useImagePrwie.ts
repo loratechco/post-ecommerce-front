@@ -1,48 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-interface ImageData {
-    preview: string | null;
-    previewError: string | null;
+interface UseImageUploadReturn {
+    avatarPreview: string | null;
+    handleImageUpload: (file: File) => { fileData: File | null; ok: boolean; error?: string } | null;
 }
 
-function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData {
-    const [imageData, setImageData] = useState<ImageData>({
-        preview: null,
-        previewError: null,
-    });
+export const useImageUpload = (imageFile: FileList | null): UseImageUploadReturn => {
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+    const handleImageUpload = (file: File) => {
+        if (!(file instanceof File) || !file) return null;
+
+        if (file.size > 1 * 1024 * 1024) {
+            return {
+                fileData: null,
+                ok: false,
+                error: "Image size must be less than 1MB"
+            };
+        }
+        return { fileData: file, ok: true };
+    };
 
     useEffect(() => {
-        console.log('fileInput', fileInput);
-        if (!fileInput || !fileInput[0]) {
-            setImageData({
-                preview: null,
-                previewError: null,
-            });
-            return;
+        if (!imageFile?.[0] || !(imageFile[0] instanceof File)) return;
+
+        try {
+            const urlImage = URL.createObjectURL(imageFile[0]);
+            setAvatarPreview(urlImage);
+
+            return () => {
+                URL.revokeObjectURL(urlImage);
+            };
+        } catch (error) {
+            console.error('Error creating object URL:', error);
         }
+    }, [imageFile]);
 
-        const file = fileInput[0];
-        if (file.size <= maxSizeMB * 1024 * 1024) {
-            const fileURL = URL.createObjectURL(file);
-            setImageData({
-                preview: fileURL,
-                previewError: null,
-            });
-        } else {
-            setImageData({
-                preview: null,
-                previewError: `File size is too large. Please select an image smaller than ${maxSizeMB} MB.`,
-            });
-        }
-
-        return () => {
-            if (fileInput && fileInput[0]) {
-                URL.revokeObjectURL(imageData.preview!);
-            }
-        };
-    }, [fileInput, maxSizeMB]);
-
-    return imageData;
-}
-
-export default useImagePreview;
+    return {
+        avatarPreview,
+        handleImageUpload,
+    };
+};

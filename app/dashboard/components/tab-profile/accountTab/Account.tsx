@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { useForm } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
-import useImagePreview from "./useImagePrwie";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -17,11 +16,8 @@ import formSchema from "./schemaEditProfile";
 
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
-// تابع fetcher که با SWR استفاده می‌شود
-import useSWR, { mutate } from 'swr'
 import { toast } from "@/hooks/use-toast";
-const fetcher = (token) => getUserAccount(token);
-
+import { useImageUpload } from './useImagePrwie';
 
 const formFields = [
     { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -37,20 +33,37 @@ const formFieldsPassword = [
 function Account() {
 
     const userToken = useSession();  // گرفتن توکن کاربر از useSession
+    const [data, setData] = useState<[] | null>([]);
 
-    const { data, error } = useSWR(
-        userToken ? ['account-data', userToken] : null,
-        ([_, token]) => fetcher(token) // ترتیب پارامترها مطابق تعریف
-    );
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await getUserAccount(userToken);
+                setData(response);
+            } catch (error) {
+                toast({
+                    description: error?.response?.data?.message || "خطا در دریافت اطلاعات",
+                    className: "bg-red-300 text-red-950 font-semibold",
+                });
+            }
+        };
+
+        if (userToken) {
+            fetchData();
+        }
+    }, [userToken]);
 
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
     const [userData, setUserData] = useState<[] | Promise<void> | null>(null)
-
     useEffect(() => setFetchError(null), [fetchError])
 
-    type FormData = z.infer<typeof formSchema>;
-    const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm({
+    // تعریف type برای فرم
+    type FormData = z.infer<typeof formSchema> & {
+        image: FileList | null;
+    };
+
+    const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
@@ -60,14 +73,11 @@ function Account() {
             image: null,
         },
     });
-
-    const userAvatar = watch("image")
-    const { preview, previewError } = useImagePreview(userAvatar);
-
+    const userAvatar = watch("image");
+    const { avatarPreview, handleImageUpload } = useImageUpload(userAvatar);
 
     // get data from api
     useEffect(() => {
-        console.log(error, data);
         if (data) {
             setSwitchState(data?.business_customer);  // به‌روزرسانی وضعیت سوییچ
             setUserData(data);  // ذخیره داده‌ها در وضعیت
@@ -78,15 +88,14 @@ function Account() {
         }
     }, [data])
 
-    //PUT User Data
+    //Post User Data
     const onSubmit = async (data: FormData) => {
-        console.log(userAvatar[0]);
-        // Create FormData instance
         const formData = new FormData();
+        const selectedImg = handleImageUpload(userAvatar?.[0]);
 
         // Handle avatar upload
-        if (userAvatar?.[0]) {
-            formData.append("avatar", userAvatar[0]);
+        if (!selectedImg?.error) {
+            formData.append("avatar", selectedImg?.fileData as File)
         }
 
         // Add form data fields
@@ -110,15 +119,11 @@ function Account() {
                 }
             });
 
-
             // Show success message
             toast({
                 description: res?.data?.message || "Profile updated successfully",
                 className: "bg-green-300 text-green-950 font-semibold",
             });
-
-            // Refresh data
-            mutate(userToken);
 
         } catch (error: any) {
             const errorMessage = error?.response?.data?.message || "Error updating profile";
@@ -132,23 +137,19 @@ function Account() {
         }
     };
 
-    const errorMessages = [
-        fetchError,
-        previewError, // استفاده از پیام خطا از استیت مشترک
-        errors?.name?.message,
-        errors?.last_name?.message,
-        errors?.email?.message,
-        errors?.phone?.message,
-        errors?.image?.message,
-    ];
-
-
     return (
         <>
             <ErrorToast
-                errorMessagesArray={errorMessages}
+                errorMessagesArray={[
+                    fetchError,
+                    errors?.name?.message,
+                    errors?.last_name?.message,
+                    errors?.email?.message,
+                    errors?.phone?.message,
+                    errors?.image?.message,
+                ]}
                 dependency={errors}
-                dependencyOption={previewError || fetchError}
+                dependencyOption={fetchError}
             />
             <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
 
@@ -159,12 +160,27 @@ function Account() {
                         type="file"
                         accept="image/*"
                         {...register("image")}
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            if (file.size > 1 * 1024 * 1024) {
+                                toast({
+                                    title: "Unsuccessful",
+                                    description: "Image size must be less than 1MB",
+                                    className: "bg-red-300 text-red-950 font-semibold",
+                                });
+                                e.target.value = '';  // پاک کردن input
+                                return;
+                            }
+                            register("image").onChange(e);
+
+                        }}
                     />
 
                     <Avatar className="cursor-pointer relative z-0 size-full">
                         <AvatarImage
                             src={
-                                `${preview || 'http://app.api/' + userData?.avatar || 'https://github.com/shadcn.png'}`
+                                `${avatarPreview || `http://app.api/${userData?.avatar}` || 'https://github.com/shadcn.png'}`
                             }
 
                             className="object-cover" />
@@ -173,14 +189,19 @@ function Account() {
                 </div>
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
-                    {formFields?.map((field) => (
+                    {formFields?.map(({
+                        id,
+                        placeholder,
+                        type,
+                        nameLabel
+                    }) => (
                         <FormInput
-                            key={field?.id}
-                            id={field?.id}
-                            placeholder={field?.placeholder}
-                            type={field?.type}
-                            nameLabel={field?.nameLabel}
-                            register={register(field?.id)}
+                            key={id}
+                            id={id}
+                            placeholder={placeholder}
+                            type={type}
+                            nameLabel={nameLabel}
+                            register={register(id as "name" | "last_name" | "email" | "phone")}
                             className="w-full border-gray-400"
                         />
                     ))
@@ -202,8 +223,9 @@ function Account() {
 
                 <div className="">
                     <label className="block pb-2 text-sm">Save profile changes</label>
-                    <Button className="px-5 border border-gray-400 bg-gray-300 hover:bg-gray-400 text-black font-semibold"
+                    <Button className="px-5 border text-white font-semibold"
                         type="submit"
+                        variant="default"
                         disabled={isSubmitting}
                     >
                         Submit

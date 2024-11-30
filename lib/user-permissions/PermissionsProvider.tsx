@@ -16,10 +16,12 @@ const PermissionsContext = createContext<PermissionsContextType>({
 
 export function PermissioinsProvider({
     children,
-    userPermissions
+    userPermissions,
+    initUserData
 }: {
     children: React.ReactNode;
     userPermissions: any;
+    initUserData: object | null;
 }) {
     const [permissions, setPermissions] = useState(userPermissions);
     const token = useSession();
@@ -61,7 +63,7 @@ export function PermissioinsProvider({
     }, [userPermissions]);
 
     return (
-        <PermissionsContext.Provider value={{ permissions, refreshPermissions }}>
+        <PermissionsContext.Provider value={{ permissions, refreshPermissions, initUserData }}>
             {children}
         </PermissionsContext.Provider>
     );

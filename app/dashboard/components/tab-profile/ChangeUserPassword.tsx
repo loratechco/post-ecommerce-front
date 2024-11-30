@@ -84,10 +84,10 @@ export default function ChangePassword() {
                         id={field?.id}
                         type='password'
                         nameLabel={field?.nameLabel}
-                        register={...register(field?.id)}
-                className="border-none"
-                placeholder="least 6 characters long"
-                classNameParentPasswordInput='w-full lg:w-1/2'
+                        register={register(field?.id)}
+                        className="border-none"
+                        placeholder="least 6 characters long"
+                        classNameParentPasswordInput='w-full lg:w-1/2'
                     />
                 ))}
             </div>

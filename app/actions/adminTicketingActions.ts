@@ -1,44 +1,41 @@
 'use server'
 
-
+import axios from "axios";
 const API_URL = 'http://app.api/api';
 
-const getUserListTickets = async ({ token }: { token: string }) => {
-
+// دریافت لیست تیکت‌ها
+const getUserListTickets = async ({ token, currentPage = '' }: { token: string, currentPage: string }) => {
     try {
-        const response = await fetch(`${API_URL}/tickets`, {
-            method: 'GET',
+        const res = await axios.get(`${API_URL}/tickets?page=${currentPage}`, {
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
             }
-        })
-        if (!response.ok) return []
+        });
 
-        return response.json();
+        // console.log('data=>>>', res)
 
+        return { data: res.data.data, last_page: res.data.last_page };
     } catch (error) {
-        console.log(error);
-        return error as string || 'An error occurred';
+        console.error('خطا در دریافت تیکت‌ها:', error);
+        return [];
     }
 }
 
-const createTicket = async ({ token, title, description }: { token: string, title: string, description: string }) => {
-
+// ایجاد تیکت جدید
+const createTicket = async ({ title, token }: { title: string, token: string }) => {
     try {
-        const response = await fetch(`${API_URL}/tickets`, {
-            method: 'POST',
+        const response = await axios.post(`${API_URL}/tickets`, { title }, {
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`
             }
-        })
-        if (!response.ok) return { createTicketError: response.statusText }
-
-        return { createTicketError: null, data: response.json() };
+        });
+        return { createTicketError: null, data: response.data };
     } catch (error) {
-        console.log(error);
-        return error as string || 'An error occurred';
+        console.error('خطا در ایجاد تیکت:', error);
+        return {
+            createTicketError: 'خطایی در ایجاد تیکت رخ داده است',
+            data: null
+        };
     }
 }
 
