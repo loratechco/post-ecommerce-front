@@ -1,13 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, MoreHorizontal, Plus, Search } from 'lucide-react'
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-
+import { Badge } from "@/components/ui/badge"
 import TableDesc from '@/components/table-responsive/TableDesc'
 import {
     TheadDesc,
@@ -33,10 +25,8 @@ import AddTicketing from './addTicketing'
 // import { useSession } from '@/lib/auth/useSession'
 import { format } from 'date-fns'
 import { PaginationComponent } from '@/components/pagination'
-import { Input } from '@/components/ui/input'
-import { useForm } from 'react-hook-form'
 import SearchComponent from './components/SearchComponent'
-
+import { cn } from '@/lib/utils'
 interface TicketList {
     data: {
         id: number;
@@ -79,7 +69,7 @@ async function TicketListPage({ searchParams }: { searchParams: { page: string, 
                 </div>
             </SearchComponent>
 
-            <section className='pt-7 w-full'>
+            <section className='pt-5 w-full'>
                 <TableDesc>
                     <TheadDesc>
                         <TrDesc>
@@ -117,9 +107,9 @@ async function TicketListPage({ searchParams }: { searchParams: { page: string, 
                         ))
                             : (
                                 <TrDesc>
-                                    <TdDesc ></TdDesc>
-                                    <TdDesc >
-                                        There are no tickets yet
+                                    <TdDesc></TdDesc>
+                                    <TdDesc>
+                                        <p className='table-text'>There are no tickets</p>
                                     </TdDesc>
                                 </TrDesc>
                             )}
@@ -135,27 +125,33 @@ async function TicketListPage({ searchParams }: { searchParams: { page: string, 
                         updated_at
                     }: TicketList['data'], index: number) => (
                         <CardTable key={id}>
-                            <WrapContent>
-                                <ContentTable
-                                    content={String(index + 1)}
-                                />
-                                <ContentTable
-                                    content={title}
-                                    className='truncate overflow-hidden max-w-[200px]'
-                                />
-                                <ContentTable
-                                    content={status}
-                                />
-                                <ContentTable
-                                    content={dateConvert(updated_at)}
-                                />
-                            </WrapContent>
+                            <Link href={`/dashboard/ticketing/${id}`} className='w-full flex items-start justify-center'>
+                                <WrapContent>
+                                    <ContentTable
+                                        content={String(index + 1)}
+                                    />
+                                    <ContentTable
+                                        content={title}
+                                        className='truncate overflow-hidden max-w-[200px]'
+                                    />
+                                    <ContentTable
+                                        content={dateConvert(updated_at)}
+                                    />
+                                </WrapContent>
+                                <div className="">
+                                    <Badge className={cn(
+                                        'px-2 pt-0.5 pb-1 shadow-none ',
+                                        status === 'open' && 'bg-emerald-600 hover:bg-emerald-700'
+
+                                    )}>{status}</Badge>
+                                </div>
+                            </Link>
                         </CardTable>
                     ))
                         : (<CardTable className="bg-zinc-200">
                             <WrapContent>
                                 <div className="text-black font-semibold">
-                                    There are no tickets yet
+                                    There are no tickets
                                 </div>
                             </WrapContent>
                         </CardTable>

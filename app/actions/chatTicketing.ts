@@ -39,4 +39,19 @@ const getTicket = async ({ ticketId, token }: { ticketId: string, token: string 
         return { ok: false, response: error };
     }
 }
-export { sendMessage, getTicket }
+
+const getServerAction = (endPiont: string, token: string,) => {
+    try {
+        const res = axios.get(`${API_URL}/${endPiont}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        // console.log(res);
+        // return res
+    } catch (error) {
+        // console.log(error);
+        // return error
+    }
+}
+export { sendMessage, getTicket, getServerAction }

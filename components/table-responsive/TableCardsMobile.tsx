@@ -33,7 +33,7 @@ export function CardTable({ children, className }: Child & { className?: string 
 
 export function WrapContent({ children }: Child) {
     return (
-        <span className="block text-gray-600">
+        <span className="block text-gray-600 w-full">
             {children}
         </span>
     )

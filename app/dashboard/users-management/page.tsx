@@ -1,15 +1,15 @@
 import { userListFetch } from "@/app/actions/userListActions";
 import ErrorToast from "@/components/ErrorToast";
 import { PaginationComponent } from "@/components/pagination";
-import TableCardsMobile, { ActionBtn, CardTable, ContentTable, WrapContent } from "@/components/table-responsive/TableCardsMobile";
+import TableCardsMobile, { CardTable, ContentTable, WrapContent } from "@/components/table-responsive/TableCardsMobile";
 import TableDesc, { TbodyDesc, TdDesc, ThDesc, TheadDesc, TrDesc } from "@/components/table-responsive/TableDesc";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cookieName } from "@/lib/auth/storage";
-import { MoreHorizontal, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { cookies } from "next/headers";
 import Link from "next/link";
 import UserListDropDown from "./UserListDropDown";
 import { Button } from "@/components/ui/button";
+import SearchComponent from "../ticketing/components/SearchComponent";
 
 interface Params {
     searchParams: {
@@ -19,11 +19,16 @@ interface Params {
 }
 export default async function UserListPage({ searchParams }: Params) {
 
-    const { page = '1' } = await searchParams;
+    const { page = '1', search = '' } = await searchParams;
     const cookieStore = await cookies();
     const { token } = JSON.parse(cookieStore.get(cookieName)?.value as string);
 
-    const { success, data, error } = await userListFetch({ pageQuery: page, token });
+    const { success, data, error } = await userListFetch({
+        pageQuery: page,
+        token,
+        query: search
+
+    });
 
     const userListData = {
         data: data?.data || [],
@@ -32,16 +37,19 @@ export default async function UserListPage({ searchParams }: Params) {
 
     const validData = (userListData?.data && userListData?.data.length > 0);
 
-    const deleteUser = async (person: any) => {
-        console.log(person);
-    }
-
     return (
-        <section className="w-full">
+        <section className="w-full space-y-5">
             {/* create new user */}
-            <Link href={'/dashboard/users-management/create-user'}>
-                <Button className='btn-outline'>Add User <Plus /></Button>
-            </Link>
+
+            <SearchComponent token={token}>
+                <Link href={'/dashboard/users-management/create-user'} className="block max-md:w-full">
+                    <Button className='btn-outline'>
+                        Add User
+                        <Plus />
+                    </Button>
+                </Link>
+            </SearchComponent>
+
             {error &&
                 <ErrorToast
                     errorMessagesArray={[error]}
@@ -82,7 +90,7 @@ export default async function UserListPage({ searchParams }: Params) {
                             (<TrDesc>
                                 <TdDesc></TdDesc>
                                 <TdDesc>
-                                    <p className='font-semibold table-text p-3'></p>
+                                    <p className='font-semibold table-text p-1'>User not found</p>
                                 </TdDesc>
                             </TrDesc>
                             )
@@ -100,15 +108,17 @@ export default async function UserListPage({ searchParams }: Params) {
                             <ContentTable
                                 content={person?.email}
                             />
+                            <ContentTable
+                                content={person?.phone}
+                            />
                         </WrapContent>
                         <UserListDropDown person={person} page={page} token={token} />
-
                     </CardTable>
                 )) || (
                         <CardTable >
                             <WrapContent>
                                 <ContentTable
-                                    content={''}
+                                    content={'User not found'}
                                 />
                             </WrapContent>
                         </CardTable>

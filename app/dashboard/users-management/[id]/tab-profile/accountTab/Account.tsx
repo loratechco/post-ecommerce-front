@@ -134,7 +134,11 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             const errorMessage = Object.values(error?.response?.data?.errors || {})
                 .flat()
                 .find((message: string) => typeof message === 'string');
-            console.log("🚀 ~ onSubmit ~ errorMessages:", error?.response?.data?.message);
+
+            console.log(
+                'error?.response ==>', error?.response?.data?.errors,
+                'Object.values ==>', Object.values(error?.response?.data || {})
+            );
             toast({
                 title: "Error",
                 // نمایش اولین پیام خطا در toast

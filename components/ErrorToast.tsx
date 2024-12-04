@@ -13,13 +13,14 @@ interface ErrorToastProps {
 const ErrorToast: React.FC<ErrorToastProps> = ({ errorMessagesArray, dependency, dependencyOption = null }) => {
     const { toast } = useToast();
     useEffect(() => {
-        const firstError = errorMessagesArray.find((error) => error);
+        const errorMsg = errorMessagesArray.find((error) => error);
 
-        if (firstError) {
+        if (errorMsg) {
             toast({
-                description: firstError,
+                description: errorMsg,
+                title: "Unsuccessful",
                 duration: 3000,
-                className: "bg-red-200 text-red-800",
+                className: "bg-red-300 text-red-950 border-none",
             });
         }
     }, [dependency, toast, dependencyOption]);

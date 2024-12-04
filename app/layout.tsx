@@ -10,10 +10,10 @@ import { SessionProvider } from "@/lib/auth/SessionProvider"
 import { PermissioinsProvider } from "@/lib/user-permissions/PermissionsProvider"
 import getPermissions from "@/lib/user-permissions/getPermissions"
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+// const inter = Inter({
+//   subsets: ["latin"],
+//   variable: "--font-sans",
+// })
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -33,7 +33,7 @@ export default async function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          inter.variable
+          // inter.variable
         )}
       >
         <SessionProvider session={JSON.parse(session)}>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { cookies } from 'next/headers'
 import { cookieName } from '@/lib/auth/storage'
-import { getTicket } from '@/app/actions/chatTicketing'
+import { getServerAction, getTicket } from '@/app/actions/chatTicketing'
 import { Suspense } from 'react'
 import axios from 'axios'
 import { API_URL } from '@/app/actions/actionHelper'
@@ -32,6 +32,8 @@ export default
             return { ok: false, response: error };
         }
     }
+    // const res = await getServerAction(`tickets/${id}/messages`, sessionData.token)
+    console.log("res=>>>>>>", res);
     const ticketData = await getTicketData();
     return (
         <div className="h-[calc(100vh-6.2rem)] p-1  relative w-full">

@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 interface Props {
     className?: string,
     token: string,
-    children: React.ReactNode
+    children?: React.ReactNode
 }
 
 function SearchComponent({ className, token, children }: Props) {
@@ -61,6 +61,7 @@ function SearchComponent({ className, token, children }: Props) {
                     }}
                 />
             </div>
+            {/* For the elements next to the input  */}
             {children}
         </div>
     );
