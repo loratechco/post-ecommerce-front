@@ -46,7 +46,7 @@ const dataFetcher = async (url: string, userToken: string) => {
 
 export default function Permission() {
     const { toast } = useToast();
-    const token = useSession();
+    const { token } = useSession();
 
     const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
     const [initialStateSet, setInitialStateSet] = useState(false);

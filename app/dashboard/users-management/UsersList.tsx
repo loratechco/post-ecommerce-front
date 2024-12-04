@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -23,7 +23,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Search, ArrowRight, MoreHorizontal, } from 'lucide-react'
+import { Search, ArrowRight, MoreHorizontal, Plus, } from 'lucide-react'
 import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import TableDesc, { TbodyDesc, TdDesc, ThDesc, TheadDesc, TrDesc } from '@/components/table-responsive/TableDesc'
@@ -43,17 +43,16 @@ import ErrorToast from '@/components/ErrorToast'
 import { object } from 'zod'
 
 export default function UserList({ pageQuery }: { pageQuery: string }) {
-    const token = useSession();
-    const [userListData, setUserListData] = useState<{ data: object[], totalPages: number, totalUsers: number, firstPage: number }>({
+    const { token } = useSession();
+    console.log('token=>>>', token);
+    const [userListData, setUserListData] = useState<{ data: object[], totalPages: number }>({
         data: [],
         totalPages: 1,
-        firstPage: 1,
-        totalUsers: 0,
     })
 
     const fetchUsers = React.useCallback(async (params: { pageQuery?: string, query?: string }) => {
         try {
-            const { success, data, error } = await userListFetch(params);
+            const { success, data, error } = await userListFetch({ ...params, token });
 
             if (error) {
                 toast({
@@ -67,8 +66,6 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
             setUserListData({
                 data: data?.data,
                 totalPages: data?.last_page,
-                totalUsers: data?.total,
-                firstPage: data?.from,
             });
         } catch (error) {
             toast({
@@ -112,15 +109,13 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                 success,
                 error,
                 data
-            } = await handleDelete({ id: person?.id, pageQuery });
+            } = await handleDelete({ id: person?.id, pageQuery, token });
 
             if (!success)
                 throw new Error(error)
             setUserListData({
                 data: data?.data,
                 totalPages: userListData?.totalPages,
-                totalUsers: userListData?.totalUsers,
-                firstPage: userListData?.firstPage,
             });
 
             toast({
@@ -139,13 +134,13 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
         }
     }
 
-    const validData = (userListData?.data && userListData?.data.length > 0);
+    const validData = userListData?.data && userListData?.data.length > 0;
 
     const handleSearchReset = async () => {
         setValue("search", ''); // پاک کردن مقدار سرچ
         // دریافت مجدد لیست کاربران
         try {
-            const { success, data, error } = await userListFetch({ pageQuery });
+            const { success, data, error } = await userListFetch({ pageQuery, token });
 
             if (error) {
                 toast({
@@ -159,8 +154,6 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
             setUserListData({
                 data: data?.data,
                 totalPages: data?.last_page,
-                totalUsers: data?.total,
-                firstPage: data?.from,
             });
         } catch (error) {
             toast({
@@ -216,7 +209,7 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                 </div>
                 {/* create new user */}
                 <Link href={'/dashboard/users-management/create-user'}>
-                    <Button variant="outline">Add User</Button>
+                    <Button className='btn-outline'>Add User <Plus /></Button>
                 </Link>
 
             </div>
@@ -234,43 +227,44 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
 
                 <TbodyDesc>
                     {
-                        validData
-                        && userListData?.data?.map((person) => (
-                            <TrDesc key={person?.id}>
+                        validData ?
+                            userListData?.data?.map((person) => (
+                                <TrDesc key={person?.id}>
+                                    <TdDesc>
+                                        <p className='table-text'>{person?.name}</p>
+                                    </TdDesc>
+                                    <TdDesc>
+                                        <p className='table-text'>{person?.email}</p>
+                                    </TdDesc>
+                                    <TdDesc>
+                                        <p className='table-text'>{person?.phone}</p>
+                                    </TdDesc>
+                                    <TdDesc>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild >
+                                                <button type='button' className="h-8 w-8 p-0 ">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal className="h-4 w-4 bg-transparent" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <Link href={`/dashboard/users-management/${person?.id}`}>
+                                                    <DropdownMenuItem className='cursor-pointer'>Edit</DropdownMenuItem>
+                                                </Link>
+                                                <DropdownMenuItem className='cursor-pointer' onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TdDesc>
+                                </TrDesc>
+                            )) :
+
+                            (<TrDesc>
+                                <TdDesc></TdDesc>
                                 <TdDesc>
-                                    <p className='text-[14px] font-medium'>{person?.name}</p>
+                                    <p className='font-semibold table-text p-3'></p>
                                 </TdDesc>
-                                <TdDesc>
-                                    <p className='text-[14px] font-medium'>{person?.email}</p>
-                                </TdDesc>
-                                <TdDesc>
-                                    <p className='text-[14px] font-medium'>{person?.phone}</p>
-                                </TdDesc>
-                                <TdDesc>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild >
-                                            <button type='button' className="h-8 w-8 p-0 ">
-                                                <span className="sr-only">Open menu</span>
-                                                <MoreHorizontal className="h-4 w-4 bg-transparent" />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <Link href={`/dashboard/users-management/${person?.id}`}>
-                                                <DropdownMenuItem className='cursor-pointer'>Edit</DropdownMenuItem>
-                                            </Link>
-                                            <DropdownMenuItem className='cursor-pointer' onClick={() => deleteUser(person)}>Delete</DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TdDesc>
-                            </TrDesc>
-                        )) ||
-                        (<TrDesc>
-                            <TdDesc></TdDesc>
-                            <TdDesc>
-                                <p className='font-semibold text- px-3'>user not found</p>
-                            </TdDesc>
-                        </TrDesc>)
+                            </TrDesc>)
                     }
                 </TbodyDesc>
             </TableDesc>
@@ -297,7 +291,7 @@ export default function UserList({ pageQuery }: { pageQuery: string }) {
                         <CardTable >
                             <WrapContent>
                                 <ContentTable
-                                    content={'user not found'}
+                                    content={''}
                                 />
                             </WrapContent>
                         </CardTable>

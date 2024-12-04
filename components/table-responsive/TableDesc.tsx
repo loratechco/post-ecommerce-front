@@ -57,7 +57,7 @@ export function TbodyDesc({ children }: Child) {
 export function TdDesc({ children }: Child) {
 
     return (
-        <td className="first:w-full first:sm:w-auto whitespace-nowrap p-4 first:max-sm:max-w-0 first:truncate">
+        <td className="text-center first:w-full max-w-[130px] first:sm:w-auto whitespace-nowrap p-4 first:max-sm:max-w-0 first:truncate">
             {children}
 
             {/* <dl className='lg:hidden hidden first:block font-normal text-gray-700'>

@@ -1,3 +1,4 @@
+'use client'
 // ErrorToast.tsx
 import React, { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";

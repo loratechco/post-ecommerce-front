@@ -1,20 +1,19 @@
 'use server'
 
 import axios from "axios";
-const API_URL = 'http://app.api/api';
+import { API_URL } from './actionHelper'
 
 // دریافت لیست تیکت‌ها
-const getUserListTickets = async ({ token, currentPage = '' }: { token: string, currentPage: string }) => {
+const getUserListTickets = async ({ token, currentPage = '', search = '' }: { token: string, currentPage: string, search: string }) => {
     try {
-        const res = await axios.get(`${API_URL}/tickets?page=${currentPage}`, {
+        console.log('search=>>>', search);
+        const res = await axios.get(`${API_URL}/tickets?page=${currentPage}&search=${search}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         });
-
-        // console.log('data=>>>', res)
-
-        return { data: res.data.data, last_page: res.data.last_page };
+        console.log('res=>>>', res.data);
+        return { data: res.data.data, last_page: res.data.last_page, res: res.data };
     } catch (error) {
         console.error('خطا در دریافت تیکت‌ها:', error);
         return [];

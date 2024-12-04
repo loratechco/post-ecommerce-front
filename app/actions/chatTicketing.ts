@@ -1,5 +1,6 @@
+'use server'
 import axios from "axios"
-const API_URL = 'http://app.api/api';
+import { API_URL } from './actionHelper'
 
 const sendMessage = async ({ ticketId, message, token }: { ticketId: string, message: string, token: string }) => {
     try {
@@ -18,20 +19,24 @@ const sendMessage = async ({ ticketId, message, token }: { ticketId: string, mes
     }
 }
 
+if (typeof value === 'string') {
+    //کدت
+}
 
 const getTicket = async ({ ticketId, token }: { ticketId: string, token: string }) => {
-
+    console.log(`${API_URL}/tickets/${ticketId}/messages`);
     try {
-        const res = await axios.get(`${API_URL}/tickets/${ticketId}/messages`, {
+        const res = await axios.get('http://app.api/api/tickets/1/messages', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
-        return { ok: true, response: res?.data }
-    } catch (error) {
-        console.error('خطا در دریافت پیام:', error);
+        console.log('res =>>>>>>>+++++', res);
+        return res;
+
+    } catch (error: any) {
+        console.error('خطا در دریافت تیکت:', error);
         return { ok: false, response: error };
     }
 }
-
 export { sendMessage, getTicket }

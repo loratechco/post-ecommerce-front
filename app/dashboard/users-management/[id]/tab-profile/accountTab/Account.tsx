@@ -18,6 +18,8 @@ import formSchema from "./schemaEditProfile";
 import { getUserAccount } from './useFetch'; // وارد کردن تابع getUserAccount
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
 import { toast } from "@/hooks/use-toast";
+import { useImageUpload } from "@/app/dashboard/components/tab-profile/accountTab/useImagePrwie";
+import { useUploadImg } from "@/app/dashboard/components/tab-profile/accountTab/useUploadImg";
 
 const formFields = [
     { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -33,12 +35,13 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
     const [userData, setUserData] = useState<[] | Promise<void> | null>([])
+    const [fileSaver, setFileSaver] = useState(null)
 
     const idCondition = (userId === 'create-user')
     useEffect(() => setFetchError(null), [fetchError])
 
     type FormData = z.infer<typeof formSchema>;
-    const { register, handleSubmit, watch, reset, getValues, formState: { errors, isSubmitting }, control } = useForm({
+    const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
             name: '',
@@ -49,9 +52,6 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
             confirmation: '',
         },
     });
-
-    const userAvatar = watch("image")
-    const { preview, previewError } = useImagePreview(userAvatar);
 
     console.log("🚀 ~ useEffect ~ userId:", userId)
 
@@ -89,82 +89,56 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
         getUser();
     }, [])
 
-    console.log(getValues("newPassword"));
-
     const onSubmit = async (data: FormData) => {
-        console.log("فرم سابمیت شد:", data);
         const formData = new FormData();
-
-        console.log("آواتار:", userAvatar);
-        // افزودن آواتار
-        if (userAvatar?.[0]) {
-            formData.append("avatar", userAvatar[0]);
+        // Handle avatar upload
+        if (fileSaver) {
+            formData.append("avatar", fileSaver as File)
         }
 
-        // ایجاد آبجکت اولیه با فیلدهای اجباری
-        const formDataObject: Record<string, string> = {
+        // Add form data fields
+        Object.entries({
             name: data.name,
             last_name: data.last_name,
             email: data.email,
             phone: data.phone,
             business_customer: switchState ? '1' : '0',
             is_administrator: '0',
-        };
-
-        // فقط اگر پسورد جدید وارد شده و خالی نباشد، آن را اضافه کن
-        if (data.newPassword && data.confirmation) {
-            console.log("پسورد اضافه شد به فرم");
-            formDataObject.password = data.newPassword;
-            formDataObject.password_confirmation = data.confirmation;
-        }
-
-        console.log(formDataObject);
-        // افزودن داده‌ها به formData
-        Object.entries(formDataObject).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
-                formData.append(key, value);
-            }
+            password: data.newPassword,
+            password_confirmation: data.confirmation,
+        }).forEach(([key, value]) => {
+            formData.append(key, value as string);
         });
 
-        // برای دیباگ
-        for (let pair of formData.entries()) {
-            console.log(pair[0] + ': ' + pair[1]);
-        }
-
-        console.log("پسورد:", data.newPassword);
-        console.log("تایید پسورد:", data.confirmation);
-
+        console.log("🚀 ~ onSubmit ~ formData:", formData)
+        const apis = idCondition ? '/api/users' : `/api/users/${userId}`
         try {
-            const endpoint = (idCondition ? '' : `/${userId}`);
-            console.log("🚀 ~ onSubmit ~ endpoint:", endpoint)
-            const res = await axios.post(
-                `http://app.api/api/users${endpoint}`,
-                formData,
-                {
-                    headers: {
-                        method: 'POST',
-                        "Authorization": `Bearer ${userToken}`,
-                        "Content-Type": "multipart/form-data",
-                        "Accept": "application/json"
-                    }
+            const res = await axios.post(`http://app.api${apis}`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${userToken}`,
+                    'Content-Type': 'multipart/form-data',
+                    'Accept': 'application/json',
                 }
-            );
+            });
 
+            console.log("🚀 ~ onSubmit ~ res:", res)
+
+            // Show success message
             toast({
-                title: "Successfully",
+                title: "Success",
                 description: res?.data?.message || "Profile updated successfully",
                 className: "bg-green-300 text-green-950 font-semibold",
             });
 
-            console.log(res);
-
         } catch (error: any) {
-            const errorMessage = error?.response?.data?.message || "خطا در بروزرسانی پروفایل";
-            setFetchError(errorMessage);
-            console.error("خطای دریافتی:", error.response?.data);
-
+            const errorMessage = Object.values(error?.response?.data?.errors || {})
+                .flat()
+                .find((message: string) => typeof message === 'string');
+            console.log("🚀 ~ onSubmit ~ errorMessages:", error?.response?.data?.message);
             toast({
-                description: errorMessage,
+                title: "Error",
+                // نمایش اولین پیام خطا در toast
+                description: errorMessage as string || "Error updating profile",
                 className: "bg-red-300 text-red-950 font-semibold",
             });
         }
@@ -176,7 +150,6 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
         <>
             <ErrorToast
                 errorMessagesArray={[
-                    previewError,
                     errors?.name?.message,
                     errors?.last_name?.message,
                     errors?.email?.message,
@@ -185,7 +158,7 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
                     errors?.confirmation?.message,
                 ]}
                 dependency={errors}
-                dependencyOption={previewError || fetchError}
+                dependencyOption={fetchError}
             />
             <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
 
@@ -196,26 +169,16 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
                         </div>
                     )
                 }
-                {!idCondition && (
-                    <div className="relative size-14 ">
+                <div className="relative size-14 ">
 
-                        <input
-                            className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
-                            type="file"
-                            accept="image/*"
-                            {...register("image")}
-                        />
-
-                        <Avatar className="cursor-pointer relative z-0 size-full">
-                            <AvatarImage
-                                src=
-                                {
-                                    `${userData?.data?.avatar || preview || 'https://github.com/shadcn.png'}`
-                                }
-                                className="object-cover" />
-                            <AvatarFallback>JS</AvatarFallback>
-                        </Avatar>
-                    </div>)}
+                    {useUploadImg({
+                        sizeFile: 1,
+                        API_IMG_URL: "http://app.api",
+                        thereAvatar: true,
+                        userData: userData as any,
+                        fileSubmit: (file: File) => setFileSaver(file),
+                    })}
+                </div>
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">
                     {formFields.map((field) => (
@@ -247,12 +210,12 @@ function Account({ userId, userToken }: { userId: string, userToken: string }) {
                 </div>
 
                 <div className="">
-                    <label className="block pb-2 text-sm">Save profile changes</label>
+                    <label className="block pb-2 text-sm">Save {idCondition ? 'new user' : 'profile changes'}</label>
                     <Button className="px-5 border border-gray-400 bg-gray-300 hover:bg-gray-400 text-black font-semibold"
                         type="submit"
                         disabled={isSubmitting}
                     >
-                        Submit
+                        {idCondition ? 'Create' : 'Save'}
                     </Button>
                 </div>
 

@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Button } from "@/components/ui/button"
 
-import { useForm } from "react-hook-form";
+import { FieldValues, useForm, UseFormRegister } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
@@ -18,6 +18,7 @@ import { getUserAccount } from './useFetch'; // وارد کردن تابع getUs
 import { useSession } from '@/lib/auth/useSession'; // وارد کردن useSession
 import { toast } from "@/hooks/use-toast";
 import { useImageUpload } from './useImagePrwie';
+import { useUploadImg } from "./useUploadImg";
 
 const formFields = [
     { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -25,20 +26,17 @@ const formFields = [
     { id: "email", placeholder: "exam@gmail.com", type: "email", nameLabel: "Email" },
     { id: "phone", placeholder: "092500002524", type: "tel", nameLabel: "Phone Number" }
 ]
-const formFieldsPassword = [
-    { id: "newPassword", placeholder: "least 6 characters long", type: "password", nameLabel: "New Password" },
-    { id: "confirmation", placeholder: "least 6 characters long", type: "password", nameLabel: "Confirmation Password" }
-]
 
 function Account() {
 
-    const userToken = useSession();  // گرفتن توکن کاربر از useSession
+    const { token } = useSession();  // گرفتن توکن کاربر از useSession
     const [data, setData] = useState<[] | null>([]);
+    const [fileSaver, setFileSaver] = useState<File | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await getUserAccount(userToken);
+                const response = await getUserAccount(token);
                 setData(response);
             } catch (error) {
                 toast({
@@ -48,10 +46,10 @@ function Account() {
             }
         };
 
-        if (userToken) {
+        if (token) {
             fetchData();
         }
-    }, [userToken]);
+    }, [token]);
 
     const [switchState, setSwitchState] = useState<boolean>(false)
     const [fetchError, setFetchError] = useState<null | string>(null)
@@ -62,6 +60,7 @@ function Account() {
     type FormData = z.infer<typeof formSchema> & {
         image: FileList | null;
     };
+
 
     const { register, handleSubmit, watch, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -74,7 +73,7 @@ function Account() {
         },
     });
     const userAvatar = watch("image");
-    const { avatarPreview, handleImageUpload } = useImageUpload(userAvatar);
+    // const { avatarPreview, handleImageUpload } = useImageUpload(userAvatar);
 
     // get data from api
     useEffect(() => {
@@ -91,11 +90,11 @@ function Account() {
     //Post User Data
     const onSubmit = async (data: FormData) => {
         const formData = new FormData();
-        const selectedImg = handleImageUpload(userAvatar?.[0]);
+        // const selectedImg = handleImageUpload(userAvatar?.[0]);
 
         // Handle avatar upload
-        if (!selectedImg?.error) {
-            formData.append("avatar", selectedImg?.fileData as File)
+        if (fileSaver) {
+            formData.append("avatar", fileSaver)
         }
 
         // Add form data fields
@@ -113,7 +112,7 @@ function Account() {
         try {
             const res = await axios.post('http://app.api/api/profile', formData, {
                 headers: {
-                    'Authorization': `Bearer ${userToken}`,
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                     'Accept': 'application/json',
                 }
@@ -128,12 +127,7 @@ function Account() {
         } catch (error: any) {
             const errorMessage = error?.response?.data?.message || "Error updating profile";
             setFetchError(errorMessage);
-            console.log("🚀 ~ onSubmit ~ error:", error?.response?.data);
-
-            toast({
-                description: errorMessage,
-                className: "bg-red-300 text-red-950 font-semibold",
-            });
+            console.log("🚀 ~ onSubmit ~ error:", error);
         }
     };
 
@@ -155,7 +149,7 @@ function Account() {
 
                 <div className="relative size-14 ">
 
-                    <input
+                    {/* <input
                         className="z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer"
                         type="file"
                         accept="image/*"
@@ -175,17 +169,19 @@ function Account() {
                             register("image").onChange(e);
 
                         }}
-                    />
+                    /> */}
 
-                    <Avatar className="cursor-pointer relative z-0 size-full">
-                        <AvatarImage
-                            src={
-                                `${avatarPreview || `http://app.api/${userData?.avatar}` || 'https://github.com/shadcn.png'}`
-                            }
-
-                            className="object-cover" />
-                        <AvatarFallback>JS</AvatarFallback>
-                    </Avatar>
+                    {useUploadImg({
+                        sizeFile: 1,
+                        API_IMG_URL: "http://app.api",
+                        thereAvatar: true,
+                        userData: userData as any,
+                        fileSubmit: (file: File) => {
+                            setFileSaver(file);
+                            console.log("🚀 ~ Account ~ file:", file)
+                            React
+                        }
+                    })}
                 </div>
 
                 <div className="grid gap-7 grid-cols-2 max-lg:grid-cols-1">

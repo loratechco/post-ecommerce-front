@@ -10,7 +10,7 @@ function TabsListProfile({ userId }: { userId: string }) {
     const { permissions, refreshPermissions } = usePermissions();
 
     console.log('Current permissions:', permissions);
-    const token = useSession() as string;
+    const { token } = useSession() as string;
 
     console.log("🚀 ~ TabsListProfile ~ userId:", userId)
 
@@ -19,15 +19,12 @@ function TabsListProfile({ userId }: { userId: string }) {
         <Tabs defaultValue="account" className="w-full">
             <TabsList className="">
                 <TabsTrigger value="account">Account</TabsTrigger>
-
                 <TabsTrigger value="Permission">Permission</TabsTrigger>
-
             </TabsList>
 
             <TabsContent value="account">
                 <Account userId={userId} userToken={token} />
             </TabsContent>
-
 
             <TabsContent value="Permission">
                 <Permission userId={userId} />

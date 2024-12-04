@@ -19,7 +19,7 @@ import AccordionSkeleton from '@/components/skeletons/AccardionSkeleton'
 // The main component
 export default function Permission({ userId }: { userId: string }) {
     const { toast } = useToast();
-    const token = useSession();
+    const { token } = useSession();
 
     const [accordionData, setAccordionData] = useState<JSX.Element[] | null>(null)
     const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({})
@@ -43,7 +43,7 @@ export default function Permission({ userId }: { userId: string }) {
 
     //get data
     useEffect(() => {
-        getUserPermissions(userId)
+        getUserPermissions(userId, token)
             .then((data) => {
                 if (Array.isArray(data)) {
                     setAccordionData(data);
@@ -100,7 +100,6 @@ export default function Permission({ userId }: { userId: string }) {
                         'Content-Type': 'application/json'
                     }
                 });
-
 
             toast({
                 title: 'Successful',

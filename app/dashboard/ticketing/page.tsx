@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { MoreHorizontal, Plus } from 'lucide-react'
+import { ArrowRight, MoreHorizontal, Plus, Search } from 'lucide-react'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -33,6 +33,9 @@ import AddTicketing from './addTicketing'
 // import { useSession } from '@/lib/auth/useSession'
 import { format } from 'date-fns'
 import { PaginationComponent } from '@/components/pagination'
+import { Input } from '@/components/ui/input'
+import { useForm } from 'react-hook-form'
+import SearchComponent from './components/SearchComponent'
 
 interface TicketList {
     data: {
@@ -43,7 +46,8 @@ interface TicketList {
         updated_at: string;
     };
 }
-async function TicketListPage({ searchParams }: { searchParams: { page: string } }) {
+async function TicketListPage({ searchParams }: { searchParams: { page: string, search: string } }) {
+    const { page, search } = await searchParams;
     const cookie = await cookies();
     const { token } = JSON.parse(
         cookie.get(cookieName)?.value as string
@@ -52,64 +56,68 @@ async function TicketListPage({ searchParams }: { searchParams: { page: string }
     console.log('token=>>>', token);
 
     // get user list tickets
-    const { data, last_page } = await getUserListTickets({ token, currentPage: searchParams.page });
-    console.log('last_page=>>>', last_page);
+    const { data: { data, last_page }, } = await getUserListTickets({
+        token,
+        currentPage: searchParams.page,
+        search: searchParams.search
+    });
     const dateConvert = (date: string) => {
         return format(new Date(date), 'yyyy/MM/dd HH:mm:ss')
     }
-    console.log('data=>>>', data);
+    console.log('data=>>>', data?.data);
     const validData = (data && data.length > 0);
 
     return (
-        <div className='relative size-full'>
+        <div className='size-full'>
+            <SearchComponent
+                token={token}
+            >
+                <div className="max-md:w-full">
+                    <AddTicketing
+                        token={token}
+                    />
+                </div>
+            </SearchComponent>
 
-            <section className='pt-16'>
-                <AddTicketing
-                    token={token}
-                />
+            <section className='pt-7 w-full'>
                 <TableDesc>
                     <TheadDesc>
                         <TrDesc>
-                            <ThDesc title='User Id' />
+                            <ThDesc title='#' />
                             <ThDesc title='Title' />
                             <ThDesc title='created at' />
                             <ThDesc title='status' />
-                            <ThDesc title='show ticket' />
                         </TrDesc>
                     </TheadDesc>
 
                     <TbodyDesc>
                         {validData ? data?.map(({
                             id,
-                            user_id,
                             title,
                             status,
                             updated_at
-                        }: TicketList['data']) => (
+                        }: TicketList['data'], index: number) => (
                             <TrDesc key={id}>
                                 <TdDesc>
-                                    <p className='text-[14px] font-medium'>{id}</p>
+                                    <p className='table-text'>{index + 1}</p>
                                 </TdDesc>
                                 <TdDesc>
-                                    <p className='text-[14px] font-medium truncate overflow-hidden max-w-[200px]'>{title}</p>
-                                </TdDesc>
-                                <TdDesc>
-                                    <p className='text-[14px] font-medium'>{dateConvert(updated_at)}</p>
-                                </TdDesc>
-                                <TdDesc>
-                                    <p className='text-[14px] font-medium'>{status}</p>
-                                </TdDesc>
-                                <TdDesc>
-                                    <Link href={`/dashboard/ticketing/${id}`} className='text-[14px] font-medium hover:underline'>
-                                        Show
+                                    <Link href={`/dashboard/ticketing/${id}`} className='block'>
+                                        <p className='table-text  truncate overflow-hidden  hover:underline'>{title}</p>
                                     </Link>
                                 </TdDesc>
+                                <TdDesc>
+                                    <p className='table-text text-center'>{dateConvert(updated_at)}</p>
+                                </TdDesc>
+                                <TdDesc>
+                                    <p className='table-text text-center'>{status}</p>
+                                </TdDesc>
+
                             </TrDesc>
                         ))
                             : (
                                 <TrDesc>
-                                    <TdDesc >
-                                    </TdDesc>
+                                    <TdDesc ></TdDesc>
                                     <TdDesc >
                                         There are no tickets yet
                                     </TdDesc>
@@ -122,15 +130,14 @@ async function TicketListPage({ searchParams }: { searchParams: { page: string }
                 <TableCardsMobile >
                     {validData ? data?.map(({
                         id,
-                        user_id,
                         title,
                         status,
                         updated_at
-                    }: TicketList['data']) => (
+                    }: TicketList['data'], index: number) => (
                         <CardTable key={id}>
                             <WrapContent>
                                 <ContentTable
-                                    content={String(user_id)}
+                                    content={String(index + 1)}
                                 />
                                 <ContentTable
                                     content={title}

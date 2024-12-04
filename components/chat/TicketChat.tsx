@@ -49,7 +49,6 @@ export default function TicketChat({ id, sessionData: { token, initData }, ticke
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null);
 
-
     // scroll to bottom when messages change
     useEffect(() => {
         messagesEndRef

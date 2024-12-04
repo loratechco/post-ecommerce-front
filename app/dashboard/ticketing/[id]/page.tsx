@@ -5,6 +5,8 @@ import { cookies } from 'next/headers'
 import { cookieName } from '@/lib/auth/storage'
 import { getTicket } from '@/app/actions/chatTicketing'
 import { Suspense } from 'react'
+import axios from 'axios'
+import { API_URL } from '@/app/actions/actionHelper'
 
 export default
     async function TicketChatPage({ params }: { params: { id: string } }) {
@@ -13,13 +15,22 @@ export default
         cookie.get(cookieName)?.value as string
     );
 
-    const getTitle = (title: string) => title;
     const { id } = await params;
     const getTicketData = async () => {
-        const { response } = await getTicket({ ticketId: id, token: sessionData?.token })
-        if (!Array.isArray(response?.messages)) return;
-        console.log(response?.messages)
-        return response;
+
+        try {
+            const res = await fetch(`${API_URL}/tickets/${id}/messages`, {
+                headers: {
+                    method: 'GET',
+                    Authorization: `Bearer ${sessionData.token}`
+                }
+            })
+            console.log('res =>>>>>>>+++++', res);
+            return res;
+        } catch (error) {
+            console.log('خطا در دریافت تیکت:', error);
+            return { ok: false, response: error };
+        }
     }
     const ticketData = await getTicketData();
     return (

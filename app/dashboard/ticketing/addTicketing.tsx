@@ -19,6 +19,7 @@ import { toast } from "@/hooks/use-toast";
 import { createTicket } from "@/app/actions/adminTicketingActions";
 
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const schema = z.object({
     title: z
@@ -88,16 +89,13 @@ function AddTicketing({ token }: { token: string }) {
     return (
         <>
             <Dialog>
-                <DialogTrigger asChild>
-                    <span className="absolute block top-1 right-1 ">
-                        <Button
-                            variant="outline"
-                            className='rounded-md bg-zinc-200 hover:bg-zinc-100 px-2 hover:border-zinc-400'
-                        >
-                            <p>Add ticket</p>
-                            <Plus className='text-black stroke-black' />
-                        </Button>
-                    </span>
+                <DialogTrigger asChild >
+                    <Button
+                        className='btn-outline'
+                    >
+                        <p>Add ticket</p>
+                        <Plus className='text-black stroke-black' />
+                    </Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md max-sm:max-w-xs rounded-xl overflow-hidden">
                     <DialogHeader>

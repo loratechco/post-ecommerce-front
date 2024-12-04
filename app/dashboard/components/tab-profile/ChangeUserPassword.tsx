@@ -19,7 +19,7 @@ const formFields = [
 import { useToast } from "@/hooks/use-toast";
 export default function ChangePassword() {
     type FormData = z.infer<typeof formSchema>;
-    const token = useSession()
+    const { token } = useSession()
     const { toast } = useToast();
 
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<FormData>({
