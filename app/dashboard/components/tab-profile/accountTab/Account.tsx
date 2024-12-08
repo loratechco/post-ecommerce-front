@@ -41,7 +41,7 @@ function Account() {
             } catch (error) {
                 toast({
                     description: error?.response?.data?.message || "خطا در دریافت اطلاعات",
-                    className: "bg-red-300 text-red-950 font-semibold",
+                    className: "toast-txt-color-error toast-bgc-error font-semibold",
                 });
             }
         };
@@ -121,7 +121,7 @@ function Account() {
             // Show success message
             toast({
                 description: res?.data?.message || "Profile updated successfully",
-                className: "bg-green-300 text-green-950 font-semibold",
+                className: "bg-toast-bgc-successful toast-txt-color-successful font-semibold",
             });
 
         } catch (error: any) {
@@ -219,7 +219,7 @@ function Account() {
 
                 <div className="">
                     <label className="block pb-2 text-sm">Save profile changes</label>
-                    <Button className="px-5 border text-white font-semibold"
+                    <Button className="px-5 border text-white font-semibold "
                         type="submit"
                         variant="default"
                         disabled={isSubmitting}

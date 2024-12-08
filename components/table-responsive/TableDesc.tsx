@@ -31,7 +31,7 @@ export function TheadDesc({ children }: Child) {
 export function TrDesc({ children, className }: Child & { className?: string }) {
 
     return (
-        <tr className={cn(
+        <tr className={cn('even:bg-[#f0f0f1]',
             className
         )}>{children}</tr>
     )
@@ -47,7 +47,7 @@ export function ThDesc({ title }: Omit<TbodyProps, 'content'>) {
 // wrap content 
 export function TbodyDesc({ children }: Child) {
     return (
-        <tbody className="divide-y divide-[#bcbcc5] bg-zinc-200">
+        <tbody className="divide-y divide-[#bcbcc5] bg-zinc-200  ">
             {children}
         </tbody>
     )

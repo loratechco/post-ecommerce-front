@@ -36,7 +36,7 @@ export default async function RootLayout({
           // inter.variable
         )}
       >
-        <SessionProvider session={JSON.parse(session)}>
+        <SessionProvider session={JSON.parse(session as string)}>
           <PermissioinsProvider userPermissions={permissions} initUserData={null}>
             {children}
             <Toaster />

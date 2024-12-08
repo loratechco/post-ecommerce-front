@@ -12,6 +12,7 @@ const sendMessage = async ({ ticketId, message, token }: { ticketId: string, mes
                 }
             }
         )
+
         return { ok: true, response: res.data }
     } catch (error) {
         console.error('خطا در ایجاد پیام:', error);
@@ -19,24 +20,34 @@ const sendMessage = async ({ ticketId, message, token }: { ticketId: string, mes
     }
 }
 
-if (typeof value === 'string') {
-    //کدت
-}
-
 const getTicket = async ({ ticketId, token }: { ticketId: string, token: string }) => {
-    console.log(`${API_URL}/tickets/${ticketId}/messages`);
     try {
-        const res = await axios.get('http://app.api/api/tickets/1/messages', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        console.log('res =>>>>>>>+++++', res);
-        return res;
+        // ابتدا بررسی کنید که ticketId و token معتبر هستند
+        if (!ticketId || !token) {
+            throw new Error('Ticket ID or Token is missing');
+        }
 
+        // درخواست به سرور
+        const res = await axios.get(`http://app.api/api/tickets/${ticketId}/messages`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+
+        console.log(res?.data);
+
+        // بررسی پاسخ و جلوگیری از ارورهای غیرمنتظره
+        if (res?.data || Array.isArray(res.data)) {
+            return { error: null, response: res.data };
+        } else {
+            // اگر داده‌ها به صورت غیرمنتظره‌ای نباشند، یک آرایه خالی ارسال می‌کنیم
+            return { error: new Error('Invalid data structure'), response: [] };
+        }
     } catch (error: any) {
-        console.error('خطا در دریافت تیکت:', error);
-        return { ok: false, response: error };
+        // مدیریت خطا به طور دقیق‌تر
+        console.error('Error fetching ticket messages:', error.message || error);
+        console.log(error);
+        return { error: error.message || 'An error occurred', response: [] };
     }
 }
 

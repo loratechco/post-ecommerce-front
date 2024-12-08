@@ -23,11 +23,11 @@ function DashboardLayout({
 
                 <SidebarInset>
                     <HeaderDasboard />
-                    <Suspense fallback={<Skeleton />}>
-                        <section className="px-4">
-                            {children}
-                        </section>
-                    </Suspense>
+                    {/* <Suspense fallback={<Skeleton />}> */}
+                    <section className="px-4">
+                        {children}
+                    </section>
+                    {/* </Suspense> */}
                 </SidebarInset>
             </SidebarProvider>
         </>

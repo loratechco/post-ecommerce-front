@@ -19,7 +19,8 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-
+import { usePathname } from "next/navigation"
+import { cn } from "@/lib/utils"
 export function NavMain({
   items,
 }: {
@@ -30,6 +31,7 @@ export function NavMain({
     isActive?: boolean
   }[]
 }) {
+  const path = usePathname();
   return (
     <SidebarGroup >
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -37,9 +39,13 @@ export function NavMain({
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title} className="hover:bg-gray-200">
+              <SidebarMenuButton asChild tooltip={item.title}
+                className={cn(
+                  'hover:bg-zinc-200',
+                  path === item.url && 'bg-zinc-200 text-zinc-900'
+                )}>
                 <Link href={item.url}>
-                  <item.icon/>
+                  <item.icon />
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>

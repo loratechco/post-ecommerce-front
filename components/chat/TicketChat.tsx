@@ -11,6 +11,7 @@ import { getTicket, sendMessage } from '@/app/actions/chatTicketing'
 import { cn } from '@/lib/utils'
 import { toast } from '@/hooks/use-toast'
 import ChatInput from './ChatInput'
+import { useRouter } from 'next/navigation'
 
 type Message = {
     user_id: string
@@ -42,9 +43,10 @@ interface Props {
             updated_at: string
         }
     }
+    errorMessage: string | null;
 }
 
-export default function TicketChat({ id, sessionData: { token, initData }, ticketData }: Props) {
+export default function TicketChat({ id, sessionData: { token, initData }, ticketData, errorMessage }: Props) {
     const [messages, setMessages] = useState<Message[]>([])
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLInputElement>(null);
@@ -84,23 +86,13 @@ export default function TicketChat({ id, sessionData: { token, initData }, ticke
             })
             return;
         };
+        setMessages(prevMessages => [...prevMessages, message]);
 
-        setMessages([...messages, message])
     }
 
     // get data from server
     useEffect(() => {
-        console.log('ticketData=>>>', ticketData)
-        if (!ticketData) {
-            setMessages([])
-            toast({
-                title: 'unsuccessful',
-                className: 'bg-red-300 text-red-900',
-                duration: 3000,
-                description: 'Ticket not found, please try again later',
-            })
-            return;
-        };
+        if (!ticketData || ticketData.length === 0) return;
         // success get ticket data
         setMessages(ticketData)
     }, [id, token])
@@ -123,7 +115,7 @@ export default function TicketChat({ id, sessionData: { token, initData }, ticke
                         key={index}
                         ref={messagesEndRef}
                         className={cn(
-                            'flex mb-7  px-4',
+                            'flex mb-7 px-4',
                             user_id === userId && 'justify-end'
                         )}>
 
@@ -134,7 +126,7 @@ export default function TicketChat({ id, sessionData: { token, initData }, ticke
                             <Avatar className="size-8">
                                 <AvatarImage src={`http://app.api/${avatar}`} />
                                 <AvatarFallback>
-                                    {sender.charAt(0).toUpperCase() || 'N'}
+                                    {sender.slice(2, 0).toUpperCase() || 'N'}
                                 </AvatarFallback>
                             </Avatar>
 

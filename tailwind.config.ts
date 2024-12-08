@@ -8,8 +8,15 @@ const config: Config = {
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
+
+
 		extend: {
 			colors: {
+				'toast-bgc-successful': 'var(--toaste-bg-success)',
+				'toast-bgc-error': 'var(--toaste-bg-error)',
+				'toast-txt-color-error': 'var(--toaste-txt-color-error)',
+				'toast-txt-color-successful': 'var(--toaste-txt-color-success)',
+
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
 				card: {

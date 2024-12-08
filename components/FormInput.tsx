@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils";
 import clsx from "clsx";
 import { Eye, EyeClosed } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
     classNameParentPasswordInput?: string
 }
 
-function FormInput(
+const FormInput: React.FC<Props & React.InputHTMLAttributes<HTMLInputElement>> = (
     {
         id,
         type,
@@ -27,10 +27,10 @@ function FormInput(
         nameLabel,
         disabled,
         register,
-        classNameParentPasswordInput
-
-    }: Props
-) {
+        classNameParentPasswordInput,
+        ...props
+    },
+) => {
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -54,7 +54,7 @@ function FormInput(
                 )}>
                 <Input
                     key={(id + "Input")}
-
+                    {...props}
                     {...register}
                     className={cn(
                         className,

@@ -21,10 +21,7 @@ export function CardTable({ children, className }: Child & { className?: string 
 
     return (
         <div className={
-            cn(
-                'w-full flex items-center justify-between rounded-lg min-h-20 py-2 px-4 bg-gray-300 shadow-md',
-                className
-            )
+            cn(className)
         }>
             {children}
         </div>
@@ -33,7 +30,7 @@ export function CardTable({ children, className }: Child & { className?: string 
 
 export function WrapContent({ children }: Child) {
     return (
-        <span className="block text-gray-600 w-full">
+        <span className="block text-gray-600 w-full *:first:text-gray-800 *:truncate *:overflow-hidden *:max-w-[200px]">
             {children}
         </span>
     )
@@ -41,7 +38,7 @@ export function WrapContent({ children }: Child) {
 
 export function ContentTable({ content, className }: { content: string, className?: string }) {
     return (
-        <p className={cn('first:text-gray-800', className)}>
+        <p className={cn(className)}>
             {content}
         </p>
     )
@@ -58,18 +55,22 @@ export function ActionBtn({
 }) {
     return (
         <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="hover:bg-zinc-100/30 p-0">
                 <Button variant="ghost" className="h-8 w-8 p-0">
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal className="h-4 w-4" />
                 </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <Link href={`${hrefEdit}/${userId}`}>
-                    <DropdownMenuItem>Edit</DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem onClick={() => handleDelete(userId)}>Delete</DropdownMenuItem>
+
+                <div className="*:cursor-pointer">
+                    <Link href={`${hrefEdit}/${userId}`} >
+                        <DropdownMenuItem className="cursor-pointer">Edit</DropdownMenuItem>
+                    </Link>
+                    <DropdownMenuItem onClick={() => handleDelete(userId)}>Delete</DropdownMenuItem>
+                </div>
             </DropdownMenuContent>
         </DropdownMenu>
     );
@@ -77,7 +78,7 @@ export function ActionBtn({
 
 export default function TableCardsMobile({ children }: Child) {
     return (
-        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center pt-5">
+        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center pt-5  *:w-full *:flex *:items-center *:justify-between *:rounded-lg *:min-h-20 *:py-2 *:px-4 *:bg-gray-300">
             {children}
         </div>
     );

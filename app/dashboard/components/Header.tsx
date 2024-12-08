@@ -11,38 +11,14 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import dataNavMain, { navMain } from "@/app/dashboard/components/dataNavbarDashoard";
+import { useRouter } from "next/router";
 
 function HeaderDasboard() {
 
     const path = usePathname();
-    const route = path.replace("/dashboard/", "");
-
-    const uperCaseRoutWord = route[0].toUpperCase() + route.slice(1);
-
-    function formatPath(input) {
-        // اگر یک اسلش بعد از کلمه باشد، آن را حذف کنیم
-        if (input.includes('/')) {
-            const basePath = input.split('/')[0]; // متن قبل از اسلش
-            return `Edit User Profile`;
-        }
-
-        // اگر اسلش وجود نداشت، متن را صرفاً فرمت می‌کنیم
-        return capitalizeWords(input);
-    }
-
-    function capitalizeWords(wordInput) {
-        return wordInput
-            .replace(/[-_]/g, ' ') // تبدیل خط تیره و آندرلاین به اسپیس
-            .replace(/\b\w/g, (char) => char.toUpperCase()); // بزرگ کردن حرف اول هر کلمه
-    }
-
-    const mainRoute = "/dashboard"
-    const routes = [
-        { label: "Dashboard", href: "/dashboard" },
-        { label: "Users Management", href: "/dashboard/users-management" },
-        //... add more routes here if needed
-    ]
-
+    const { navMain } = dataNavMain('/dashboard');
+    const data = navMain?.find(item => item.url === path);
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 ">
             <div className="flex items-center gap-2 px-4">
@@ -59,15 +35,11 @@ function HeaderDasboard() {
                         </BreadcrumbItem>
 
                         {
-
-
                             path.includes('/dashboard/') && (
                                 <>
                                     <BreadcrumbSeparator className="hidden md:block mt-1" />
-                                    <BreadcrumbLink
-                                        href={'/dashboard/' + route}
-                                    >
-                                        {route.includes('users-management/') ? formatPath(route) : capitalizeWords(route)}
+                                    <BreadcrumbLink>
+                                        {data?.title || ''}
                                     </BreadcrumbLink>
                                 </>
                             )

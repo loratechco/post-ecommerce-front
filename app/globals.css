@@ -60,6 +60,11 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* my var */
+    --toaste-bg-success: #7fe7a5;
+    --toaste-bg-error: #f59b9b;
+    --toaste-txt-color-success: #052e16;
+    --toaste-txt-color-error: #450a0a;
   }
   .dark {
     --background: 240 10% 3.9%;
@@ -112,5 +117,11 @@ body {
   }
   .btn-outline {
     @apply transition-all duration-200 dark:text-white text-black rounded-md border bg-zinc-200 hover:bg-zinc-100 px-2 hover:border-zinc-400 !important;
+  }
+  .toaser-successfuls {
+    @apply bg-toast-bgc-successful text-toast-txt-color-successful border-none !important;
+  }
+  .toaser-errors {
+    @apply bg-toast-bgc-error text-toast-txt-color-error border-none !important;
   }
 }

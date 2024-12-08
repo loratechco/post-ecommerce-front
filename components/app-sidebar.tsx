@@ -2,13 +2,7 @@
 
 import * as React from "react"
 import {
-  Home,
   LogOut,
-  MessagesSquare,
-  Settings2,
-  User2,
-  Users2,
-  Wallet,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -33,59 +27,21 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import dataNavMain from "@/app/dashboard/components/dataNavbarDashoard"
 
 const BASE_ROUTE = '/dashboard'
-
-const data = {
-  navMain: [
-    {
-      title: "Home",
-      url: BASE_ROUTE,
-      icon: Home,
-    },
-    {
-      title: "Wallet",
-      url: BASE_ROUTE + "/wallet",
-      icon: Wallet,
-    },
-    {
-      title: 'Profile',
-      url: BASE_ROUTE + "/profile",
-      icon: User2,
-    },
-    {
-      title: 'User Management',
-      url: BASE_ROUTE + "/users-management",
-      icon: Users2,
-    },
-    {
-      title: 'Tickets',
-      url: BASE_ROUTE + "/ticketing",
-      icon: MessagesSquare,
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-    },
-  ],
-
-}
-
+const data = dataNavMain(BASE_ROUTE)
 interface Props {
   userData: Session;
 }
 
 export function AppSidebar({ userData }: Props) {
 
-
   return (
     <Sidebar variant="inset"
       className={`h-full`}
     >
       <ScrollArea className="flex-1">
-
-
         <Link href="/dashboard/profile" className="bg-transparent">
           <SidebarHeader className=" rounded-md h-14 hover:bg-gray-200 hover:text-black overflow-hidden">
             <SidebarMenu>
