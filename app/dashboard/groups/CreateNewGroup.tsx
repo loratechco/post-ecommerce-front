@@ -17,6 +17,7 @@ import { TextareaAutosize } from "@/components/ui/textarea-autosize";
 import { toast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -28,14 +29,15 @@ const schema = z.object({
 type Sumbit = z.infer<typeof schema>;
 
 function CreateNewGroup({ token }: { token: string }) {
+    const router = useRouter()
+
     const {
         handleSubmit,
         register,
-        formState: {
-            errors
-        } } = useForm<Sumbit>({
+        formState: { errors }, reset } = useForm<Sumbit>({
             resolver: zodResolver(schema),
         });
+
 
     const sumbitHandler = async (data: Sumbit) => {
         console.log(data);
@@ -53,6 +55,11 @@ function CreateNewGroup({ token }: { token: string }) {
                 title: 'Successful',
                 description: 'Your group was temporarily registered'
             })
+            reset({
+                name: '',
+                description: ''
+            })
+            router.refresh()
         } catch (error) {
             console.log(error);
             toast({
@@ -62,6 +69,7 @@ function CreateNewGroup({ token }: { token: string }) {
             })
         }
     }
+
 
     return (
         <div className="z-40 relative">
