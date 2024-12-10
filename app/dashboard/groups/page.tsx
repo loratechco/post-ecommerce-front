@@ -109,7 +109,7 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                             description,
                             name,
                         }, index: number) => (
-                            <Link href={`/dashboard/ticketing/${id}`} key={id}>
+                            <Link href={`#`} key={id}>
                                 <CardTable className="">
                                     <WrapContent>
                                         <ContentTable
