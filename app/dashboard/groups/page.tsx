@@ -12,11 +12,16 @@ import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CreateNewGroup from "./CreateNewGroup";
-import ActionBtnGroup from "./ActionBtnGroup";
+import ActionBtnGroup from "./action-btn-group/ActionBtnGroup";
+// ActionBtnGroup از مسیر صحیح وارد نشده است. لطفا مسیر صحیح را وارد کنید.
 
 
-const getGroupList = async (token: string, endpiont: string) => {
-    const { res, errorMessage } = await getData(endpiont, token);
+const getGroupList = async (token: string, endpoint: string) => {
+    const data = await getData(endpoint, token);
+    if (!data) {
+        return { res: [], errorMessage: "داده‌ای دریافت نشد" };
+    }
+    const { res, errorMessage } = data;
 
     if (errorMessage && !res) {
         return { res: [], errorMessage };
@@ -39,14 +44,14 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
     const { token } = JSON.parse(coockieStorage.get(cookieName)?.value as string)
 
     // get group List data 
-    const { errorMessage, res: { groups } } = await getGroupList(
+    const { errorMessage, res } = await getGroupList(
         token,
         `api/groups?page=${page}&search=${search}`
     )
     const calculateIndexListItems = (index: number) => {
         return ((+page - 1) * 10 + index + 1);
     };
-    console.log(errorMessage, groups?.last_page, groups?.data)
+    console.log(errorMessage, res?.groups?.last_page, res?.groups?.data)
     return (
         <>
             <div className='size-full'>
@@ -69,7 +74,7 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                         </TheadDesc>
 
                         <TbodyDesc>
-                            {groups?.data.length > 0 ? groups?.data?.map(({
+                            {res?.groups?.data.length > 0 ? res?.groups?.data?.map(({
                                 id,
                                 description,
                                 name,
@@ -104,7 +109,7 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
 
                     {/* card box for mobile size  */}
                     <TableCardsMobile >
-                        {groups?.data.length > 0 ? groups?.data?.map(({
+                        {res?.groups?.data.length > 0 ? res?.groups?.data?.map(({
                             id,
                             description,
                             name,
@@ -141,7 +146,7 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
 
                 <div className="py-7">
                     <PaginationComponent
-                        pages={groups?.last_page || 1}
+                        pages={res?.groups?.last_page || 1}
                     />
                 </div>
             </div>

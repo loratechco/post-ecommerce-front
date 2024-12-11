@@ -5,6 +5,7 @@ import {
     LucideProps,
     MessagesSquare,
     Settings2,
+    TicketPercent,
     User2,
     Users2,
     Wallet,
@@ -48,6 +49,11 @@ export default (BASE_ROUTE: string) => {
                 title: 'Groups',
                 url: BASE_ROUTE + "/groups",
                 icon: FolderKanban,
+            },
+            {
+                title: "Coupons",
+                url: BASE_ROUTE + "/coupons",
+                icon: TicketPercent,
             },
             {
                 title: "Settings",

@@ -14,7 +14,7 @@ import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import useSWR from 'swr'
 import { useToast } from "@/hooks/use-toast"
-import AccardionSkeleton from '@/components/skeletons/AccardionSkeleton'
+import { AccardionSkeleton } from '@/components/skeletons/AccardionSkeleton'
 
 // تعریف تایپ‌ها
 type SwitchItem = {

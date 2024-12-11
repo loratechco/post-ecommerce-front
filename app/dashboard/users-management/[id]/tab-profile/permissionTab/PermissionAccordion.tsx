@@ -14,7 +14,7 @@ import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import { useToast } from "@/hooks/use-toast";
 import { getUserPermissions } from '@/app/actions/userListActions'
-import AccordionSkeleton from '@/components/skeletons/AccardionSkeleton'
+import { AccordionSkeleton } from '@/components/skeletons/AccardionSkeleton'
 
 // The main component
 export default function Permission({ userId }: { userId: string }) {

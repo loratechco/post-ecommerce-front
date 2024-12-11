@@ -9,7 +9,7 @@ export async function saveSession({ sessionData }: { sessionData: object }) {
     cookie.set(cookieName, data, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 14 * 24 * 60 * 60, // 2 هفته بر حسب ثانیه
+        maxAge: 14 * 24 * 60 * 60, //2 weeks
     });
 }
 

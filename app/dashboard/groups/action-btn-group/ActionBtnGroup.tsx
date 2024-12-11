@@ -5,9 +5,8 @@ import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useReducer, useState } from "react";
-import { array, boolean, number, object } from "zod";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,60 +17,34 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Form, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { API_Backend, useGEt } from "@/hooks/use-fetch";
-import { Skeleton } from "@/components/ui/skeleton";
 import clsx from "clsx";
-
-
+import { ActionReducerFunc, initialState } from "./action-btn-reducer";
 
 interface Props {
     id: string;
     token: string
 }
-type StateReducer = {
-    delete: boolean;
-    addUser: boolean;
-};
-
-type ActionReducer = {
-    type: 'DELETE' | 'ADD_USER';
-    data: boolean;
-};
-interface FormValues {
-    [key: string]: boolean;
-}
-
-const alertReducer = (state: StateReducer, action: ActionReducer): StateReducer => {
-    switch (action.type) {
-        case 'DELETE':
-            return { ...state, delete: action.data }; // فقط مقدار delete را تغییر می‌دهد
-        case 'ADD_USER':
-            return { ...state, addUser: action.data }; // فقط مقدار addUser را تغییر می‌دهد
-        default:
-            return state;
-    }
-};
-
 
 function ActionBtnGroup(props: Props) {
 
     const router = useRouter()
-    const path = usePathname()
 
-    const initialState: StateReducer = {
-        delete: false,
-        addUser: false,
-    };
+    //Activator of action button alerts
+    const [alertState, dispatch] = useReducer(ActionReducerFunc, initialState);
 
-    const [alertState, dispatch] = useReducer(alertReducer, initialState);
+    //react-hook-form
+    const form = useForm()
+
+    //Number of user list pages
+    const [pageUserListAlert, setPageUserListAlert] = useState('1')
 
     const deletGroupHandler = async () => {
         console.log('this worked');
@@ -99,29 +72,8 @@ function ActionBtnGroup(props: Props) {
         }
     }
 
-    const ALERT_CONFIG: PropsAlertComponent = {
-        tilte: "Are you absolutely sure?",
-        description: "Release the continue button and you will delete this group.",
-        nameFirstBtn: "continue",
-        cancelBtn: "cancel",
-
-        btnValue: (value: string) => {
-            if (value === 'continue') {
-                deletGroupHandler()
-            }
-        },
-        open: alertState.delete,
-        setOpen: () => {
-            dispatch({
-                type: 'DELETE',
-                data: false,
-            })
-        },
-    }
-
-    const form = useForm()
-
     const onSubmit = async (data: Record<number, string>) => {
+        //Get user IDs from selected users
         const selectedUsers = {
             user_ids: Object.entries(data)
                 .filter(([_, item]) => item)
@@ -141,22 +93,40 @@ function ActionBtnGroup(props: Props) {
                 })
 
             console.log('response=>>', res, 'id=>>', props.id);
-            form.reset()
+
         } catch (error) {
             console.log(error, 'id=>>', props.id);
         }
     }
-    const [pageUserListAlert, setPageUserListAlert] = useState('1')
 
-
+    //get user list data
     const { data: userListData, errorMessage, loading } = useGEt({
         endpoint: `api/users?page=${pageUserListAlert}`,
         token: props?.token || '',
     })
 
-    console.log(userListData?.data?.last_page);
-
     const lastPage = userListData?.data?.last_page;
+
+    // alert Delete 
+    const ALERT_CONFIG: PropsAlertComponent = {
+        tilte: "Are you absolutely sure?",
+        description: "Release the continue button and you will delete this group.",
+        nameFirstBtn: "continue",
+        cancelBtn: "cancel",
+
+        btnValue: (value: string) => {
+            if (value === 'continue') {
+                deletGroupHandler()
+            }
+        },
+        open: alertState.delete,
+        setOpen: () => {
+            dispatch({
+                type: 'DELETE',
+                data: false,
+            })
+        },
+    }
 
     return (
         <>
@@ -251,9 +221,7 @@ function ActionBtnGroup(props: Props) {
                                     <svg
                                         onClick={() => {
                                             setPageUserListAlert((perv) => {
-                                                if (+perv <= 1) {
-                                                    return '1'
-                                                }
+                                                if (+perv <= 1) return '1';
                                                 return String(+perv - 1)
                                             })
                                         }}
@@ -265,18 +233,14 @@ function ActionBtnGroup(props: Props) {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                                     </svg>
 
-                                    <span
-                                        className="block px-3 py-1 rounded-lg bg-zinc-300"
-                                    >
+                                    <span className="block px-3 py-1 rounded-lg bg-zinc-300">
                                         {pageUserListAlert || 1}
                                     </span>
 
                                     <svg
                                         onClick={() => {
                                             setPageUserListAlert((perv) => {
-                                                if (perv === String(lastPage)) {
-                                                    return perv
-                                                }
+                                                if (+perv === lastPage) return perv;
                                                 return String(+perv + 1)
                                             })
                                         }}
