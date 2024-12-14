@@ -27,6 +27,11 @@ import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { API_Backend, useGEt } from "@/hooks/use-fetch";
 import clsx from "clsx";
 import { ActionReducerFunc, initialState } from "./action-btn-reducer";
+import FormInput from "@/components/FormInput";
+import { schemaEditGroupAndCreatGroup, Submit } from "../type";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { TextareaAutosize } from "@/components/ui/textarea-autosize";
+import DialogFormEditGroup from "./DialogFormEditGroup";
 
 interface Props {
     id: string;
@@ -40,11 +45,12 @@ function ActionBtnGroup(props: Props) {
     //Activator of action button alerts
     const [alertState, dispatch] = useReducer(ActionReducerFunc, initialState);
 
+    //Number of user list pages
+    const [pageUserListAlert, setPageUserListAlert] = useState('1')
+
     //react-hook-form
     const form = useForm()
 
-    //Number of user list pages
-    const [pageUserListAlert, setPageUserListAlert] = useState('1')
 
     const deletGroupHandler = async () => {
         console.log('this worked');
@@ -89,7 +95,6 @@ function ActionBtnGroup(props: Props) {
                     headers: {
                         Authorization: `Bearer ${props?.token || ''}`
                     }
-
                 })
 
             console.log('response=>>', res, 'id=>>', props.id);
@@ -101,14 +106,13 @@ function ActionBtnGroup(props: Props) {
 
     //get user list data
     const { data: userListData, errorMessage, loading } = useGEt({
-        endpoint: `api/users?page=${pageUserListAlert}`,
+        endpoint: `api/users/group/${props.id}?page=${pageUserListAlert}`,
         token: props?.token || '',
     })
 
-    const lastPage = userListData?.data?.last_page;
+    const lastPage = 1;
 
-    // alert Delete 
-    const ALERT_CONFIG: PropsAlertComponent = {
+    const alertDelete: PropsAlertComponent = {
         tilte: "Are you absolutely sure?",
         description: "Release the continue button and you will delete this group.",
         nameFirstBtn: "continue",
@@ -122,21 +126,35 @@ function ActionBtnGroup(props: Props) {
         open: alertState.delete,
         setOpen: () => {
             dispatch({
-                type: 'DELETE',
+                type: 'DELETE_GROUP',
                 data: false,
             })
         },
     }
 
+    const [pervChecked, setPervChecked] = useState<number | null>(null)
+
+    const checkPreviouslySelectedItems = (
+        isChecked: boolean,
+        checkIds: number
+    ) => {
+
+        console.log('count', checkIds);
+        if (isChecked) {
+            setPervChecked(checkIds)
+            return isChecked;
+        }
+        return false;
+    }
     return (
         <>
             {/* this is alert for delete group  */}
-            <AlertComponent {...ALERT_CONFIG} />
+            <AlertComponent {...alertDelete} />
 
             <Dialog
                 open={alertState.addUser}
                 onOpenChange={(isOpen) =>
-                    dispatch({ type: 'ADD_USER', data: isOpen })
+                    dispatch({ type: 'ADD_USER_TO_GROUP', data: isOpen })
                 }>
 
                 <DialogContent className="max-sm:max-w-sm sm:max-w-lg rounded-lg space-y-2">
@@ -158,7 +176,7 @@ function ActionBtnGroup(props: Props) {
                                     <ScrollArea>
                                         <div className="w-full py-3 max-sm:divide-y divide-zinc-300 *:py-5 max-h-64 *:flex *:w-full *:items-center *:gap-3">
                                             {
-                                                userListData?.data?.data?.map((person: object) => (
+                                                userListData?.users.map((person: object) => (
                                                     <FormField
                                                         key={person?.id}
                                                         control={form.control}
@@ -166,7 +184,12 @@ function ActionBtnGroup(props: Props) {
                                                         render={({ field }) => (
                                                             <FormItem>
                                                                 <FormControl>
-                                                                    <Checkbox id={person?.id}
+
+                                                                    <Checkbox
+                                                                        id={person?.id}
+                                                                        defaultChecked={
+                                                                            checkPreviouslySelectedItems(person.is_in_group, person?.id)
+                                                                        }
                                                                         checked={field.value}
                                                                         onCheckedChange={field.onChange}
                                                                     />
@@ -190,7 +213,7 @@ function ActionBtnGroup(props: Props) {
                                         </div>
                                     </ScrollArea>
                                 ) : (
-                                    <ul className="w-full *:w-full *:rounded-lg *:bg-zinc-300 *:h-12 space-y-2 *:animate-pulse">
+                                    <ul className="w-full *:w-full *:rounded-lg *:bg-zinc-200 *:h-12 space-y-2 *:animate-pulse">
                                         <li></li>
                                         <li></li>
                                         <li></li>
@@ -207,7 +230,7 @@ function ActionBtnGroup(props: Props) {
                                             type="button"
                                             variant={"outline"}
                                             className="border border-zinc-500 bg-transparent font-semibold"
-                                            onClick={() => dispatch({ type: 'ADD_USER', data: false })}
+                                            onClick={() => dispatch({ type: 'ADD_USER_TO_GROUP', data: false })}
                                         >
                                             Close
                                         </Button>
@@ -256,39 +279,47 @@ function ActionBtnGroup(props: Props) {
                             </DialogFooter>
                         </form>
                     </FormProvider>
+
                 </DialogContent>
             </Dialog >
+
+            <DialogFormEditGroup
+                alertState={alertState}
+                dispatch={dispatch}
+                id={props?.id || ''}
+                token={props?.token || ''}
+            />
 
             <DropdownMenu>
                 <DropdownMenuTrigger>
                     <MoreHorizontal size={20} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuLabel className="pb-1 font-bold !cursor-default border-b border-b-zinc-300  mb-1.5">
+
+                    <DropdownMenuLabel className="pb-1 font-bold !cursor-default border-b border-b-zinc-300 mb-1.5">
                         Acctions
                     </DropdownMenuLabel>
 
-                    <div className="*:cursor-pointer font-semibold hover:*:!bg-zinc-300/70">
+                    <div className="*:cursor-pointer hover:*:!bg-zinc-200">
 
                         <DropdownMenuItem
                             onClick={() => {
-                                dispatch({ type: "ADD_USER", data: true })
-                                console.log('this reducer state =>>', alertState.addUser);
+                                dispatch({ type: "ADD_USER_TO_GROUP", data: true })
                             }}>
                             Add User
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem>
-                            <Link
-                                href={`/dashboard/groups/${props?.id || ''}`}
-                                className="block size-full">
-                                Edit Group
-                            </Link>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                dispatch({ type: 'Edit_GROUP', data: true })
+                                console.log(alertState.editUser);
+                            }}>
+                            Edit Group
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
                             onClick={() => {
-                                dispatch({ type: "DELETE", data: true })
+                                dispatch({ type: "DELETE_GROUP", data: true })
                             }}>
                             Delete Group
                         </DropdownMenuItem>

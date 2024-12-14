@@ -1,4 +1,4 @@
-function AccardionSkeleton({ numberItems = 7 }: { numberItems: number }) {
+function AccardionSkeleton({ numberItems = 7 }: { numberItems?: number }) {
 
     const number = Array.from({ length: numberItems }, (index) => index)
     return (

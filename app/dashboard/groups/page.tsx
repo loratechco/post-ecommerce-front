@@ -44,13 +44,15 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
     const { token } = JSON.parse(coockieStorage.get(cookieName)?.value as string)
 
     // get group List data 
-    const { errorMessage, res } = await getGroupList(
-        token,
-        `api/groups?page=${page}&search=${search}`
-    )
+    const {
+        errorMessage,
+        res
+    } = await getGroupList(token, `api/groups?page=${page}&search=${search}`);
+
     const calculateIndexListItems = (index: number) => {
         return ((+page - 1) * 10 + index + 1);
     };
+
     console.log(errorMessage, res?.groups?.last_page, res?.groups?.data)
     return (
         <>
@@ -84,9 +86,9 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                                         <p className='table-text'>{String(calculateIndexListItems(index))}</p>
                                     </TdDesc>
                                     <TdDesc>
-                                        <Link href={`/dashboard/ticketing/${id}`} className='block'>
-                                            <p className='table-text truncate overflow-hidden  hover:underline'>{name}</p>
-                                        </Link>
+                                        {/* <Link href={`/dashboard/groups/edit-user-group/${id}`} className='block'> */}
+                                        <p className='table-text truncate overflow-hidden underline'>{name}</p>
+                                        {/* </Link> */}
                                     </TdDesc>
 
                                     <TdDesc>
@@ -114,7 +116,7 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                             description,
                             name,
                         }, index: number) => (
-                            <Link href={`#`} key={id}>
+                            <Link href={`/dashboard/groups/edit-group/${id}`} key={id}>
                                 <CardTable className="">
                                     <WrapContent>
                                         <ContentTable

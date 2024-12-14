@@ -13,10 +13,13 @@ interface Child {
     children: ReactNode
 }
 
-export function TheadDesc({ children }: Child) {
+export function TheadDesc({ children, className }: Child & { className: string }) {
     return (
 
-        <thead className="border-b font-medium bg-zinc-300 dark:border-neutral-500 border-zinc-400 rounded-t-lg">
+        <thead className={cn(
+            className,
+            'border-b  border-zinc-300 rounded-t-lg'
+        )}>
 
             {children}
             {/* This is for when mobile responsive card mode is not used  */}
@@ -31,7 +34,7 @@ export function TheadDesc({ children }: Child) {
 export function TrDesc({ children, className }: Child & { className?: string }) {
 
     return (
-        <tr className={cn('even:bg-[#f0f0f1]',
+        <tr className={cn('even:bg-white',
             className
         )}>{children}</tr>
     )
@@ -40,14 +43,14 @@ export function TrDesc({ children, className }: Child & { className?: string }) 
 // title in THeader 
 export function ThDesc({ title }: Omit<TbodyProps, 'content'>) {
     return (
-        <th scope="col" className="px-6 py-4 first-letter:uppercase">{title}</th>
+        <th scope="col" className="px-6 py-4 first-letter:uppercase text-zinc-500 ">{title}</th>
     )
 }
 
 // wrap content 
 export function TbodyDesc({ children }: Child) {
     return (
-        <tbody className="divide-y divide-[#bcbcc5] bg-zinc-200  ">
+        <tbody className="divide-y divide-zinc-300 bg-zinc-50  ">
             {children}
         </tbody>
     )
@@ -57,7 +60,7 @@ export function TbodyDesc({ children }: Child) {
 export function TdDesc({ children }: Child) {
 
     return (
-        <td className="text-center first:w-full max-w-[130px] first:sm:w-auto whitespace-nowrap p-4 first:max-sm:max-w-0 first:truncate">
+        <td className="text-center first:w-full max-w-[130px] font-semibold first:sm:w-auto whitespace-nowrap p-4 first:max-sm:max-w-0 first:truncate">
             {children}
 
             {/* <dl className='lg:hidden hidden first:block font-normal text-gray-700'>
@@ -72,16 +75,15 @@ export function TdDesc({ children }: Child) {
 }
 
 // table wrapper 
-
 export default function TableDesc({ children }: Child) {
     return (
-        <div className="hidden lg:flex lg:flex-col overflow-x-auto w-full pt-5 ">
+        <div className="hidden lg:flex lg:flex-col overflow-x-auto w-full pt-5">
 
             <ScrollArea className=' rounded-lg overflow-hidden ' >
                 <div className="sm:-mx-6 lg:-mx-8 overflow-hidden rounded-lg">
                     <div className="inline-block min-w-full sm:px-5 lg:px-4 overflow-hidden rounded-lg">
                         <div className="overflow-x-auto rounded-lg">
-                            <table className="min-w-full text-center text-sm overflow-hidden font-light bg-[#e2e2e7] rounded-lg">
+                            <table className="min-w-full text-center text-sm overflow-hidden bg-zinc-100 rounded-lg">
                                 {children}
                             </table>
                         </div>

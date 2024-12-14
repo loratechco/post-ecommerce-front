@@ -14,7 +14,8 @@ import axios from 'axios'
 import { useSession } from '@/lib/auth/useSession'
 import { useToast } from "@/hooks/use-toast";
 import { getUserPermissions } from '@/app/actions/userListActions'
-import { AccordionSkeleton } from '@/components/skeletons/AccardionSkeleton'
+import { AccardionSkeleton } from '@/components/skeletons/AccardionSkeleton'
+import { API_Backend } from '@/hooks/use-fetch'
 
 // The main component
 export default function Permission({ userId }: { userId: string }) {
@@ -43,6 +44,7 @@ export default function Permission({ userId }: { userId: string }) {
 
     //get data
     useEffect(() => {
+
         getUserPermissions(userId, token)
             .then((data) => {
                 if (Array.isArray(data)) {
@@ -56,7 +58,6 @@ export default function Permission({ userId }: { userId: string }) {
             .catch(error => {
                 console.error('Error fetching permissions:', error);
             });
-
 
     }, [userId]);
 
@@ -89,10 +90,10 @@ export default function Permission({ userId }: { userId: string }) {
         console.log(activePermissions);
 
         try {
-            const res = await axios.post('http://app.api/api/permissions/assign-to-user',
+            const res = await axios.post(`${API_Backend}/api/permissions/assign-to-user`,
                 {
                     user_id: userId,
-                    permissions: activePermissions // فقط سوییچ‌های فعال فعلی
+                    permissions: activePermissions
                 },
                 {
                     headers: {
@@ -157,7 +158,7 @@ export default function Permission({ userId }: { userId: string }) {
         <div className="w-full pt-3">
             <Accordion type="single" collapsible className="w-full">
                 {!isLoading
-                    ? <AccordionSkeleton />
+                    ? <AccardionSkeleton />
                     : dynamicAccordionItem
                 }
             </Accordion>

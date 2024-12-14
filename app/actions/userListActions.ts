@@ -68,12 +68,7 @@ const getUserPermissions = async (id: string, token: string) => {
             cache: "no-cache"
         });
 
-        if (!res.ok) {
-            console.error('API Error:', res.status, res.statusText);
-            throw new Error(`خطا در دریافت دسترسی‌ها: ${res.status}`);
-        }
-
-        const result = res.json();
+        const result = await res.json();
         return result;
 
     } catch (error: any) {

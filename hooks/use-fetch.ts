@@ -45,7 +45,6 @@ export const useGEt = ({
             // Validate endpoint before fetching
             const endpointResult = checkeEndPoint(endpoint);
             if (!endpointResult.ok) return;
-
             setLoading(true);
             setErrorMessage(null);
 

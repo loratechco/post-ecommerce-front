@@ -20,13 +20,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const schema = z.object({
-    name: z.string().min(1, 'The group name is required').max(80, 'The length of the name field is 80 characters'),
-    description: z.string().min(1, 'The group description is required').max(800, 'The length of the name field is 800 characters'),
-})
-
-type Sumbit = z.infer<typeof schema>;
+import { schemaEditGroupAndCreatGroup, Submit } from "./type";
 
 function CreateNewGroup({ token }: { token: string }) {
     const router = useRouter()
@@ -34,12 +28,11 @@ function CreateNewGroup({ token }: { token: string }) {
     const {
         handleSubmit,
         register,
-        formState: { errors }, reset } = useForm<Sumbit>({
-            resolver: zodResolver(schema),
+        formState: { errors }, reset } = useForm<Submit>({
+            resolver: zodResolver(schemaEditGroupAndCreatGroup),
         });
 
-
-    const sumbitHandler = async (data: Sumbit) => {
+    const sumbitHandler = async (data: Submit) => {
         console.log(data);
 
         try {
