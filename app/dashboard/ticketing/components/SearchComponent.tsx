@@ -9,11 +9,10 @@ import { useEffect, useState } from "react";
 
 interface Props {
     className?: string,
-    token: string,
     children?: React.ReactNode
 }
 
-function SearchComponent({ className, token, children }: Props) {
+function SearchComponent({ className, children }: Props) {
     const path = usePathname()
     const router = useRouter()
 

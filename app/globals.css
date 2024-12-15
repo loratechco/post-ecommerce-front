@@ -118,10 +118,10 @@ body {
   .btn-outline {
     @apply transition-all duration-200 dark:text-white text-black rounded-md border bg-zinc-200 hover:bg-zinc-100 px-2 hover:border-zinc-400 !important;
   }
-  .toaser-successfuls {
+  .toaster-successfuls {
     @apply bg-toast-bgc-successful text-toast-txt-color-successful border-none !important;
   }
-  .toaser-errors {
+  .toaster-errors {
     @apply bg-toast-bgc-error text-toast-txt-color-error border-none !important;
   }
 }

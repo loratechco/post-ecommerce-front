@@ -86,14 +86,16 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                                         <p className='table-text'>{String(calculateIndexListItems(index))}</p>
                                     </TdDesc>
                                     <TdDesc>
-                                        {/* <Link href={`/dashboard/groups/edit-user-group/${id}`} className='block'> */}
-                                        <p className='table-text truncate overflow-hidden underline'>{name}</p>
-                                        {/* </Link> */}
+                                        <Link href={`/dashboard/groups/edit-user-group/${id}`} >
+                                            <p className='table-text truncate overflow-hidden underline'>{name}</p>
+                                        </Link>
                                     </TdDesc>
 
                                     <TdDesc>
-                                        <ActionBtnGroup id={String(id)}
+                                        <ActionBtnGroup
+                                            id={String(id)}
                                             token={token}
+                                            key={id}
                                         />
                                     </TdDesc>
                                 </TrDesc>
@@ -128,8 +130,10 @@ async function GroupsPage({ searchParams: { page = '1', search = '' }, }: Props)
                                         />
                                     </WrapContent>
                                 </CardTable>
-                                <ActionBtnGroup id={String(id)}
+                                <ActionBtnGroup
+                                    id={String(id)}
                                     token={token}
+                                    key={id}
                                 />
                             </Link>
                         ))

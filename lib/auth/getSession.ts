@@ -4,6 +4,11 @@ import { cookies } from "next/headers"
 import { Session } from "./types"
 import { cookieName } from "./storage"
 
+export type GetSession = {
+    token: string;
+    initData: string;
+}
+
 export default async function getToken(): Promise<string | null> {
     const coockie = await cookies()
     const accessToken = coockie.get(cookieName)?.value as string

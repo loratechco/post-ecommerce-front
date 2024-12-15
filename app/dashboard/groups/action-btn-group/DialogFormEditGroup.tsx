@@ -121,4 +121,4 @@ function DialogFormEditGroup({ dispatch, alertState, id, token }: Props) {
     );
 }
 
-export default DialogFormEditGroup;
+export default React.memo(DialogFormEditGroup);
