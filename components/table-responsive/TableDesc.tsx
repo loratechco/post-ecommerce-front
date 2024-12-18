@@ -18,7 +18,7 @@ export function TheadDesc({ children, className }: Child & { className: string }
 
         <thead className={cn(
             className,
-            'border-b  border-zinc-300 rounded-t-lg'
+            'border-b  border-zinc-300 bg-zinc-100 px-3 rounded-t-lg'
         )}>
 
             {children}
@@ -50,7 +50,7 @@ export function ThDesc({ title }: Omit<TbodyProps, 'content'>) {
 // wrap content 
 export function TbodyDesc({ children }: Child) {
     return (
-        <tbody className="divide-y divide-zinc-300 bg-zinc-50  ">
+        <tbody className="divide-y divide-zinc-300 bg-zinc-50">
             {children}
         </tbody>
     )
@@ -60,7 +60,7 @@ export function TbodyDesc({ children }: Child) {
 export function TdDesc({ children }: Child) {
 
     return (
-        <td className="text-center first:w-full max-w-[130px] font-semibold first:sm:w-auto whitespace-nowrap p-4 first:max-sm:max-w-0 first:truncate">
+        <td className="text-center max-w-[130px] font-semibold  whitespace-nowrap p-4 truncate">
             {children}
 
             {/* <dl className='lg:hidden hidden first:block font-normal text-gray-700'>
@@ -71,7 +71,8 @@ export function TdDesc({ children }: Child) {
                     {content}
                 </dd>
             </dl> */}
-        </td>)
+        </td>
+        )
 }
 
 // table wrapper 
@@ -83,7 +84,7 @@ export default function TableDesc({ children }: Child) {
                 <div className="sm:-mx-6 lg:-mx-8 overflow-hidden rounded-lg">
                     <div className="inline-block min-w-full sm:px-5 lg:px-4 overflow-hidden rounded-lg">
                         <div className="overflow-x-auto rounded-lg">
-                            <table className="min-w-full text-center text-sm overflow-hidden bg-zinc-100 rounded-lg">
+                            <table className="min-w-full text-center text-sm overflow-hidden rounded-lg">
                                 {children}
                             </table>
                         </div>

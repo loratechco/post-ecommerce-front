@@ -1,118 +1,259 @@
-import CreateNewGroup from "../../groups/CreateNewGroup";
 import SearchComponent from "../../ticketing/components/SearchComponent";
 
-import TableDesc, { TbodyDesc, TdDesc, ThDesc, TheadDesc, TrDesc } from "@/components/table-responsive/TableDesc";
-import TableCardsMobile, { ActionBtn, CardTable, ContentTable, WrapContent } from "@/components/table-responsive/TableCardsMobile";
+import TableDesc, {
+  TbodyDesc,
+  TdDesc,
+  ThDesc,
+  TheadDesc,
+  TrDesc,
+} from "@/components/table-responsive/TableDesc";
+
+import TableCardsMobile, {
+  CardTable,
+  ContentTable,
+  WrapContent,
+} from "@/components/table-responsive/TableCardsMobile";
+
 import Link from "next/link";
 import { PaginationComponent } from "@/components/pagination";
-import { Button } from "@/components/ui/button";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
-    OptionalComponentNextToInput?: ReactNode;
-    headerItems: string[];
-    tablebodyChildren: ReactNode;
-    cardBodyChildren: ReactNode;
-    lastPageForPagination: number;
-    searchInput: boolean;
+  OptionalComponentNextToInput?: ReactNode;
+  headerItems: { key: string; label: string }[];
+  lastPageForPagination: number;
+  searchInput?: boolean;
+  url?: string;
+  table: {
+    currentPage: string;
+    tableBodyData: Record<string, any>[] & {
+      actions?: ReactNode;
+      badge?: {
+        badgeValue: string;
+        badgeClassname: string;
+      };
+    };
+    indexItemsAvalabe?: boolean;
+    customErrorMassage?: string;
+  };
 }
 
 /**
- * ⚠️ Note: In this component, you must use `TdDesc Component` to render the `tablebodyChildren`.
+ * MyDatatTable Component
  *
- * Example:
- * `tablebodyChildren={
- *  array.map((items)=>{
- *    <TrDesc>
- *      <TdDesc>
- *          items
- *      <TdDesc/>
- *     <TrDesc/>
- *  })
- * }`
- * 
- * 
- * ⚠️Note: In this component, you must use `CardTable>WrapContent>ContentTable Components` to render the `cardBodyChildren`.
- *   
- * Example:
- * `
- * Array.map(items=>(
- * <CardTable className="">
- * <WrapContent>
- * <ContentTable
- * content={'hi'}
+ * This component is a customizable data table designed for displaying tabular data in a responsive way.
+ * It supports both desktop and mobile views, with additional features like pagination and custom error messages.
+ *
+ * ## Usage Example
+ * ```tsx
+ * import { MyDatatTable } from "@/components/MyDatatTable";
+ *
+ * <MyDatatTable
+ *   headerItems={[
+ *       { key: "email", label: "Email" },
+ *       { key: "name", label: "Name" },
+ *       { key: "lastName", label: "Last Name" },
+ *       { key: "phone", label: "Phone" },
+ *   ]}
+ *   table={{
+ *     currentPage: "1",
+ *     tableBodyData: data?.map((item) => ({
+ *       name: item?.name,
+ *       lastName: item?.last_name,
+ *       phone: item?.phone,
+ *       email: item?.email,
+ *     })),
+ *     customErrorMassage: "There is no data",
+ *   }}
+ *   lastPageForPagination={last_page}
  * />
- * <ContentTable
- * className="max-w-[120px]"
- * content={name}
- * />
- * </WrapContent>
- * </CardTable>
- * ))
- * `
+ * ```
+ *
+ * ## Props
+ *
+ * ### `headerItems`
+ * - **Type:** `Array<{ key: string; label: string }>`
+ * - **Description:** Defines the columns of the table. Each object in the array should include:
+ *   - `key`: The property name from `tableBodyData` that will be displayed in the column.
+ *   - `label`: The header label displayed in the table.
+ *
+ * ### `table`
+ * - **Type:** `Object`
+ * - **Description:** Contains the table data and additional configuration.
+ *
+ * #### Properties:
+ * - `currentPage` (string): The current page number for pagination.
+ * - `tableBodyData` (Array<Record<string, any>>): An array of objects representing the table rows.
+ * - `customErrorMassage` (string): A message displayed when no data is available.
+ * - `indexItemsAvalabe` (optional, boolean): If `true`, displays row numbers in the table. Default is `true`.
+ *
+ * ### `lastPageForPagination`
+ * - **Type:** `number`
+ * - **Description:** The total number of pages for pagination.
+ *
+ * ### `OptionalComponentNextToInput` (optional)
+ * - **Type:** `ReactNode`
+ * - **Description:** Allows you to add a custom component next to the search input field.
+ *
+ * ### `searchInput` (optional)
+ * - **Type:** `boolean`
+ * - **Default:** `true`
+ * - **Description:** Toggles the search input visibility.
+ *
+ * ## Features
+ * - **Responsive Design:** Automatically adapts for mobile and desktop views.
+ * - **Dynamic Columns:** Fully customizable headers and data binding via `headerItems` and `tableBodyData`.
+ * - **Pagination:** Built-in pagination for large datasets.
+ * - **Custom Error Message:** Display a friendly error message when no data is available.
+ *
+ * ## Notes
+ * - Ensure that the keys in `headerItems` match the property names in `tableBodyData` objects.
+ * - Use the `OptionalComponentNextToInput` prop to add buttons or filters alongside the search bar if needed.
  */
 
 function MyDatatTable({
-    OptionalComponentNextToInput,
-    tablebodyChildren,
-    cardBodyChildren,
-    headerItems,
-    lastPageForPagination,
-    searchInput = true
+  OptionalComponentNextToInput,
+  headerItems,
+  lastPageForPagination,
+  url = "",
+  table: {
+    currentPage = "1",
+    tableBodyData = [],
+    indexItemsAvalabe = true,
+    customErrorMassage = "There is no data",
+  },
+  searchInput = true,
 }: Props) {
-    return (
-        <div className='size-full'>
-            {searchInput && <SearchComponent>
-                {OptionalComponentNextToInput}
-            </SearchComponent>
-            }
+  return (
+    <div className="size-full">
+      {searchInput && (
+        <SearchComponent>{OptionalComponentNextToInput}</SearchComponent>
+      )}
 
-            <div className='pt-5 w-full'>
-                <TableDesc>
-                    <TheadDesc>
-                        <TrDesc>
-                            {
-                                headerItems || headerItems?.length > 1 ?
+      <div className="pt-3 w-full">
+        <TableDesc>
+          <TheadDesc>
+            <TrDesc>
+              {indexItemsAvalabe && <ThDesc title="#" />}
 
-                                    headerItems?.map((title: string, index) => (
-                                        <ThDesc title={title} key={index} />
-                                    ))
-                                    : <ThDesc title="There is no title" />
-                            }
-                        </TrDesc>
-                    </TheadDesc>
+              {headerItems?.map(({ label }, index) => (
+                <ThDesc title={label} key={index} />
+              ))}
+            </TrDesc>
+          </TheadDesc>
 
-                    <TbodyDesc>
-                        {
-                            tablebodyChildren
-                        }
-                    </TbodyDesc>
-                </TableDesc>
+          <TbodyDesc>
+            {tableBodyData?.length > 0 ? (
+              tableBodyData.map((row, rowIndex) => (
+                <TrDesc key={rowIndex}>
+                  {indexItemsAvalabe && (
+                    <TdDesc>
+                      {calculateIndexListItems(rowIndex, currentPage)}
+                    </TdDesc>
+                  )}
 
-                {/* card box for mobile size  */}
-                <TableCardsMobile >
-                    {
-                        cardBodyChildren
-                    }
-                </TableCardsMobile>
+                  {headerItems.map(({ key }, colIndex) => (
+                    <TdDesc>
+                      <Link
+                        href={url && colIndex == 0 ? url : ""}
+                        className={cn(
+                          !(url && colIndex == 0) ? "cursor-default":'underline'
+                        )}
+                        key={colIndex}
+                      >
+                        {row[key] || "-"}
+                      </Link>
+                    </TdDesc>
+                  ))}
+                </TrDesc>
+              ))
+            ) : (
+              <TrDesc>
+                <TdDesc>{customErrorMassage}</TdDesc>
+              </TrDesc>
+            )}
+          </TbodyDesc>
+        </TableDesc>
 
-            </div>
+        {/* card box for mobile size  */}
+        <TableCardsMobile>
+          {tableBodyData.length > 0 ? (
+            tableBodyData.map((row, rowIndex) => (
+              <div
+                className="flex items-center justify-center w-full hover:bg-zinc-200 transition-colors"
+                key={rowIndex}
+              >
+                <Link
+                  href={url}
+                  className={cn(
+                    "w-full block cursor-default",
+                    url && "cursor-pointer"
+                  )}
+                >
+                  <CardTable className="w-full max-sm:max-w-[250px] truncate">
+                    <WrapContent>
+                      {headerItems.map(({ key, label }, colIndex) => (
+                        <div
+                          className="flex items-center justify-start gap-1.5 w-full"
+                          key={colIndex}
+                        >
+                          {!key.includes("actions") && (
+                            <div className="text-zinc-800 font-semibold">
+                              {label}:
+                            </div>
+                          )}
 
-            <div className="py-7">
-                <PaginationComponent
-                    pages={lastPageForPagination || 1}
-                />
-            </div>
-        </div>
-    );
+                          <ContentTable
+                            className="truncate overflow-hidden text-ellipsis max-sm:max-w-[160px]" 
+                            content={`${
+                              !key.includes("actions") ? row[key] || "-" : ""
+                            }`}
+                          />
+                        </div>
+                      ))}
+                    </WrapContent>
+                  </CardTable>
+                </Link>
+
+                <div className="w-1/12 flex items-center justify-center flex-col h-16 gap-5">
+                  {row?.badge && (
+                    <Badge
+                      className={cn(
+                        row?.badge?.badgeClassname,
+                        "justify-self-start"
+                      )}
+                    >
+                      {row?.badge?.badgeValue}
+                    </Badge>
+                  )}
+
+                  {row?.actions && row?.actions}
+                </div>
+              </div>
+            ))
+          ) : (
+            <CardTable>
+              <WrapContent>
+                <div className="text-black font-semibold">
+                  {customErrorMassage}
+                </div>
+              </WrapContent>
+            </CardTable>
+          )}
+        </TableCardsMobile>
+      </div>
+
+      <div className="pt-7 pb-5">
+        <PaginationComponent pages={lastPageForPagination || 1} />
+      </div>
+    </div>
+  );
 }
 
-const calculateIndexListItems = (
-    index: number,
-    page: string
-) => {
-    return ((+page - 1) * 10 + index + 1);
+const calculateIndexListItems = (index: number, page: string) => {
+  return (+page - 1) * 10 + index + 1;
 };
 
 export { MyDatatTable, calculateIndexListItems };

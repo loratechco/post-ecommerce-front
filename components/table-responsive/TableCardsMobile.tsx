@@ -20,9 +20,7 @@ interface Child {
 export function CardTable({ children, className }: Child & { className?: string }) {
 
     return (
-        <div className={
-            cn(className)
-        }>
+        <div className={cn(className, )}>
             {children}
         </div>
     )
@@ -30,7 +28,7 @@ export function CardTable({ children, className }: Child & { className?: string 
 
 export function WrapContent({ children }: Child) {
     return (
-        <span className="block text-gray-600 w-full *:first:text-gray-800 *:truncate *:overflow-hidden *:max-w-[200px]">
+        <span className="block text-zinc-700 w-full *:truncate *:overflow-hidden *:py-0.5 ">
             {children}
         </span>
     )
@@ -38,7 +36,7 @@ export function WrapContent({ children }: Child) {
 
 export function ContentTable({ content, className }: { content: string, className?: string }) {
     return (
-        <p className={cn(className)}>
+        <p className={cn(className,'w-full')}>
             {content}
         </p>
     )
@@ -78,7 +76,7 @@ export function ActionBtn({
 
 export default function TableCardsMobile({ children }: Child) {
     return (
-        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center pt-5  *:w-full *:flex *:items-center *:justify-between *:rounded-lg *:min-h-20 *:py-2 *:px-4 *:bg-gray-300">
+        <div className="lg:hidden flex flex-col gap-3 items-center w-full justify-center pt-5  *:w-full *:flex *:items-center *:justify-between *:rounded-lg *:min-h-20 *:py-2 *:px-4 *:bg-zinc-100">
             {children}
         </div>
     );

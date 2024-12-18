@@ -6,6 +6,7 @@ interface UseFetchProps {
     endpoint: string;
     token: string;
     customErrorMessage?: string;
+    dependencyOptional?:any;
 }
 
 interface UseFetchResult {
@@ -35,6 +36,7 @@ export const useGEt = ({
     endpoint,
     token,
     customErrorMessage,
+    dependencyOptional=null
 }: UseFetchProps): UseFetchResult => {
     const [data, setData] = useState<any | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -72,7 +74,7 @@ export const useGEt = ({
         };
 
         fetchData();
-    }, [endpoint, token]);
+    }, [endpoint, token,dependencyOptional]);
 
     return { data, errorMessage, loading };
 };

@@ -116,7 +116,7 @@ body {
     @apply text-[14px] font-medium !important;
   }
   .btn-outline {
-    @apply transition-all duration-200 dark:text-white text-black rounded-md border bg-zinc-200 hover:bg-zinc-100 px-2 hover:border-zinc-400 !important;
+    @apply transition-all duration-200 dark:text-white text-black rounded-md border border-zinc-200 bg-zinc-100 hover:bg-zinc-50 px-2 hover:border-zinc-300 !important;
   }
   .toaster-successfuls {
     @apply bg-toast-bgc-successful text-toast-txt-color-successful border-none !important;

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,9 +9,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { MouseEvent, useState } from "react";
 
 export type PropsAlertComponent = {
@@ -19,55 +18,67 @@ export type PropsAlertComponent = {
   description: string;
   nameFirstBtn: string;
   cancelBtn: string;
-  btnValue: (vlue: string) => void;
+  btnValue: (value: string) => void;
   open: boolean;
   setOpen: (value: boolean) => void;
-}
+};
+
+//This is the prop value that should be given to this component when using it
+//Example:
+// const PROPS_VALUE_ALERT_DELETE: PropsAlertComponent = {
+//  tilte: "Are you absolutely sure?",
+//  description: "Release the continue button and you will delete this group.",
+//  nameFirstBtn: "continue",
+//  cancelBtn: "cancel",//
+
+//  btnValue: (value: string) => {
+//    if (value === "continue") {
+//      deleteUserFromGroupHandler();
+//    }
+//  },
+//  open,
+//  setOpen: () => {
+//    setOpen(false);
+//  },
+//};
 
 export function AlertComponent({
   description,
-  nameFirstBtn = 'Continue',
-  cancelBtn = 'Cancel',
+  nameFirstBtn = "Continue",
+  cancelBtn = "Cancel",
   tilte,
   btnValue,
   open,
   setOpen,
 }: PropsAlertComponent) {
-
-  const setBtnValue = (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
+  const setCloseAlertAndGetValue = (e: MouseEvent<HTMLButtonElement>) => {
+    setOpen(false);
     btnValue(e?.target?.textContent);
-  }
+  };
 
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent>
+      <AlertDialogContent className="min-h-44 flex items-end justify-between flex-col">
         <AlertDialogHeader>
           <AlertDialogTitle>{tilte}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogDescription className="text-zinc-600">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
 
           <AlertDialogCancel
-            onClick={(e) => {
-              setOpen(false)
-              setBtnValue(e)
-            }}>
-            {nameFirstBtn}
+            className="!border border-zinc-800"
+            onClick={setCloseAlertAndGetValue}
+          >
+            {cancelBtn}
           </AlertDialogCancel>
 
-          <AlertDialogAction
-            onClick={(e) => {
-              setOpen(false)
-              setBtnValue(e)
-            }}>
-            {cancelBtn}
+          <AlertDialogAction onClick={setCloseAlertAndGetValue}>
+            {nameFirstBtn}
           </AlertDialogAction>
-
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }
-
