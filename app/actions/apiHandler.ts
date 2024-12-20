@@ -1,41 +1,5 @@
 'use server'
-import axios from "axios";
 const API_URL = 'http://app.api';
-
-export const apiHandler = async ({
-    method = "GET",
-    endpoint = "",
-    token = "",
-    data = null
-}) => {
-
-    try {
-
-        const url = `${API_URL}/${endpoint}`;
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await axios({
-            method,
-            url,
-            data,
-            headers
-        });
-
-        // بازگشت داده‌ها در صورت موفقیت
-        return {
-            success: true,
-            data: response.data,
-            message: '',
-            status: response.status,
-        };
-    } catch (error) {
-        // مدیریت خطاها
-        return {
-            success: false,
-            message: error.response?.data?.message || "An error occurred",
-            status: error.response?.status || 500,
-        };
-    }
-};
 
 const checkeEndPoint = (endpoint: string) => {
     // Endpoint should not start with slash and http.
@@ -71,8 +35,11 @@ export const getData = async (
             }
         })
 
-        if (!response.ok)
-            throw `${customErrorMessage || 'Error receiving information, please try again'}`;
+
+        if (!response.ok) {
+            console.info(response);
+            throw `${customErrorMessage || 'Error receiving information, please try again'}`
+        };
 
         const resutl = await response.json();
         return {
@@ -83,7 +50,7 @@ export const getData = async (
         console.error(error);
         return {
             res: error,
-            errorMessage: null,
+            errorMessage: error as string,
         };
     }
 }

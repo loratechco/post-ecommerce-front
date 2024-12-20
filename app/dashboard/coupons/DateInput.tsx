@@ -1,6 +1,6 @@
 "use client"
 
-import * as React from "react"
+import {useState , useEffect} from "react"
 import { addDays, format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
@@ -18,16 +18,17 @@ import { DateRange } from "react-day-picker"
 const today = new Date();
 
 
-export function DatePickerInput() {
+export function DatePickerInput({getDate}:{getDate:(value:object)=>void}) {
   const nowYear = today.getFullYear();
   const nowMonth = String(today.getMonth() + 1).padStart(2, '0'); 
   const nowDay = Number(String(today.getDate()).padStart(2, '0'));
-  console.info(`${nowYear}-${nowMonth}-${nowDay}`); 
 
-  const [date, setDate] = React.useState<DateRange | undefined>({
+  const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(nowYear|| 2024, 0, +nowMonth),
     to: addDays(new Date(nowYear||2024, 0, 20), 20),
   })
+
+  useEffect(()=>getDate(date as DateRange),[date])
 
   return (
     <Popover >
@@ -37,7 +38,7 @@ export function DatePickerInput() {
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "justify-start text-left font-normal w-full border-zinc-400",
               !date && "text-muted-foreground"
             )}
           >

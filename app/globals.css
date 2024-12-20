@@ -124,4 +124,7 @@ body {
   .toaster-errors {
     @apply bg-toast-bgc-error text-toast-txt-color-error border-none !important;
   }
+  .input-primary{
+    @apply focus-visible:!ring-0 border !border-zinc-300 focus-visible:!border-zinc-600 transition-colors text-black;
+  }
 }

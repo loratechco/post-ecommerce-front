@@ -5,7 +5,7 @@ import TableDesc, {
   TheadDesc,
   TrDesc,
 } from "@/components/table-responsive/TableDesc";
-import SearchComponent from "../ticketing/components/SearchComponent";
+import SearchComponent from "../components/SearchComponent";
 import Link from "next/link";
 import TableCardsMobile, {
   CardTable,
@@ -13,25 +13,12 @@ import TableCardsMobile, {
   WrapContent,
 } from "@/components/table-responsive/TableCardsMobile";
 import { PaginationComponent } from "@/components/pagination";
-import {  getData } from "@/app/actions/apiHandler";
+import { getData } from "@/app/actions/apiHandler";
 import { cookieName } from "@/lib/auth/storage";
 import { cookies } from "next/headers";
 import CreateNewGroup from "./CreateNewGroup";
 import ActionBtnGroup from "./action-btn-group/ActionBtnGroup";
-
-const getGroupList = async (token: string, endpoint: string) => {
-  const data = await getData(endpoint, token);
-  if (!data) {
-    return { res: [], errorMessage: "داده‌ای دریافت نشد" };
-  }
-  const { res, errorMessage } = data;
-
-  if (errorMessage && !res) {
-    return { res: [], errorMessage };
-  }
-  // else
-  return { res, errorMessage };
-};
+import { MyDatatTable } from "../components/my-data-table/my-data-table";
 
 interface Props {
   searchParams: {
@@ -41,121 +28,38 @@ interface Props {
 }
 
 async function GroupsPage({
-  searchParams: { page = "1", search = "" },
+  searchParams
 }: Props) {
-  console.log(page, search);
+  const { page = "1", search = "" } = await searchParams;
   const coockieStorage = await cookies();
   const { token } = JSON.parse(coockieStorage.get(cookieName)?.value as string);
 
-  // get group List data
-  const { errorMessage, res } = await getGroupList(
-    token,
-    `api/groups?page=${page}&search=${search}`
+  const { res, errorMessage } = await getData(
+    `api/groups?page=${page}&search=${search} `,
+    token
   );
 
-  const calculateIndexListItems = (index: number) => {
-    return (+page - 1) * 10 + index + 1;
-  };
-
-  console.log(errorMessage, res?.groups?.last_page, res?.groups?.data);
   return (
     <>
-      <div className="size-full">
-        <SearchComponent token={token}>
-          <CreateNewGroup token={token} />
-        </SearchComponent>
-
-        <section className="pt-5 w-full">
-          <TableDesc>
-            <TheadDesc>
-              <TrDesc>
-                <ThDesc title="#" />
-                <ThDesc title="Title" />
-                <ThDesc title="Actions" />
-              </TrDesc>
-            </TheadDesc>
-
-            <TbodyDesc>
-              {res?.groups?.data.length > 0 ? (
-                res?.groups?.data?.map(
-                  ({ id, description, name }, index: number) => (
-                    <TrDesc key={id}>
-                      <TdDesc>
-                        <p className="table-text">
-                          {String(calculateIndexListItems(index))}
-                        </p>
-                      </TdDesc>
-                      <TdDesc>
-                        <Link href={`/dashboard/groups/edit-user-group/${id}`}>
-                          <p className="table-text truncate overflow-hidden underline">
-                            {name}
-                          </p>
-                        </Link>
-                      </TdDesc>
-
-                      <TdDesc>
-                        <ActionBtnGroup
-                          id={String(id)}
-                          token={token}
-                          key={id}
-                        />
-                      </TdDesc>
-                    </TrDesc>
-                  )
-                )
-              ) : (
-                <TrDesc>
-                  <TdDesc></TdDesc>
-                  <TdDesc>
-                    <p className="table-text">There are no group</p>
-                  </TdDesc>
-                </TrDesc>
-              )}
-            </TbodyDesc>
-          </TableDesc>
-
-          {/* card box for mobile size  */}
-          <TableCardsMobile>
-            {res?.groups?.data.length > 0 ? (
-              res?.groups?.data?.map(
-                ({ id, description, name }, index: number) => (
-                  <div className="flex items-center justify-center w-full" key={id}>
-                    <Link
-                      href={`/dashboard/groups/edit-user-group/${id}`} >
-                      
-                      <CardTable className="">
-                        
-                        <WrapContent>
-                          <ContentTable
-                            content={String(calculateIndexListItems(index))}
-                          />
-                          <ContentTable
-                            className="max-w-[120px]"
-                            content={name}
-                          />
-                        </WrapContent>
-                      </CardTable>
-                    </Link>
-                    <ActionBtnGroup id={String(id)} token={token} key={id} />
-                  </div>
-                )
-              )
-            ) : (
-              <CardTable className="bg-zinc-200">
-                <WrapContent>
-                  <div className="text-black font-semibold">
-                    There are no group
-                  </div>
-                </WrapContent>
-              </CardTable>
-            )}
-          </TableCardsMobile>
-        </section>
-
-        <div className="py-7">
-          <PaginationComponent pages={res?.groups?.last_page || 1} />
-        </div>
-      </div>
+      <MyDatatTable
+        headerItems={[
+          { key: "name", label: "Name" },
+          { key: "actions", label: "Actions" },
+        ]}
+        table={{
+          currentPage: page,
+          tableBodyData: res?.groups?.data?.map((item) => ({
+            name: item?.name,
+            actions: <ActionBtnGroup id={String(item?.id)} token={token} key={item?.id}/>,
+            urlLink: `/dashboard/groups/edit-user-group/${item?.id || ""}`,
+          })),
+          customErrorMassage: "There are no groups",
+        }}
+        lastPageForPagination={res?.groups?.last_page || 1}
+        OptionalComponentNextToInput={
+        <CreateNewGroup token={token || ""} />
+      }
+      />
     </>
   );
 }

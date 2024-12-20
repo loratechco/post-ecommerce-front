@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Dialog,
@@ -25,15 +25,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";
 import { DatePickerInput } from "./DateInput";
 import { cn } from "@/lib/utils";
-import TabDemo from "./TabsChoosMethodsCrateCoupen";
+import TabsMethodCoupen from "./TabsChoosMethodsCrateCoupen";
+import { TabsContent } from "@radix-ui/react-tabs";
+import InputNumber from "../components/input-number";
+import { toast } from "@/hooks/use-toast";
 const CreactCoupenShema = z.object({
   coupenCode: z
     .string()
     .min(1, "It is mandatory to fill in the input")
     .min(5, "Minimum 5 characters")
     .max(10, "Maximum 10 characters"),
-  dateCheckbox: z.boolean(),
-  numberCheckbox: z.boolean(),
+
+  nubmerCoupens: z.string().min(1, "Minimum 5 characters").optional(),
 });
 
 type CoupenSubmit = z.infer<typeof CreactCoupenShema>;
@@ -41,18 +44,41 @@ function CreateNewCoupen() {
   const [openDialog, setOpenDialog] = useState(false);
   const randomGeneratCode = randomCodeGenerator() || "";
 
+  const initCurrentTabsStateValue = "tab-number";
+  const [currentTabs, setCurrentTabs] = useState<string>(
+    initCurrentTabsStateValue
+  );
+  const [dateValue, setDateValue] = useState({});
+
+  useEffect(() => {
+    console.info(currentTabs);
+  }, [currentTabs]);
+
   const form = useForm<CoupenSubmit>({
     defaultValues: {
-      dateCheckbox: false,
-      numberCheckbox: false,
       coupenCode: randomGeneratCode,
+      nubmerCoupens: "0",
     },
     resolver: zodResolver(CreactCoupenShema),
     shouldFocusError: true,
   });
 
   const submitCoupenData = async (data: CoupenSubmit) => {
-    console.info(data);
+    const conditionData = currentTabs.includes(initCurrentTabsStateValue);
+
+    const finalyData = {
+      codeCoupen: data?.coupenCode,
+      coupenNumber: conditionData ? data?.nubmerCoupens : null,
+      date: !conditionData ? dateValue||null : null,
+    };
+    if (finalyData.date === null && finalyData.coupenNumber === null) {
+      toast({
+        title:"Unsuccessful",
+        description:"Creating a coupon with one of the available methods is mandatory",
+        className:"toaster-errors"
+      })
+    }
+    console.info(finalyData);
     // try {
     //     const res = await axios.post(`${API_Backend}`)
     // } catch (error) {
@@ -62,22 +88,16 @@ function CreateNewCoupen() {
 
   return (
     <>
-      <Button
-        onClick={() => setOpenDialog(true)}
-        variant={"outline"}
-        className="btn-outline"
-      >
-        Create Coupen <Plus />
-      </Button>
-
       <Dialog open={openDialog} onOpenChange={setOpenDialog} modal={false}>
         {/* background blur and dark  */}
-      <div className={cn(openDialog&&'fixed inset-0 bg-black/80 z-40 ')}></div>
+        <div
+          className={cn(openDialog && "fixed inset-0 bg-black/80 z-40 ")}
+        ></div>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>Create Coupen</DialogTitle>
             <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
+              Here you can create your coupon by choosing one of these methods
             </DialogDescription>
           </DialogHeader>
 
@@ -87,61 +107,69 @@ function CreateNewCoupen() {
                 control={form.control}
                 name="coupenCode"
                 render={({ field }) => (
+                  <FormItem className="pb-3">
+                    <FormControl>
+                      <Input
+                        maxLength={10}
+                        {...field}
+                        className="border-zinc-400"
+                      ></Input>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nubmerCoupens"
+                render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <div className="">
-                        <Input maxLength={10} {...field}></Input>
-                      </div>
+                      <TabsMethodCoupen
+                        defaultTab={initCurrentTabsStateValue}
+                        currentTabs={(value) => {
+                          setCurrentTabs(value);
+                        }}
+                        tabContentChild={
+                          <div className="pt-3">
+                            <TabsContent value="tab-number">
+                              <InputNumber
+                                minNumber={0}
+                                maxNumber={3}
+                                {...field}
+                              />
+                            </TabsContent>
+                            <TabsContent value="tab-date">
+                              <DatePickerInput
+                                getDate={(value) => {
+                                  setDateValue(value);
+                                }}
+                              />
+                            </TabsContent>
+                          </div>
+                        }
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
 
-              {[
-                { key: "dateCheckbox", label: "date" },
-                {
-                  key: "Valid time of coupon",
-                  label: "Number of users allowed to use",
-                },
-              ].map((checkBox, index) => (
-                <FormField
-                  key={index}
-                  control={form.control}
-                  name={checkBox.key as "dateCheckbox" | "numberCheckbox"}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <div className="">
-                        <Checkbox
-                          value={field.value as boolean}
-                          onCheckedChange={field.onChange}
-                          id={checkBox.key}
-                        />
-                        <Label htmlFor={checkBox.key}>{checkBox.label}</Label>
-                        </div>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              ))}
-              <DialogFooter>
-              
-                <Button type="submit">Save changes</Button>
+              <DialogFooter className="pt-7">
+                <Button type="submit" onClick={()=>setOpenDialog(false)}>Save changes</Button>
               </DialogFooter>
             </form>
-            
           </FormProvider>
-
-          <div className="">
-          <TabDemo 
-            currontTabs={(value)=>{
-              console.info(value);
-            }}
-          />
-            
-          </div>
         </DialogContent>
       </Dialog>
+
+      <div className="max-md:w-full max-md:flex items-start justify-start">
+        <Button
+          onClick={() => setOpenDialog(true)}
+          variant={"outline"}
+          className="btn-outline"
+        >
+          Create Coupen <Plus />
+        </Button>
+      </div>
     </>
   );
 }

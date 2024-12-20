@@ -1,8 +1,13 @@
-function AccardionSkeleton({ numberItems = 7 }: { numberItems?: number }) {
+import { cn } from "@/lib/utils";
 
-    const number = Array.from({ length: numberItems }, (index) => index)
+function AccardionSkeleton({ numberItems = 7, perrentClassName= 'h-14' }: { numberItems?: number, perrentClassName?: string }) {
+
+    const number = Array.from({ length: numberItems,  }, (index) => index)
     return (
-        <ul className="size-full space-y-3  *:w-full *:h-14 *:animate-pulse *:bg-gray-300 *:rounded-xl">
+        <ul className={cn(
+            perrentClassName,
+            "size-full space-y-3 *:w-full *:h-14 *:animate-pulse *:bg-gray-200 *:rounded-xl"
+        )}>
             {number.map(() => <li></li>)}
         </ul>
     );

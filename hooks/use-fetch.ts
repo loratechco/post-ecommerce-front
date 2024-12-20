@@ -49,15 +49,15 @@ export const useGEt = ({
             if (!endpointResult.ok) return;
             setLoading(true);
             setErrorMessage(null);
-
+            
             try {
-                const response = await fetch(`${API_Backend}/${endpointResult.endpoint}`, {
+                const response = await fetch(`${API_Backend}/${endpointResult?.endpoint}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`,
                     },
                 });
-
+                
                 if (!response.ok) {
                     throw new Error(
                         customErrorMessage || 'Error receiving information, please try again'

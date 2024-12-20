@@ -1,4 +1,4 @@
-import SearchComponent from "../../ticketing/components/SearchComponent";
+import SearchComponent from "../SearchComponent";
 
 import TableDesc, {
   TbodyDesc,
@@ -25,19 +25,20 @@ interface Props {
   headerItems: { key: string; label: string }[];
   lastPageForPagination: number;
   searchInput?: boolean;
-  url?: string;
   table: {
     currentPage: string;
-    tableBodyData: Record<string, any>[] & {
+    tableBodyData: {
       actions?: ReactNode;
+      urlLink?: string;
       badge?: {
         badgeValue: string;
         badgeClassname: string;
       };
-    };
+    }[];
     indexItemsAvalabe?: boolean;
     customErrorMassage?: string;
   };
+  searchDelay?: number;
 }
 
 /**
@@ -117,19 +118,20 @@ function MyDatatTable({
   OptionalComponentNextToInput,
   headerItems,
   lastPageForPagination,
-  url = "",
   table: {
     currentPage = "1",
     tableBodyData = [],
+    
     indexItemsAvalabe = true,
     customErrorMassage = "There is no data",
   },
   searchInput = true,
+  searchDelay =1000
 }: Props) {
   return (
     <div className="size-full">
       {searchInput && (
-        <SearchComponent>{OptionalComponentNextToInput}</SearchComponent>
+        <SearchComponent delay={searchDelay}>{OptionalComponentNextToInput}</SearchComponent>
       )}
 
       <div className="pt-3 w-full">
@@ -147,7 +149,7 @@ function MyDatatTable({
           <TbodyDesc>
             {tableBodyData?.length > 0 ? (
               tableBodyData.map((row, rowIndex) => (
-                <TrDesc key={rowIndex}>
+                <TrDesc key={rowIndex} >
                   {indexItemsAvalabe && (
                     <TdDesc>
                       {calculateIndexListItems(rowIndex, currentPage)}
@@ -157,9 +159,10 @@ function MyDatatTable({
                   {headerItems.map(({ key }, colIndex) => (
                     <TdDesc>
                       <Link
-                        href={url && colIndex == 0 ? url : ""}
+                        href={( row?.urlLink && colIndex == 0) ? row?.urlLink||'' : ""}
                         className={cn(
-                          !(url && colIndex == 0) ? "cursor-default":'underline'
+                          "ps-3",
+                          !( row?.urlLink && colIndex == 0) ? "cursor-default":'underline'
                         )}
                         key={colIndex}
                       >
@@ -186,10 +189,10 @@ function MyDatatTable({
                 key={rowIndex}
               >
                 <Link
-                  href={url}
+                  href={row?.urlLink||''}
                   className={cn(
                     "w-full block cursor-default",
-                    url && "cursor-pointer"
+                    row?.urlLink && "cursor-pointer"
                   )}
                 >
                   <CardTable className="w-full max-sm:max-w-[250px] truncate">
