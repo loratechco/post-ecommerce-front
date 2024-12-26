@@ -8,7 +8,7 @@ function AccardionSkeleton({ numberItems = 7, perrentClassName= 'h-14' }: { numb
             perrentClassName,
             "size-full space-y-3 *:w-full *:h-14 *:animate-pulse *:bg-gray-200 *:rounded-xl"
         )}>
-            {number.map(() => <li></li>)}
+            {number.map((_,index) => <li key={index}></li>)}
         </ul>
     );
 }

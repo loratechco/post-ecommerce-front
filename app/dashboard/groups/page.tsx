@@ -1,18 +1,3 @@
-import TableDesc, {
-  TbodyDesc,
-  TdDesc,
-  ThDesc,
-  TheadDesc,
-  TrDesc,
-} from "@/components/table-responsive/TableDesc";
-import SearchComponent from "../components/SearchComponent";
-import Link from "next/link";
-import TableCardsMobile, {
-  CardTable,
-  ContentTable,
-  WrapContent,
-} from "@/components/table-responsive/TableCardsMobile";
-import { PaginationComponent } from "@/components/pagination";
 import { getData } from "@/app/actions/apiHandler";
 import { cookieName } from "@/lib/auth/storage";
 import { cookies } from "next/headers";
@@ -34,13 +19,12 @@ async function GroupsPage({
   const coockieStorage = await cookies();
   const { token } = JSON.parse(coockieStorage.get(cookieName)?.value as string);
 
-  const { res, errorMessage } = await getData(
+  const { res } = await getData(
     `api/groups?page=${page}&search=${search} `,
     token
   );
 
   return (
-    <>
       <MyDatatTable
         headerItems={[
           { key: "name", label: "Name" },
@@ -60,7 +44,6 @@ async function GroupsPage({
         <CreateNewGroup token={token || ""} />
       }
       />
-    </>
   );
 }
 

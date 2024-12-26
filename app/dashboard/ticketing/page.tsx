@@ -17,7 +17,7 @@ const dateConvert = (date: string) => {
   return format(new Date(date), "yyyy/MM/dd HH:mm:ss");
 };
 
-type BadgeStatus = "open" | "pending" | "closed";
+// type BadgeStatus = "open" | "pending" | "closed";
 
 const badgeChecker = (badgeStatus: BadgeStatus) => {
   switch (badgeStatus) {
@@ -33,6 +33,14 @@ const badgeChecker = (badgeStatus: BadgeStatus) => {
   }
 };
 
+enum StatusBadg {
+  open = "bg-emerald-600 hover:bg-emerald-700",
+  pending = "bg-yellow-600 hover:bg-yellow-700",
+  closed = "bg-red-600 hover:bg-red-700",
+}
+const badgeClassname = (badgeStatus: keyof typeof StatusBadg) => {
+  return StatusBadg[badgeStatus] || "bg-zinc-600 hover:bg-zinc-700";
+};
 async function TicketListPage({
   searchParams,
 }: {
@@ -53,12 +61,13 @@ async function TicketListPage({
     title: item?.title,
     createdAt: dateConvert(item?.updated_at),
     urlLink: `/dashboard/ticketing/${item?.id}` || "",
-    statusTickets: item?.status || "",
+    statusTickets: item?.status,
+        
     badge: {
       badgeValue: item?.status,
       badgeClassname: cn(
-        "px-2 pt-0.5 pb-1 shadow-none ",
-        badgeChecker((item?.status || "") as BadgeStatus)
+        "px-2 pt-0.5 pb-1 shadow-none rounded-full",
+        badgeClassname((item?.status || "") as keyof typeof StatusBadg)
       ),
     },
   }));

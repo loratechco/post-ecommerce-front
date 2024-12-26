@@ -1,8 +1,12 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+	// corePlugins: {
+	// 	container: false,
+	//   },
 	darkMode: ["class"],
 	content: [
+		// '!./app/page.tsx', //Overrides for build and compilation by tailwind CSS
 		"./pages/**/*.{js,ts,jsx,tsx,mdx}",
 		"./components/**/*.{js,ts,jsx,tsx,mdx}",
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",

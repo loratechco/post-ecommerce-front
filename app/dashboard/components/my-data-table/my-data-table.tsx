@@ -19,6 +19,7 @@ import { PaginationComponent } from "@/components/pagination";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import clsx from "clsx";
 
 interface Props {
   OptionalComponentNextToInput?: ReactNode;
@@ -121,17 +122,19 @@ function MyDatatTable({
   table: {
     currentPage = "1",
     tableBodyData = [],
-    
+
     indexItemsAvalabe = true,
     customErrorMassage = "There is no data",
   },
   searchInput = true,
-  searchDelay =1000
+  searchDelay = 1000,
 }: Props) {
   return (
     <div className="size-full">
       {searchInput && (
-        <SearchComponent delay={searchDelay}>{OptionalComponentNextToInput}</SearchComponent>
+        <SearchComponent delay={searchDelay}>
+          {OptionalComponentNextToInput}
+        </SearchComponent>
       )}
 
       <div className="pt-3 w-full">
@@ -149,28 +152,43 @@ function MyDatatTable({
           <TbodyDesc>
             {tableBodyData?.length > 0 ? (
               tableBodyData.map((row, rowIndex) => (
-                <TrDesc key={rowIndex} >
-                  {indexItemsAvalabe && (
-                    <TdDesc>
-                      {calculateIndexListItems(rowIndex, currentPage)}
-                    </TdDesc>
-                  )}
+                <>
+                  <TrDesc key={rowIndex}>
+                    {indexItemsAvalabe && (
+                      <TdDesc>
+                        {calculateIndexListItems(rowIndex, currentPage)}
+                      </TdDesc>
+                    )}
 
-                  {headerItems.map(({ key }, colIndex) => (
-                    <TdDesc>
-                      <Link
-                        href={( row?.urlLink && colIndex == 0) ? row?.urlLink||'' : ""}
-                        className={cn(
-                          "ps-3",
-                          !( row?.urlLink && colIndex == 0) ? "cursor-default":'underline'
-                        )}
-                        key={colIndex}
-                      >
-                        {row[key] || "-"}
-                      </Link>
-                    </TdDesc>
-                  ))}
-                </TrDesc>
+                    {!row?.actions &&
+                      headerItems.map(({ key }, colIndex) => (
+                        <TdDesc key={colIndex}>
+                          <Link
+                            href={
+                              row?.urlLink && colIndex == 0
+                                ? row?.urlLink || ""
+                                : ""
+                            }
+                            className={cn(
+                              "ps-3",
+                              row?.urlLink && colIndex == 0
+                                ? "pointer-events-auto select-auto underline"
+                                : "cursor-default select-none"
+                            )}
+                          >
+                            {row[key] || "-"}
+                          </Link>
+                        </TdDesc>
+                      ))}
+
+                    {row?.actions &&
+                      headerItems.map(({ key }, colIndex) => (
+                        <TdDesc key={colIndex}>
+                          {key === "actions" ? row?.actions : row[key] || "-"}
+                        </TdDesc>
+                      ))}
+                  </TrDesc>
+                </>
               ))
             ) : (
               <TrDesc>
@@ -189,10 +207,11 @@ function MyDatatTable({
                 key={rowIndex}
               >
                 <Link
-                  href={row?.urlLink||''}
+                  href={row?.urlLink || ""}
                   className={cn(
-                    "w-full block cursor-default",
-                    row?.urlLink && "cursor-pointer"
+                    row?.urlLink
+                      ? "pointer-events-auto cursor-pointer "
+                      : "w-full cursor-default pointer-events-none select-none"
                   )}
                 >
                   <CardTable className="w-full max-sm:max-w-[250px] truncate">
@@ -209,7 +228,7 @@ function MyDatatTable({
                           )}
 
                           <ContentTable
-                            className="truncate overflow-hidden text-ellipsis max-sm:max-w-[160px]" 
+                            className="truncate overflow-hidden text-ellipsis max-sm:max-w-[160px]"
                             content={`${
                               !key.includes("actions") ? row[key] || "-" : ""
                             }`}

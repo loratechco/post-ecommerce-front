@@ -10,6 +10,7 @@ import React, { useReducer, useState } from "react";
 import { ActionReducerFunc, initialState } from "./action-btn-reducer";
 import DialogFormEditGroup from "./DialogFormEditGroup";
 import DialogFormAddUserToGroup from "./DialogFormAddUserToGroup";
+import { API_Backend } from "@/hooks/use-fetch";
 
 interface Props {
     id: string;
@@ -24,9 +25,8 @@ function ActionBtnGroup(props: Props) {
     const [alertState, dispatch] = useReducer(ActionReducerFunc, initialState);
 
     const deletGroupHandler = async () => {
-        console.log('this worked');
         try {
-            await axios.delete(`http://app.api/api/groups/${props?.id || ''}`, {
+            await axios.delete(`${API_Backend}/api/groups/${props?.id || ''}`, {
                 headers: {
                     Authorization: `Bearer ${props?.token || ''}`
                 }
@@ -37,14 +37,14 @@ function ActionBtnGroup(props: Props) {
             toast({
                 title: 'Successful',
                 description: 'The group was successfully deleted',
-                className: 'toaser-successfuls',
+                className: 'toaster-successfuls ',
             })
 
         } catch (error) {
             toast({
                 title: 'Unsuccessful',
                 description: 'The group could not be deleted, something went wrong.',
-                className: 'toaser-errors',
+                className: 'toaster-errors',
             })
         }
     }

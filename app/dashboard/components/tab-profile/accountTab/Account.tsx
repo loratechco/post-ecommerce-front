@@ -1,12 +1,11 @@
 "use client";
 import FormInput from "@/components/FormInput";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 
-import { FieldValues, useForm, UseFormRegister } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
 import { z } from "zod";
@@ -14,12 +13,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import formSchema from "./schemaEditProfile";
 
-import { useSession } from "@/lib/auth/useSession"; // وارد کردن useSession
+import { useSession } from "@/lib/auth/useSession";
 import { toast } from "@/hooks/use-toast";
-import { useImageUpload } from "./useImagePrwie";
 import { useUploadImg } from "./useUploadImg";
 import { API_Backend, useGEt } from "@/hooks/use-fetch";
-import { AccardionSkeleton } from "@/components/skeletons/AccardionSkeleton";
 
 const formFields = [
   { id: "name", placeholder: "Emily", type: "text", nameLabel: "Name" },
@@ -50,15 +47,15 @@ type FormData = z.infer<typeof formSchema> & {
 function Account() {
   const { token } = useSession();
   const [fileSaver, setFileSaver] = useState<File | null>(null);
-
   const [switchState, setSwitchState] = useState<boolean>(false);
-  const [userData, setUserData] = useState<[] | Promise<void> | null>(null);
 
-  const { data, errorMessage, loading } = useGEt({
+  // fetch profile data
+  const { data: userData } = useGEt({
     token,
     endpoint: `api/profile`,
   });
 
+  //react-hook-form
   const {
     register,
     handleSubmit,
@@ -76,17 +73,15 @@ function Account() {
     shouldUseNativeValidation: true,
   });
 
-  // get data from api
   useEffect(() => {
-    if (data) {
-      setSwitchState(data?.business_customer);
-      setUserData(data);
+    if (userData) {
+      setSwitchState(userData?.business_customer);
       reset({
-        ...data,
-        image: data?.avatar,
+        ...userData,
+        image: userData?.avatar,
       });
     }
-  }, [data]);
+  }, [userData]);
 
   const onSubmit = async (data: FormData) => {
     const formData = new FormData();
@@ -127,8 +122,6 @@ function Account() {
         description: "Something went wrong. Please try again",
         className: "toaster-errors",
       });
-
-      console.log("🚀 ~ onSubmit ~ error:", error);
     }
   };
 
@@ -148,9 +141,9 @@ function Account() {
         <div className="relative size-14 ">
           {useUploadImg({
             sizeFile: 1,
+            userData,
             API_IMG_URL: API_Backend,
             thereAvatar: true,
-            userData: userData as any,
             fileSubmit: setFileSaver,
           })}
         </div>

@@ -55,23 +55,30 @@ function AddTicketing({ token }: { token: string }) {
 
     setFormError({ title: "" });
     // create ticket handler
-    const { createTicketError, data } = await createTicket({
+    const { createTicketError=null, data } = await createTicket({
       token: token,
       title: value,
     });
-
-    console.log("data=>>>", data);
-    // redirect to ticket chat
-    router.push(`/dashboard/ticketing/${data?.id}`);
     // check error backend side
     if (createTicketError) {
       toast({
-        title: "Error",
-        className: "bg-red-300 text-950",
+        title: "Unsuccessful",
+        description:createTicketError,
+        className: "toaster-errors",
         duration: 3000,
       });
       return;
     }
+
+    toast({
+      title: "Successful",
+      description:'The ticket was created',
+      className: "toaster-successfuls",
+      duration: 3000,
+    });
+
+    // redirect to ticket chat
+    router.push(`/dashboard/ticketing/${data?.id}`);
   };
 
   // toast error
@@ -79,8 +86,7 @@ function AddTicketing({ token }: { token: string }) {
     if (!formError?.title) return;
     toast({
       title: "Unsuccessful",
-      className: "bg-red-300 text-950 font-semibold",
-      duration: 3000,
+      className: "toaster-errors",
       description: formError?.title || "Something went wrong",
     });
   }, [formError]);

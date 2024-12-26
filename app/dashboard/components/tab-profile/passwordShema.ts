@@ -1,26 +1,11 @@
+import { UserPasswordSchema } from "@/app/types/field-schemas";
 import { z } from "zod";
 
 const formSchema = z.object({
-    oldPassword: z
-        .string()
-        .min(6, { message: "Old Password must be at least 6 characters long." })
-        .regex(/^[^,/\\]+$/, {
-            message: "Old Password contains invalid characters.",
-        }),
+    oldPassword: UserPasswordSchema,
+    newPassword: UserPasswordSchema,
+    confirmation: UserPasswordSchema,
 
-    newPassword: z
-        .string()
-        .min(6, { message: "New Password must be at least 6 characters long." })
-        .regex(/^[^,/\\]+$/, {
-            message: "New Password contains invalid characters.",
-        }),
-
-    confirmation: z
-        .string()
-        .min(6, { message: "Confirmation Password must be at least 6 characters long." })
-        .regex(/^[^,/\\]+$/, {
-            message: "Confirmation Password contains invalid characters.",
-        }),
 }).refine((data) => data.newPassword === data.confirmation, {
     message: "Confirmation Password does not match New Password.",
     path: ["confirmation"],
@@ -29,4 +14,5 @@ const formSchema = z.object({
     path: ["newPassword"],
 });
 
+export type FormData = z.infer<typeof formSchema>; 
 export { formSchema };

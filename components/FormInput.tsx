@@ -2,16 +2,15 @@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { cn } from "@/lib/utils";
-import clsx from "clsx";
-import { Eye, EyeClosed } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import React, { useState } from "react";
 import { UseFormRegisterReturn } from "react-hook-form";
 
 interface Props {
     id: string;
     type: string;
-    nameLabel: string;
-    register: UseFormRegisterReturn;
+    nameLabel?: string;
+    register?: UseFormRegisterReturn;
     placeholder?: string;
     className?: string;
     disabled?: boolean;
@@ -50,7 +49,7 @@ const FormInput: React.FC<Props & React.InputHTMLAttributes<HTMLInputElement>> =
                 className={cn(
                     classNameParentPasswordInput,
                     'mt-1',
-                    { "flex items-center justify-between border rounded-md px-2 border-gray-400": isPasswordType },
+                    { "flex items-center justify-between border rounded-md px-2 border-gray-400 input-primary": isPasswordType },
                 )}>
                 <Input
                     key={(id + "Input")}
@@ -58,7 +57,7 @@ const FormInput: React.FC<Props & React.InputHTMLAttributes<HTMLInputElement>> =
                     {...register}
                     className={cn(
                         className,
-                        { " focus-visible:ring-0 border-none": isPasswordType },
+                        { " focus-visible:ring-0 border-none !input-primary": isPasswordType },
                         "w-full"
                     )}
 
@@ -76,9 +75,9 @@ const FormInput: React.FC<Props & React.InputHTMLAttributes<HTMLInputElement>> =
                     >
 
                         {!showPassword ? (
-                            <EyeClosed size={22} />
+                            <EyeOff size={19} className="opacity-70"/>
                         ) : (
-                            <Eye size={22} />
+                            <Eye  size={19} />
                         )}
 
                     </button>

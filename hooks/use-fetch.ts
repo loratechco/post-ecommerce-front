@@ -57,6 +57,7 @@ export const useGEt = ({
                         Authorization: `Bearer ${token}`,
                     },
                 });
+                console.info(response);
                 
                 if (!response.ok) {
                     throw new Error(

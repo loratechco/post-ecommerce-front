@@ -33,6 +33,7 @@ export default async function UserListPage({ searchParams }: Params) {
         currentPage: page,
         tableBodyData: res?.data?.data?.map((item) => ({
           name: item?.name,
+          urlLink:`/dashboard/users-management/${item?.id ||''}`,
           lastName: item?.last_name,
           phone: item?.phone,
           email: item?.email,

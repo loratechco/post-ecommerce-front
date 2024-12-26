@@ -15,6 +15,7 @@ import { useSession } from '@/lib/auth/useSession'
 import useSWR from 'swr'
 import { useToast } from "@/hooks/use-toast"
 import { AccardionSkeleton } from '@/components/skeletons/AccardionSkeleton'
+import { API_Backend } from '@/hooks/use-fetch'
 
 // تعریف تایپ‌ها
 type SwitchItem = {
@@ -44,25 +45,57 @@ const dataFetcher = async (url: string, userToken: string) => {
     }
 };
 
+export const useFetchPermissions = (token: string | null) => {
+    const { toast } = useToast();
+
+    const [data, setData] = useState<AccordionItem[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPermissions = async () => {
+            if (!token) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const response = await axios.post(
+                    `http://app.api/api/permissions`,
+                    { user_id: 0 },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                setData(response.data);
+            } catch (err: any) {
+                console.error("Error fetching data:", err);
+                toast({
+                    description: "Failed to fetch permissions data. Please try again.",
+                    variant: "destructive",
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPermissions();
+    }, [token]);
+
+    return { data, isLoading };
+};
+
 export default function Permission() {
     const { toast } = useToast();
     const { token } = useSession();
 
     const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
     const [initialStateSet, setInitialStateSet] = useState(false);
-    const [activeInit, setActiveInit] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    const { data: accordionData, error } = useSWR<AccordionItem[]>(
-        token ? ['permission-data', `http://app.api/api/permissions`] : null,
-        ([_, url]) => dataFetcher(url, token),
-        {
-            errorRetryCount: 2,
-            onSuccess: () => setIsLoading(false)
-        }
-    );
+    const { data: accordionData, isLoading } = useFetchPermissions(token);
 
-    // تنظیم وضعیت اولیه سوییچ‌ها
     useEffect(() => {
         if (!initialStateSet && accordionData && Array.isArray(accordionData)) {
             const initialSwitchStates: Record<string, boolean> = {};
@@ -99,7 +132,7 @@ export default function Permission() {
         console.log("Active permissions to send:", activePermissions);
 
         try {
-            const res = await axios.post('http://app.api/api/permissions/assign-to-user',
+            const res = await axios.post(`${API_Backend}/api/permissions/assign-to-user`,
                 {
                     permissions: activePermissions
                 },
@@ -133,7 +166,7 @@ export default function Permission() {
             <AccordionItem
                 key={item.id}
                 value={item.id}
-                className='border-0 my-2 px-3 last:py-1 rounded-xl bg-[#e4e4e7]'
+                className='border-0 my-2 px-3 py-1 last:py-1 rounded-xl bg-zinc-200'
             >
                 <AccordionTrigger className='font-bold [&[data-state=open]]:underline'>
                     {item.title}

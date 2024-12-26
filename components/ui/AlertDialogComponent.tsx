@@ -8,10 +8,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { MouseEvent, useState } from "react";
+import { MouseEvent } from "react";
 
 export type PropsAlertComponent = {
   tilte: string;
@@ -58,7 +56,7 @@ export function AlertComponent({
 
   return (
     <AlertDialog open={open}>
-      <AlertDialogContent className="min-h-44 flex items-end justify-between flex-col">
+      <AlertDialogContent className="min-h-44 flex justify-between flex-col">
         <AlertDialogHeader>
           <AlertDialogTitle>{tilte}</AlertDialogTitle>
           <AlertDialogDescription className="text-zinc-600">
