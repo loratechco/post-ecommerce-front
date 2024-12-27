@@ -48,7 +48,7 @@ const originAndDestinationStructure = {
 
 interface CountryCitySelectorProps {
     countries: { name: string; flag: string }[];
-    hookForm: any; // می‌توانید نوع دقیق‌تر برای `hookForm` تعریف کنید
+    hookForm: any; 
     countryName: string;
     cityName: string;
     countryPlaceholder: string;
@@ -75,12 +75,12 @@ interface CountryCitySelectorProps {
             <FormItem className="w-1/2 bg-zinc-300">
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5">
+                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5 text-xs">
                     <SelectValue placeholder={countryPlaceholder} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {countries.map((country, index) => (
+                  {countries?.map((country, index) => (
                     <SelectItem
                       value={country.name}
                       key={index}
@@ -100,7 +100,7 @@ interface CountryCitySelectorProps {
             <FormItem className="bg-zinc-300 w-1/2">
                <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5">
+                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5 text-xs">
                     <SelectValue placeholder={cityPlaceholder} />
                   </SelectTrigger>
                 </FormControl>

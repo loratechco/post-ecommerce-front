@@ -17,12 +17,6 @@ import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";
 
-interface Props {
-  hookForm: UseFormReturn;
-  selectBoxName: string;
-  ProductDetailsFieldName: string | number;
-}
-
 type Box = {
   name: string | null;
   width: number | null; // inches
@@ -74,20 +68,25 @@ const BOX_SIZE = [
   },
 ];
 
-const generatUnicId = randomCodeGenerator(7);
-
-const detailFields= [
+const detailFields = [
   { id: `width`, label: "width" },
   { id: `length`, label: "length" },
   { id: `height`, label: "height" },
   { id: `volume`, label: "volume" },
-  
 ];
+
+interface Props {
+  hookForm: UseFormReturn;
+  selectBoxName: string;
+  ProductDetailsFieldName: string | number;
+  disableFieldTitles?: boolean;
+}
 
 function ProductDetailsForm({
   hookForm,
   selectBoxName,
   ProductDetailsFieldName = "",
+  disableFieldTitles = false,
 }: Props) {
   const [itemValue, setItemValue] = useState<Box>({
     name: "Custom",
@@ -96,12 +95,6 @@ function ProductDetailsForm({
     height: null,
     volume: null,
   });
-
-  const getSelectBoxValueItem = (value) => {
-    setItemValue(
-      (BOX_SIZE.find((item) => item?.name === value) as Box) || "value is null"
-    );
-  };
 
   useEffect(() => {
     if (itemValue) {
@@ -127,7 +120,7 @@ function ProductDetailsForm({
   }, [itemValue, hookForm, ProductDetailsFieldName]);
 
   return (
-    <div className="pt-9 pb-5 flex items-center justify-center max-lg:flex-col w-full h-fit gap-x-3 gap-y-5">
+    <div className="flex items-center justify-center max-lg:flex-col w-full h-fit gap-x-3 gap-y-5">
       <div className="w-2/6 max-lg:w-full">
         <Label className="block text-xs font-semibold mb-2 ms-0.5">
           Product Size
@@ -139,9 +132,12 @@ function ProductDetailsForm({
           render={({ field }) => (
             <FormItem className="w-full">
               <Select
-                onValueChange={(e) => {
-                  field.onChange(e);
-                  getSelectBoxValueItem(e);
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  setItemValue(
+                    (BOX_SIZE.find((item) => item?.name === value) as Box) ||
+                      "value is null"
+                  );
                 }}
                 defaultValue={field.value}
               >
@@ -173,10 +169,13 @@ function ProductDetailsForm({
         )}
       >
         {detailFields?.map((field, index) => (
-          <div key={field?.id ||  index}>
+          <div key={field?.id || index}>
             <Label
               htmlFor={field.id}
-              className="text-xs font-semibold mb-2 ms-0.5"
+              className={cn(
+                "text-xs font-semibold mb-2 ms-0.5",
+                disableFieldTitles && "max-lg:hidden"
+              )}
             >
               {field.label}
             </Label>
@@ -194,7 +193,6 @@ function ProductDetailsForm({
             />
           </div>
         ))}
-
       </div>
     </div>
   );

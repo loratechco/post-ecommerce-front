@@ -11,8 +11,10 @@ import { Form } from "@/components/ui/form";
 import CountryCitySelector from "./CountryCitySelector";
 import InputNumber from "@/app/dashboard/components/input-number";
 import ProductDetailsForm from "./ProductDetailsForm";
-import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { PlusIcon, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { API_Backend, useGEt } from "@/hooks/use-fetch";
+import axios from "axios";
 
 // test data
 
@@ -50,21 +52,57 @@ const countries = [
   { name: "Finland", flag: "🇫🇮" },
 ];
 
-export function SelectBox() {
+type AddProductDetailsForm = {
+  hookForm: any;
+  selectBoxName: string | number;
+  ProductDetailsFieldName: string | number;
+};
+
+const getData = async () =>{
+  try {
+    const {data}= await axios.post(`${API_Backend}/api/providers/getavailibilities`);
+    console.info(data);
+  } catch (error) {
+    console.info(error?.response , 'This Pure Error=>>>>>>>',error);
+  }
+}
+
+
+export function SelectBox({ token }: { token: string }) {
   const form = useForm();
 
-  let addNewProductDetailsFormComponentArray = [];
-  const [addProductDetailsForm, setAddProductDetailsForm] = useState(null);
+  getData()
+
+  const [saveData, setData] = useState<AddProductDetailsForm[]>([]);
 
   function onSubmit(data) {
     console.info(data);
+  }
+  const addNewProductDetailsFormComponent = () => {
+    console.log("hi");
+    if (saveData?.length >= 3) return;
+    setData((prev) => [
+      ...prev,
+      {
+        hookForm: () => form,
+        ProductDetailsFieldName: prev.length + 1,
+        selectBoxName: prev.length + 1,
+      },
+    ]);
   };
-  const addNewProductDetailsFormComponentFunc = () => {
-    console.log('hi');
+
+  const deleteHandlerdetailfieldsComponent = (items: AddProductDetailsForm) => {
+    const filterRemoveItem = saveData?.filter(
+      (filterItem) => filterItem?.selectBoxName !== items?.selectBoxName
+    );
+    ["width", "length", "height", "volume"]?.forEach((staticKey) =>
+      form.unregister(`${staticKey}${items?.selectBoxName}`)
+    );
+    setData(filterRemoveItem);
   };
 
   return (
-    <div className="p-5 shadow-md rounded-lg bg-zinc-300 w-2/3 max-md:w-11/12">
+    <div className="p-5 shadow-md rounded-lg bg-zinc-300 w-2/3 max-md:w-11/12 ">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="w-full">
@@ -93,22 +131,39 @@ export function SelectBox() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center max-lg:flex-col lg:gap-3 w-full">
-
+          <div className="w-full space-y-5 pt-3">
             <ProductDetailsForm
               hookForm={form}
-              selectBoxName={"type-product"}
-              ProductDetailsFieldName={1}
+              selectBoxName={"first-type-product"}
+              ProductDetailsFieldName={"-first-item"}
             />
 
-            <div className="max-lg:w-full w-auto max-lg:pb-7  lg:mt-10">
+            {saveData?.map((items) => (
+              <div className="">
+                <ProductDetailsForm
+                  disableFieldTitles={true}
+                  hookForm={items?.hookForm()}
+                  ProductDetailsFieldName={items?.ProductDetailsFieldName}
+                  selectBoxName={String(items?.selectBoxName)}
+                  key={items?.selectBoxName}
+                />
+
+                <button
+                  className="text-xs block text-red-600 p-0 ps-1 font-semibold pt-2"
+                  onClick={() => deleteHandlerdetailfieldsComponent(items)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+            <div className="w-full pb-7 flex items-center justify-start gap-3">
               <Button
-              onClick={addNewProductDetailsFormComponentFunc}
+                onClick={addNewProductDetailsFormComponent}
                 variant={"outline"}
                 type="button"
                 className="text-xs px-2 py-[1.19rem]"
               >
-                <PlusIcon className="inline" size={20} />
+                <PlusIcon size={20} />
                 <span>Add Package</span>
               </Button>
             </div>

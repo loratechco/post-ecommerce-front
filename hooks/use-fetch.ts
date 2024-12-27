@@ -49,7 +49,6 @@ export const useGEt = ({
             if (!endpointResult.ok) return;
             setLoading(true);
             setErrorMessage(null);
-            
             try {
                 const response = await fetch(`${API_Backend}/${endpointResult?.endpoint}`, {
                     headers: {
@@ -57,7 +56,7 @@ export const useGEt = ({
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                console.info(response);
+                // console.info('response=>>>>>>',response, 'response and Json parse=====>',await response.json());
                 
                 if (!response.ok) {
                     throw new Error(
@@ -76,6 +75,6 @@ export const useGEt = ({
 
         fetchData();
     }, [endpoint, token,dependencyOptional]);
-
+    
     return { data, errorMessage, loading };
 };
