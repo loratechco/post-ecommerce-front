@@ -12,61 +12,13 @@ import { UseFormReturn } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
 import { memo, useEffect, useState } from "react";
-import { Box } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { randomCodeGenerator } from "@/lib/randomGeneratCode";
 
-type Box = {
-  name: string | null;
-  width: number | null; // inches
-  length: number | null; // inches
-  height: number | null; // inches
-  volume: number | null; // cubic inches
-};
+import { BOX_SIZE, BoxSizeType } from "./productBoxSize";
+import { PenLine } from "lucide-react";
+import {ProductDetailFormType} from '../../../../app/types/shipping-selector-types'
 
-const BOX_SIZE = [
-  {
-    name: "select product size",
-    width: null, // inches
-    length: null, // inches
-    height: null, // inches
-    volume: null, // cubic inches
-    BoxIcon: null,
-  },
-  {
-    name: "Small",
-    width: 5.4375, // inches
-    length: 8.6875, // inches
-    height: 1.75, // inches
-    volume: 5.4375 * 8.6875 * 1.75, // cubic inches
-    BoxIcon: <Box size={16} />,
-  },
-  {
-    name: "Medium",
-    width: 8.75, // inches
-    length: 11.25, // inches
-    height: 6, // inches
-    volume: 8.75 * 11.25 * 6, // cubic inches
-    BoxIcon: <Box size={18} />,
-  },
-  {
-    name: "Large",
-    width: 12, // inches
-    length: 14, // inches
-    height: 3.5, // inches
-    volume: 12 * 14 * 3.5, // cubic inches
-    BoxIcon: <Box size={20} />,
-  },
-  {
-    name: "Extra Large",
-    width: 12.25, // inches
-    length: 12.25, // inches
-    height: 6, // inches
-    volume: 12.25 * 12.25 * 6, // cubic inches
-    BoxIcon: <Box size={22} />,
-  },
-];
 
 const detailFields = [
   { id: `width`, label: "width" },
@@ -75,10 +27,7 @@ const detailFields = [
   { id: `volume`, label: "volume" },
 ];
 
-interface Props {
-  hookForm: UseFormReturn;
-  selectBoxName: string;
-  ProductDetailsFieldName: string | number;
+interface Props{
   disableFieldTitles?: boolean;
 }
 
@@ -87,9 +36,9 @@ function ProductDetailsForm({
   selectBoxName,
   ProductDetailsFieldName = "",
   disableFieldTitles = false,
-}: Props) {
-  const [itemValue, setItemValue] = useState<Box>({
-    name: "Custom",
+}: Props & ProductDetailFormType) {
+  const [itemValue, setItemValue] = useState<BoxSizeType>({
+    name: "select product size",
     width: null,
     length: null,
     height: null,
@@ -135,21 +84,29 @@ function ProductDetailsForm({
                 onValueChange={(value) => {
                   field.onChange(value);
                   setItemValue(
-                    (BOX_SIZE.find((item) => item?.name === value) as Box) ||
-                      "value is null"
+                    (BOX_SIZE.find(
+                      (item) => item?.name === value
+                    ) as BoxSizeType) || "value is null"
                   );
                 }}
                 defaultValue={field.value}
               >
                 <FormControl>
-                  <SelectTrigger className="bg-zinc-50 py-5 text-xs">
-                    <SelectValue placeholder="select product size" />
+                  <SelectTrigger className="bg-zinc-50 py-5">
+                    <SelectValue
+                      placeholder={
+                        <div className="flex items-center gap-2">
+                          <PenLine size={18} />
+                          <span>Select product size</span>
+                        </div>
+                      }
+                    />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent >
                   {BOX_SIZE?.map((selectTypes, index) => (
-                    <SelectItem value={selectTypes?.name} key={index}>
-                      <div className=" flex items-center justify-start gap-1">
+                    <SelectItem className="hover:!bg-zinc-200/70" value={selectTypes?.name} key={index}>
+                      <div className=" flex items-center justify-start gap-2">
                         <div>{selectTypes?.BoxIcon}</div>
                         <div className="">{selectTypes?.name}</div>
                       </div>

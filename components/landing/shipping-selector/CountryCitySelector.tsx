@@ -1,123 +1,178 @@
 "use client";
 
+import { FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
-import { UseFormReturn } from "react-hook-form";
-import { Input } from "@/components/ui/input";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+const languages = [
+  { label: "English", value: "en" },
+  { label: "French", value: "fr" },
+  { label: "German", value: "de" },
+  { label: "Spanish", value: "es" },
+  { label: "Portuguese", value: "pt" },
+  { label: "Russian", value: "ru" },
+  { label: "Japanese", value: "ja" },
+  { label: "Korean", value: "ko" },
+  { label: "Chinese", value: "zh" },
+] as const;
+import {
+  DataStructureCountry,
+  Country,
+  ProductDetailFormType,
+} from "@/app/types/shipping-selector-types";
+import Flag from "react-world-flags";
+interface CountryCitySelectorProps {
+  countries: Country[];
+  hookForm: any;
+  countryName: string;
+  cityName: string;
+  cityData: string[];
+}
 
+const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
+  countries,
+  hookForm,
+  countryName,
+  cityName,
+  cityData,
+}) => {
+  const getCountriesSelected = ({ value }) => {
+    const result = countries.find((countrie) => countrie.name === value);
+    return result;
+  };
 
-const originAndDestinationStructure = {
-  fieldsOrigin: {
-    countryOrigin: {
-      name: "country-origin",
-      lable: "Country of Origin",
-      placeholder: "Select the country of origin",
-    },
-    cityOrigin: {
-      name: "city-origin",
-      lable: "City of Origin",
-      placeholder: "Select the city of origin",
-    },
-  },
+  return (
+    <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">
+      {/* Country Selector */}
+      <FormField
+        control={hookForm?.control}
+        name={countryName}
+        render={({ field }) => (
+          <FormItem className="w-1/2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    data-muted={!field.value}
+                    className="w-full flex justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground"
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <Flag
+                        code={getCountriesSelected(field)?.code}
+                        width={23}
+                        height={23}
+                      />
+                      {getCountriesSelected(field)?.name ||
+                        "Select the country"}
+                    </div>
+                    <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="max-w-56 sm:max-w-64">
+                <Command>
+                  <CommandInput placeholder="Search language..." />
+                  <CommandList>
+                    <CommandEmpty>No city found.</CommandEmpty>
+                    <CommandGroup className="">
+                      {countries.map((countrie) => (
+                        <CommandItem
+                          className="hover:!bg-zinc-200/70"
+                          value={countrie.name}
+                          key={countrie?.name}
+                          onSelect={() => {
+                            hookForm.setValue(countryName, countrie.name);
+                          }}
+                        >
+                          <Flag
+                            code={countrie?.code}
+                            width={23}
+                            height={23}
+                          />
+                          {countrie.name}
+                          <Check
+                            data-active={countrie.name === field.value}
+                            className="ml-auto opacity-0  transition-opacity data-[active=true]:opacity-100"
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormItem>
+        )}
+      />
 
-  fieldDestination: {
-    countryDestination: {
-      name: "country-destination",
-      lable: "Country of Destination",
-      placeholder: "Select the destination country",
-    },
-    cityDestination: {
-      name: "city-destination",
-      lable: "City of Destination",
-      placeholder: "Select the destination city",
-    },
-  },
+      {/* City Selector */}
+      <FormField
+        control={hookForm?.control}
+        name={cityName}
+        render={({ field }) => (
+          <FormItem className="bg-zinc-300 flex flex-col w-1/2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    data-muted={!field.value}
+                    className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground"
+                  >
+                    {languages.find(
+                      (language) => language.value === field.value
+                    )?.label || "Select the city"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className="max-w-56 sm:max-w-64 p-0">
+                <Command>
+                  <CommandInput placeholder="Search language..." />
+                  <CommandList>
+                    <CommandEmpty>No city found.</CommandEmpty>
+                    <CommandGroup>
+                      {languages.map((language) => (
+                        <CommandItem
+                          className="hover:!bg-zinc-200/70"
+                          value={language.label}
+                          key={language.value}
+                          onSelect={() => {
+                            hookForm.setValue(cityName, language.value);
+                          }}
+                        >
+                          {language.label}
+                          <Check
+                            data-active={language.value === field.value}
+                            className="ml-auto opacity-0  transition-opacity data-[active=true]:opacity-100"
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </FormItem>
+        )}
+      />
+    </div>
+  );
 };
 
-interface CountryCitySelectorProps {
-    countries: { name: string; flag: string }[];
-    hookForm: any; 
-    countryName: string;
-    cityName: string;
-    countryPlaceholder: string;
-    cityPlaceholder: string;
-    cityData: string[];
-  }
-
-  const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
-    countries,
-    hookForm,
-    countryName,
-    cityName,
-    countryPlaceholder,
-    cityPlaceholder,
-    cityData
-  }) => {
-    return (
-      <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">
-        {/* Country Selector */}
-        <FormField
-          control={hookForm?.control}
-          name={countryName}
-          render={({ field }) => (
-            <FormItem className="w-1/2 bg-zinc-300">
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5 text-xs">
-                    <SelectValue placeholder={countryPlaceholder} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {countries?.map((country, index) => (
-                    <SelectItem
-                      value={country.name}
-                      key={index}
-                    >{`${country.flag} ${country.name}`}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-  
-        {/* City Selector */}
-        <FormField
-          control={hookForm?.control}
-          name={cityName}
-          render={({ field }) => (
-            <FormItem className="bg-zinc-300 w-1/2">
-               <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="focus:!ring-0 rounded-none bg-zinc-50 py-5 text-xs">
-                    <SelectValue placeholder={cityPlaceholder} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {cityData?.map((cityItems, index) => (
-                    <SelectItem
-                      value={cityItems}
-                      key={index}
-                    >cityItems</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
-          )}
-        />
-      </div>
-    );
-  };
-  
-  export default CountryCitySelector;
+export default CountryCitySelector;

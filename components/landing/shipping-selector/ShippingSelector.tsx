@@ -9,75 +9,54 @@ import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import CountryCitySelector from "./CountryCitySelector";
-import InputNumber from "@/app/dashboard/components/input-number";
-import ProductDetailsForm from "./ProductDetailsForm";
-import { PlusIcon, X } from "lucide-react";
+import ProductDetailsForm from "./product-details-form/ProductDetailsForm";
+import { PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { API_Backend, useGEt } from "@/hooks/use-fetch";
 import axios from "axios";
+import { DataStructureCountry,Country ,ProductDetailFormType} from "../../../app/types/shipping-selector-types";
 
-// test data
-
-const countries = [
-  { name: "United States", flag: "🇺🇸" },
-  { name: "Canada", flag: "🇨🇦" },
-  { name: "Mexico", flag: "🇲🇽" },
-  { name: "Brazil", flag: "🇧🇷" },
-  { name: "United Kingdom", flag: "🇬🇧" },
-  { name: "Germany", flag: "🇩🇪" },
-  { name: "France", flag: "🇫🇷" },
-  { name: "Italy", flag: "🇮🇹" },
-  { name: "Spain", flag: "🇪🇸" },
-  { name: "Australia", flag: "🇦🇺" },
-  { name: "Japan", flag: "🇯🇵" },
-  { name: "China", flag: "🇨🇳" },
-  { name: "India", flag: "🇮🇳" },
-  { name: "South Korea", flag: "🇰🇷" },
-  { name: "Russia", flag: "🇷🇺" },
-  { name: "South Africa", flag: "🇿🇦" },
-  { name: "Egypt", flag: "🇪🇬" },
-  { name: "Argentina", flag: "🇦🇷" },
-  { name: "Chile", flag: "🇨🇱" },
-  { name: "Colombia", flag: "🇨🇴" },
-  { name: "Peru", flag: "🇵🇪" },
-  { name: "Saudi Arabia", flag: "🇸🇦" },
-  { name: "Turkey", flag: "🇹🇷" },
-  { name: "Iran", flag: "🇮🇷" },
-  { name: "Iraq", flag: "🇮🇶" },
-  { name: "Israel", flag: "🇮🇱" },
-  { name: "Greece", flag: "🇬🇷" },
-  { name: "Portugal", flag: "🇵🇹" },
-  { name: "Sweden", flag: "🇸🇪" },
-  { name: "Norway", flag: "🇳🇴" },
-  { name: "Finland", flag: "🇫🇮" },
-];
-
-type AddProductDetailsForm = {
-  hookForm: any;
-  selectBoxName: string | number;
-  ProductDetailsFieldName: string | number;
-};
-
-const getData = async () =>{
+const getData = async () => {
   try {
-    const {data}= await axios.post(`${API_Backend}/api/providers/getavailibilities`);
+    const { data } = await axios.post(
+      `${API_Backend}/api/providers/getavailibilities`
+    );
     console.info(data);
   } catch (error) {
-    console.info(error?.response , 'This Pure Error=>>>>>>>',error);
+    console.info(error?.response, "This Pure Error=>>>>>>>", error);
   }
-}
+};
 
-
-export function SelectBox({ token }: { token: string }) {
+export function SelectBox({
+  token,
+  countrysData,
+}: {
+  token: string;
+  countrysData: DataStructureCountry;
+}) {
   const form = useForm();
+  getData();
+  const [saveData, setData] = useState<ProductDetailFormType[]>([]);
+  const [dataOriginDestinationCountries, setDataOriginDestinationCountries] =
+    useState<DataStructureCountry>({
+      origin_countries: [],
+      destination_countries: [],
+    });
 
-  getData()
+  useEffect(() => {
+    if (!countrysData || Object.entries(countrysData)?.length <= 0) return;
+    setDataOriginDestinationCountries({
+      origin_countries: countrysData?.destination_countries || null,
+      destination_countries: countrysData?.origin_countries || null,
+    });
 
-  const [saveData, setData] = useState<AddProductDetailsForm[]>([]);
+    console.info(countrysData);
+  }, [countrysData]);
 
   function onSubmit(data) {
     console.info(data);
   }
+
   const addNewProductDetailsFormComponent = () => {
     console.log("hi");
     if (saveData?.length >= 3) return;
@@ -91,7 +70,7 @@ export function SelectBox({ token }: { token: string }) {
     ]);
   };
 
-  const deleteHandlerdetailfieldsComponent = (items: AddProductDetailsForm) => {
+  const deleteHandlerdetailfieldsComponent = (items: ProductDetailFormType) => {
     const filterRemoveItem = saveData?.filter(
       (filterItem) => filterItem?.selectBoxName !== items?.selectBoxName
     );
@@ -112,21 +91,17 @@ export function SelectBox({ token }: { token: string }) {
             <div className="flex items-center justify-center max-lg:flex-col gap-5">
               <CountryCitySelector
                 cityData={["Tehran", "Shiraz", "Isfahan", "Tabriz", "Mashhad"]}
-                countries={countries}
+                countries={dataOriginDestinationCountries?.origin_countries as Country[]}
                 hookForm={form}
                 countryName="country-origin"
-                countryPlaceholder="Select the country of origin"
                 cityName="city-origin"
-                cityPlaceholder="Select the city of origin"
               />
               <CountryCitySelector
                 cityData={["Tehran", "Shiraz", "Isfahan", "Tabriz", "Mashhad"]}
-                countries={countries}
+                countries={dataOriginDestinationCountries?.destination_countries  as Country[]}
                 hookForm={form}
-                countryName="country-origin"
-                countryPlaceholder="Select the country of origin"
-                cityName="city-origin"
-                cityPlaceholder="Select the city of origin"
+                countryName="country-destination"
+                cityName="city-destination "
               />
             </div>
           </div>
