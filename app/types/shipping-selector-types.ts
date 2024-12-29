@@ -14,7 +14,7 @@ export type DataStructureCountry = {
 };
 
 export type ProductDetailFormType = {
-    hookForm: UseFormReturn;
-    selectBoxName: string;
+    hookForm: UseFormReturn<any>;
+    selectBoxName: string | number;
     ProductDetailsFieldName: string | number;
 }

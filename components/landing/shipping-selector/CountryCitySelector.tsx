@@ -68,22 +68,24 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     variant="outline"
                     role="combobox"
                     data-muted={!field.value}
-                    className="w-full flex justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground"
+                    className="w-full flex justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground max-sm:text-xs"
                   >
-                    <div className="flex items-center gap-2 w-full">
+                    <div className="flex items-center justify-start gap-2 overflow-hidden">
                       <Flag
                         code={getCountriesSelected(field)?.code}
                         width={23}
                         height={23}
                       />
-                      {getCountriesSelected(field)?.name ||
-                        "Select the country"}
+                      <p className=" overflow-hidden text-ellipsis">
+                        {getCountriesSelected(field)?.name ||
+                          "Select the country"}
+                      </p>
                     </div>
                     <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="max-w-56 sm:max-w-64">
+              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56">
                 <Command>
                   <CommandInput placeholder="Search language..." />
                   <CommandList>
@@ -98,11 +100,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                             hookForm.setValue(countryName, countrie.name);
                           }}
                         >
-                          <Flag
-                            code={countrie?.code}
-                            width={23}
-                            height={23}
-                          />
+                          <Flag code={countrie?.code} width={23} height={23} />
                           {countrie.name}
                           <Check
                             data-active={countrie.name === field.value}
@@ -132,16 +130,17 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     variant="outline"
                     role="combobox"
                     data-muted={!field.value}
-                    className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground"
+                    className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground max-sm:text-xs"
                   >
-                    {languages.find(
-                      (language) => language.value === field.value
-                    )?.label || "Select the city"}
+                   <div className="overflow-hidden text-ellipsis">
+                   {languages.find((city) => city.value === field.value)
+                      ?.label || "Select the city"}
+                   </div>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="max-w-56 sm:max-w-64 p-0">
+              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56 p-0">
                 <Command>
                   <CommandInput placeholder="Search language..." />
                   <CommandList>

@@ -11,7 +11,7 @@ const checkeEndPoint = (endpoint: string) => {
             "Endpoint should not start with slash(/) and http.",
             'Guide ====>The endpoint should be like this:(api/groups)'
         );
-        return { ok: true, endpoint };
+        return { ok: false, endpoint };
     }
     return { ok: true, endpoint };
 }
@@ -34,7 +34,6 @@ export const getData = async (
                 Authorization: `Bearer ${token}`
             }
         })
-
 
         if (!response.ok) {
             console.info(response);

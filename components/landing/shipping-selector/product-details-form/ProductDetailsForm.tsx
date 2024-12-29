@@ -69,7 +69,7 @@ function ProductDetailsForm({
   }, [itemValue, hookForm, ProductDetailsFieldName]);
 
   return (
-    <div className="flex items-center justify-center max-lg:flex-col w-full h-fit gap-x-3 gap-y-5">
+    <div className="flex items-center justify-center max-lg:flex-col w-full h-fit gap-x-3 gap-y-5 ">
       <div className="w-2/6 max-lg:w-full">
         <Label className="block text-xs font-semibold mb-2 ms-0.5">
           Product Size
@@ -77,7 +77,7 @@ function ProductDetailsForm({
 
         <FormField
           control={hookForm?.control}
-          name={selectBoxName}
+          name={`product-${String(selectBoxName)}`}
           render={({ field }) => (
             <FormItem className="w-full">
               <Select
@@ -128,7 +128,6 @@ function ProductDetailsForm({
         {detailFields?.map((field, index) => (
           <div key={field?.id || index}>
             <Label
-              htmlFor={field.id}
               className={cn(
                 "text-xs font-semibold mb-2 ms-0.5",
                 disableFieldTitles && "max-lg:hidden"
