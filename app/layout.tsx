@@ -31,7 +31,7 @@ export default async function RootLayout({
     <html lang="en">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased"
+          "min-h-screen bg-zinc-100  font-sans antialiased"
           // inter.variable
         )}
       >

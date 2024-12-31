@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -11,9 +9,7 @@ import { Form } from "@/components/ui/form";
 import CountryCitySelector from "./CountryCitySelector";
 import ProductDetailsForm from "./product-details-form/ProductDetailsForm";
 import { PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
-import { API_Backend, useGEt } from "@/hooks/use-fetch";
-import axios from "axios";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import {
   DataStructureCountry,
   Country,
@@ -21,17 +17,12 @@ import {
 } from "@/app/types/shipping-selector-types";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";
 import TooltipPrimary from "@/components/toolltip-primary";
-
-const getData = async () => {
-  try {
-    const { data } = await axios.post(
-      `${API_Backend}/api/providers/getavailibilities`
-    );
-    console.info(data);
-  } catch (error) {
-    console.info(error?.response, "This Pure Error=>>>>>>>", error);
-  }
-};
+import {
+  citySearchReducer,
+  initialCitySearchState,
+} from "./search-citys-reducer";
+import useSearchCitysLogic from "./use-search-citys-logic";
+type GetCitys = { city_name: string; id: number };
 
 export function SelectBox({
   token,
@@ -91,8 +82,32 @@ export function SelectBox({
     setAddNewComponent(filterRemoveItem);
   };
 
+  const [citySearchData, dispatch] = useReducer(
+    citySearchReducer,
+    initialCitySearchState
+  );
+
+  const [originCityData, setOriginCityData] = useState<GetCitys[]>(null);
+  const [destinationCityData, setDestinationCityData] =
+    useState<GetCitys[]>(null);
+
+  useSearchCitysLogic({
+    citySearchData,
+    setOriginCityData,
+    setDestinationCityData,
+  });
+
+  console.info(citySearchData);
+
   return (
-    <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 ">
+    <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 relative">
+      <div className="w-full flex justify-center items-center">
+        <Link href={"#"} className="block">
+          <span className="block -translate-y-8 h-fit max-md:text-sm max-sm:text-xs text-nowrap max-sm:px-1 bg-secondery-color hover:bg-amber-500 transition-colors duration-150 px-3 py-0.5   rounded-md text-white">
+            Do you do a lot of shipping? Discover SPEDIREPRO
+          </span>
+        </Link>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <div className="w-full">
@@ -101,16 +116,23 @@ export function SelectBox({
             </h2>
             <div className="flex items-center justify-center max-lg:flex-col gap-3">
               <CountryCitySelector
-                cityData={["Tehran", "Shiraz", "Isfahan", "Tabriz", "Mashhad"]}
+                getSearchCityValue={(value) =>
+                  dispatch({ type: "SET_ORIGIN_CITY", payload: value })
+                }
                 countries={
                   dataOriginDestinationCountries?.origin_countries as Country[]
                 }
                 hookForm={form}
                 countryName="country-origin"
+                cityData={originCityData}
                 cityName="city-origin"
               />
+
               <CountryCitySelector
-                cityData={["Tehran", "Shiraz", "Isfahan", "Tabriz", "Mashhad"]}
+                getSearchCityValue={(value) =>
+                  dispatch({ type: "SET_DESTINATION_CITY", payload: value })
+                }
+                cityData={destinationCityData}
                 countries={
                   dataOriginDestinationCountries?.destination_countries as Country[]
                 }
@@ -159,7 +181,6 @@ export function SelectBox({
                   <Button
                     onClick={addNewProductDetailsFormComponentHandler}
                     variant={"outline"}
-                    
                     type="button"
                     className="text-xs px-2 py-[1.19rem]  disabled:!opacity-60 "
                     disabled={addNewComponent?.length >= 1}

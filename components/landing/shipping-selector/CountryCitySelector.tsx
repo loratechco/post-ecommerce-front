@@ -16,29 +16,21 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-const languages = [
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "German", value: "de" },
-  { label: "Spanish", value: "es" },
-  { label: "Portuguese", value: "pt" },
-  { label: "Russian", value: "ru" },
-  { label: "Japanese", value: "ja" },
-  { label: "Korean", value: "ko" },
-  { label: "Chinese", value: "zh" },
-] as const;
+
 import {
   DataStructureCountry,
   Country,
   ProductDetailFormType,
 } from "@/app/types/shipping-selector-types";
 import Flag from "react-world-flags";
+
 interface CountryCitySelectorProps {
   countries: Country[];
   hookForm: any;
   countryName: string;
   cityName: string;
-  cityData: string[];
+  cityData: { city_name: string; id: number }[];
+  getSearchCityValue: (searchValue: string) => void;
 }
 
 const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
@@ -47,9 +39,10 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
   countryName,
   cityName,
   cityData,
+  getSearchCityValue,
 }) => {
   const getCountriesSelected = ({ value }) => {
-    const result = countries.find((countrie) => countrie.name === value);
+    const result = countries.find((countrie) => countrie?.name === value);
     return result;
   };
 
@@ -132,33 +125,36 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     data-muted={!field.value}
                     className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground max-sm:text-xs"
                   >
-                   <div className="overflow-hidden text-ellipsis">
-                   {languages.find((city) => city.value === field.value)
-                      ?.label || "Select the city"}
-                   </div>
+                    <div className="overflow-hidden text-ellipsis">
+                      {cityData?.find((city) => city?.city_name === field.value)
+                        ?.city_name || "Select the city"}
+                    </div>
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
               <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56 p-0">
                 <Command>
-                  <CommandInput placeholder="Search language..." />
+                  <CommandInput
+                    placeholder="Search language..."
+                    onValueChange={getSearchCityValue}
+                  />
                   <CommandList>
                     <CommandEmpty>No city found.</CommandEmpty>
                     <CommandGroup>
-                      {languages.map((language) => (
+                      {cityData?.map((city, key) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
-                          value={language.label}
-                          key={language.value}
+                          value={city?.city_name}
+                          key={city?.city_name + String(key)}
                           onSelect={() => {
-                            hookForm.setValue(cityName, language.value);
+                            hookForm.setValue(cityName, city?.city_name);
                           }}
                         >
-                          {language.label}
+                          {city?.city_name}
                           <Check
-                            data-active={language.value === field.value}
-                            className="ml-auto opacity-0  transition-opacity data-[active=true]:opacity-100"
+                            data-active={city?.city_name === field?.value}
+                            className="ml-auto opacity-0 transition-opacity data-[active=true]:opacity-100"
                           />
                         </CommandItem>
                       ))}

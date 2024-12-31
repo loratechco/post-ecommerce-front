@@ -4,7 +4,7 @@ const ICON_SIZE = 18 as const
 
 export const navbarStructur = [
   {
-    title: 'Postal Services',
+    title: 'Services',
     items: [
       { href: '#services', titleItem: 'Our Services', icon: <Package size={ICON_SIZE}/> },
       { href: '#pricing', titleItem: 'Pricing', icon: <DollarSign size={ICON_SIZE}/> },
@@ -20,7 +20,7 @@ export const navbarStructur = [
     ],
   },
   {
-    title: 'Customer Support',
+    title: 'Support',
     items: [
       { href: '#help', titleItem: 'Help Center', icon: <HelpCircle size={ICON_SIZE}/> },
       { href: '#livechat', titleItem: 'Live Chat', icon: <MessageCircle size={ICON_SIZE}/> },

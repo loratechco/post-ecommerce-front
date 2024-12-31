@@ -4,6 +4,9 @@ const nextConfig = {
     defaultLocale: "en",
     localeDetection: true,
   },
+  images: {
+    domains: ["betaspedire.b-cdn.net"],
+  },
 };
 
 export default nextConfig;

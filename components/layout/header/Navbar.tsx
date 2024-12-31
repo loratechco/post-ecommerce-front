@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 import {
@@ -21,15 +20,15 @@ export function Navbar({
   classNameNavigationTriger?: string;
 }) {
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
+    <NavigationMenu className="py-1">
+      <NavigationMenuList className="divide-x divide-zinc-300">
         {navbarStructur?.map((nav, index) => (
-          <NavigationMenuItem key={index}>
+          <NavigationMenuItem key={index} className="">
               <NavigationMenuLink
                 className={cn(
                   classNameNavigationTriger,
                   navigationMenuTriggerStyle(),
-                  "hover:!bg-zinc-100/50"
+                  "hover:!bg-zinc-100/50 px-2"
                 )}
                 href="#nav"
               >
@@ -37,6 +36,7 @@ export function Navbar({
               </NavigationMenuLink>
           </NavigationMenuItem>
         ))}
+        
       </NavigationMenuList>
     </NavigationMenu>
   );

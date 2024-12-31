@@ -12,10 +12,16 @@ const config: Config = {
 		"./app/**/*.{js,ts,jsx,tsx,mdx}",
 	],
 	theme: {
-
-
 		extend: {
+			gridTemplateColumns: {
+				'fit-230': 'repeat(auto-fit, minmax(230px, 1fr))',
+				'fill-230': 'repeat(auto-fill, minmax(230px, 1fr))',
+			},
+
 			colors: {
+				'primary-color': '#00A6E4',
+				'secondery-color': '#FF9343',
+				'tertiary-color': '#2ECC71',
 				'toast-bgc-successful': 'var(--toaste-bg-success)',
 				'toast-bgc-error': 'var(--toaste-bg-error)',
 				'toast-txt-color-error': 'var(--toaste-txt-color-error)',
@@ -93,7 +99,8 @@ const config: Config = {
 					to: {
 						height: '0'
 					}
-				}
+				},
+				
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',

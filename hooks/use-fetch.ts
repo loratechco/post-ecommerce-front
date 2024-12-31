@@ -1,12 +1,14 @@
 'use client'
 
 import { useEffect, useState } from "react";
+import { boolean } from "zod";
 
 interface UseFetchProps {
     endpoint: string;
-    token: string;
+    token?: string;
     customErrorMessage?: string;
-    dependencyOptional?:any;
+    dependencyOptional?: any;
+    tokenIsavailable?: boolean;
 }
 
 interface UseFetchResult {
@@ -35,8 +37,9 @@ const checkeEndPoint = (endpoint: string) => {
 export const useGEt = ({
     endpoint,
     token,
+    tokenIsavailable = true,
     customErrorMessage,
-    dependencyOptional=null
+    dependencyOptional = null,
 }: UseFetchProps): UseFetchResult => {
     const [data, setData] = useState<any | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -53,11 +56,12 @@ export const useGEt = ({
                 const response = await fetch(`${API_Backend}/${endpointResult?.endpoint}`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
+                        ...(tokenIsavailable && { Authorization: `Bearer ${token}` }),
                     },
                 });
-                // console.info('response=>>>>>>',response, 'response and Json parse=====>',await response.json());
-                
+                // console.info('response=>>>>>>', response, 'response and Json parse=====>', await response.json());
+
+                console.info(response);
                 if (!response.ok) {
                     throw new Error(
                         customErrorMessage || 'Error receiving information, please try again'
@@ -74,7 +78,7 @@ export const useGEt = ({
         };
 
         fetchData();
-    }, [endpoint, token,dependencyOptional]);
-    
+    }, [endpoint, token, dependencyOptional]);
+
     return { data, errorMessage, loading };
 };
