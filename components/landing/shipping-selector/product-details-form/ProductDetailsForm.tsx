@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/select";
 
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import { UseFormReturn } from "react-hook-form";
 
 import { Input } from "@/components/ui/input";
 import { memo, useEffect, useState } from "react";
@@ -17,14 +16,14 @@ import { Label } from "@/components/ui/label";
 
 import { BOX_SIZE, BoxSizeType } from "./productBoxSize";
 import { PenLine } from "lucide-react";
-import {ProductDetailFormType} from '../../../../app/types/shipping-selector-types'
+import {ProductDetailFormType} from '@/app/types/shipping-selector-types'
 
 
 const detailFields = [
-  { id: `width`, label: "width" },
-  { id: `length`, label: "length" },
   { id: `height`, label: "height" },
-  { id: `volume`, label: "volume" },
+  { id: `length`, label: "length" },
+  { id: `realWeight`, label: "realWeight" },
+  { id: `depth`, label: "depth" },
 ];
 
 interface Props{
@@ -39,30 +38,30 @@ function ProductDetailsForm({
 }: Props & ProductDetailFormType) {
   const [itemValue, setItemValue] = useState<BoxSizeType>({
     name: "select product size",
-    width: null,
-    length: null,
     height: null,
-    volume: null,
+    length: null,
+    depth: null,
+    realWeight: null,
   });
 
   useEffect(() => {
     if (itemValue) {
       [
         {
-          name: `width${ProductDetailsFieldName}`,
-          value: itemValue?.width || "",
+          name: `height${ProductDetailsFieldName}`,
+          value: itemValue?.height || "",
         },
         {
           name: `length${ProductDetailsFieldName}`,
           value: itemValue?.length || "",
         },
         {
-          name: `height${ProductDetailsFieldName}`,
-          value: itemValue?.height || "",
+          name: `realWeight${ProductDetailsFieldName}`,
+          value: itemValue?.realWeight || "",
         },
         {
-          name: `volume${ProductDetailsFieldName}`,
-          value: itemValue?.volume || "",
+          name: `depth${ProductDetailsFieldName}`,
+          value: itemValue?.depth || "",
         },
       ]?.forEach(({ name, value }) => hookForm.setValue(name, value));
     }
@@ -84,7 +83,7 @@ function ProductDetailsForm({
                 onValueChange={(value) => {
                   field.onChange(value);
                   setItemValue(
-                    (BOX_SIZE.find(
+                    (BOX_SIZE?.find(
                       (item) => item?.name === value
                     ) as BoxSizeType) || "value is null"
                   );

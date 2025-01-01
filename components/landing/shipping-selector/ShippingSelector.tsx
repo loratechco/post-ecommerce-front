@@ -6,9 +6,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import CountryCitySelector from "./CountryCitySelector";
+import CountryCitySelector from "./country-city-selector-form/CountryCitySelector";
 import ProductDetailsForm from "./product-details-form/ProductDetailsForm";
-import { PlusIcon } from "lucide-react";
+import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import {
   DataStructureCountry,
@@ -20,10 +20,12 @@ import TooltipPrimary from "@/components/toolltip-primary";
 import {
   citySearchReducer,
   initialCitySearchState,
-} from "./search-citys-reducer";
+} from "./country-city-selector-form/search-citys-reducer";
 import useSearchCitysLogic from "./use-search-citys-logic";
 import { API_Backend } from "@/hooks/use-fetch";
 import axios from "axios";
+import { object } from "zod";
+import CounterySitySelectorListItems from "./country-city-selector-form/country-city-selector-list-items";
 type GetCitys = { city_name: string; id: number };
 
 const sendDeitailsDeliveryProduct = async (data) => {
@@ -32,6 +34,7 @@ const sendDeitailsDeliveryProduct = async (data) => {
       `${API_Backend}/api/providers/getavailibilities`,
       data
     );
+    console.log(res);
     return res;
   } catch (error) {
     console.error("error=>>>>", error);
@@ -69,8 +72,7 @@ export function SelectBox({
 
   const addNewProductDetailsFormComponentHandler = () => {
     const randomKey = randomCodeGenerator(3);
-    console.log("hi");
-    if (addNewComponent?.length >= 1) return;
+    if (addNewComponent?.length >= 2) return;
     setAddNewComponent((prev) => [
       ...prev,
       {
@@ -82,13 +84,17 @@ export function SelectBox({
     ]);
   };
 
-  const deleteHandlerdetailfieldsComponent = (items: ProductDetailFormType) => {
+  const deleteHandlerDetailFieldsComponent = (items: ProductDetailFormType) => {
     const filterRemoveItem = addNewComponent?.filter(
       (filterItem) => filterItem?.selectBoxName !== items?.selectBoxName
     );
-    ["width", "length", "height", "volume"]?.forEach((staticKey) =>
-      form.unregister(`${staticKey}${items?.selectBoxName}`)
-    );
+    console.log(filterRemoveItem);
+    ["height", "length", "depth", "realWeight"]?.forEach((staticKey) => {
+      console.log(`${staticKey}-item-${items?.selectBoxName}`);
+      form.unregister(`${staticKey}-item-${items?.selectBoxName}`);
+    });
+
+    form.unregister(`product-${items?.selectBoxName}`);
     setAddNewComponent(filterRemoveItem);
   };
 
@@ -102,52 +108,86 @@ export function SelectBox({
     dispatch,
   });
 
-  type SendDetailProductShipment = {
-    senderCountry: string;
-    recipientCountry: string;
-    senderPostalCode: string;
-    recipientPostalCode: string;
+  const onSubmit = useCallback((data: Record<string, any>) => {
+    let capOrigin = null;
+    let capDestination = null;
+    console.log(data);
+    if (
+      data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
+      data?.countryDestination?.name?.toLowerCase()?.includes("italia")
+    ) {
+      capOrigin = data?.cityOrigin?.cap;
+      capDestination = data?.cityDestination?.cap;
+    }
 
-    senderCity: string;
-    recipientCity: string;
-    senderProvince: string;
-    recipientProvince: string;
-
-    packages: {
-      height: number;
-      width: number;
-      depth: number;
-      actualWeight: number;
-      packagingType: number;
-    }[];
-  };
-
-  function onSubmit(data) {
-
-    const sendDetailProductShipmentStructure: SendDetailProductShipment = {
-      senderCountry: data["country-origin"],
-      recipientCountry: data["country-destination"],
-
-      senderPostalCode: data["postal-code-origin"],
-      recipientPostalCode: data["postal-code-destination"],
-      senderCity: data["city-origin"],
-      recipientCity: data["city-destination"],
-      senderProvince: data["province-origin"],
-      recipientProvince: data["province-destination"],
-      packages: [],
+    const staticData = {
+      nazioneMittente: data?.countryOrigin?.code ?? "",
+      nazioneDestinatario: data?.countryDestination?.code ?? "",
+      capMittente: capOrigin ?? "",
+      cittaMittente: data?.cityOrigin?.city_name ?? "",
+      // provinciaMittente: data?.cityOrigin?.province ?? "",
+      capDestinatario: capDestination ?? "",
+      cittaDestinatario: data?.cityDestination?.city_name ?? "",
+      // provinciaDestinatario: data?.cityDestination?.province ?? "",
     };
-    console.info(data);
-    // sendDeitailsDeliveryProduct(data);
-  }
+
+    const keysData = ["height", "width", "depth", "realWeight", "product"];
+
+    const mapKey = (key: string) =>
+      key
+        .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
+        .replace(/height/, "altezza")
+        .replace(/width/, "larghezza")
+        .replace(/depth/, "profondita")
+        .replace(/realWeight/, "pesoReale")
+        .replace(/product/, "packagingType");
+
+    if (!keysData.some((key) => data.hasOwnProperty(`${key}-item-0`))) {
+      console.error(
+        "Missing data for item-0. Ensure the data starts with item-0."
+      );
+      return;
+    }
+
+    const groupedData = Object.entries(data)
+      .filter(([key]) => keysData.some((k) => key.includes(k)))
+      .reduce<Record<string, Record<string, any>>>((acc, [key, value]) => {
+        const match = key.match(/item-(\d+)$/);
+        if (match) {
+          const groupIndex = match[1];
+          if (!acc[groupIndex]) acc[groupIndex] = {};
+          acc[groupIndex][mapKey(key)] = value;
+        }
+        return acc;
+      }, {});
+
+    const colliArray = Object.keys(groupedData)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key) => groupedData[key]);
+
+    // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
+    const finalData = {
+      ...staticData,
+      colli: colliArray.map((item) => ({
+        ...item,
+        larghezza: item.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
+        packagingType: item.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
+      })),
+    };
+
+    console.log("Final Data to Send:", finalData);
+
+    sendDeitailsDeliveryProduct(finalData);
+  }, []);
 
   return (
     <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 relative">
       <div className="w-full flex justify-center items-center">
-        <Link href={"#"} className="block">
-          <span className="block -translate-y-8 h-fit max-md:text-sm max-sm:text-xs text-nowrap max-sm:px-1 bg-secondery-color hover:bg-amber-500 transition-colors duration-150 px-3 py-0.5   rounded-md text-white">
+        <span className="block -translate-y-8 h-fit max-md:text-sm max-sm:text-xs text-nowrap max-sm:px-1 bg-secondery-color hover:bg-amber-500 transition-colors duration-150 px-3 py-0.5   rounded-md text-white">
+          <Link href={"#"} className="">
             Do you do a lot of shipping? Discover SPEDIREPRO
-          </span>
-        </Link>
+          </Link>
+        </span>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -155,44 +195,21 @@ export function SelectBox({
             <h2 className=" font-bold text-start pb-3 ps-1">
               Shipping Selector
             </h2>
-            <div className="flex items-center justify-center max-lg:flex-col gap-3">
-              <CountryCitySelector
-                getSearchCityValue={(value) =>
-                  dispatch({ type: "SET_DEBOUNCE_ORIGIN_CITY", payload: value })
-                }
-                cityData={citySearchData?.originCityData}
-                countries={
-                  dataOriginDestinationCountries?.origin_countries as Country[]
-                }
-                hookForm={form}
-                countryName="country-origin"
-                cityName="city-origin"
-              />
 
-              <CountryCitySelector
-                getSearchCityValue={(value) =>
-                  dispatch({
-                    type: "SET_DEBOUNCE_DESTINATION_CITY",
-                    payload: value,
-                  })
-                }
-                cityData={citySearchData?.destinationCityData}
-                countries={
-                  dataOriginDestinationCountries?.destination_countries as Country[]
-                }
-                hookForm={form}
-                countryName="country-destination"
-                cityName="city-destination "
-              />
-            </div>
+            <CounterySitySelectorListItems
+              citySearchData={citySearchData}
+              dataOriginDestinationCountries={dataOriginDestinationCountries}
+              dispatch={dispatch}
+              form={form}
+            />
           </div>
 
           <div className="w-full space-y-5 pt-5">
             {/* init fields */}
             <ProductDetailsForm
               hookForm={form}
-              selectBoxName={"first-type-product"}
-              ProductDetailsFieldName={"-itme-0"}
+              selectBoxName={"0"}
+              ProductDetailsFieldName={"-item-0"}
             />
 
             {addNewComponent?.map((items) => (
@@ -201,7 +218,7 @@ export function SelectBox({
                   disableFieldTitles={true}
                   hookForm={items?.hookForm}
                   ProductDetailsFieldName={
-                    "-itme-" + items?.ProductDetailsFieldName
+                    "-item-" + items?.ProductDetailsFieldName
                   }
                   selectBoxName={String(items?.selectBoxName)}
                   key={`${items?.key}-${String(items?.selectBoxName)}`}
@@ -209,7 +226,7 @@ export function SelectBox({
 
                 <button
                   className="text-xs block text-red-600 p-0 ps-1 font-semibold pt-2"
-                  onClick={() => deleteHandlerdetailfieldsComponent(items)}
+                  onClick={() => deleteHandlerDetailFieldsComponent(items)}
                 >
                   Remove
                 </button>
@@ -218,7 +235,7 @@ export function SelectBox({
             <div className="w-full pt-3 lg:pt-5 flex items-center justify-start gap-3 max-md:hidden max-md:pointer-events-none max-md:select-none">
               <TooltipPrimary
                 content={
-                  addNewComponent?.length >= 1
+                  addNewComponent?.length >= 2
                     ? "Adding more load is not allowed"
                     : "You can add a load"
                 }
@@ -230,7 +247,7 @@ export function SelectBox({
                     variant={"outline"}
                     type="button"
                     className="text-xs px-2 py-[1.19rem]  disabled:!opacity-60 "
-                    disabled={addNewComponent?.length >= 1}
+                    disabled={addNewComponent?.length >= 2}
                   >
                     <PlusIcon size={20} />
                     <span>Add Package</span>
@@ -240,7 +257,12 @@ export function SelectBox({
             </div>
           </div>
 
-          <Button type="submit" className="w-full py-5 mt-7">
+          <Button
+            type="submit"
+            className="w-full py-5 mt-7 flex items-center justify-center"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting && <LoaderCircleIcon size="sm" />}
             Submit
           </Button>
         </form>

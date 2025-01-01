@@ -31,8 +31,10 @@ interface CountryCitySelectorProps {
   hookForm: any;
   countryName: string;
   cityName: string;
-  cityData: { city_name: string; id: number }[];
+  cityData: { city_name: string; id: number; cap?: string }[];
+  selectedCountry: (value: string) => void;
   getSearchCityValue: (searchValue: string) => void;
+  disabled?: boolean;
 }
 
 const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
@@ -41,7 +43,9 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
   countryName,
   cityName,
   cityData,
+  selectedCountry,
   getSearchCityValue,
+  disabled,
 }) => {
   const getCountriesSelected = ({ value }) => {
     const result = countries.find((countrie) => countrie?.name === value?.name);
@@ -90,12 +94,13 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                   <CommandList>
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup className="">
-                      {countries.map((countrie) => (
+                      {countries?.map((countrie) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
                           value={countrie.name}
                           key={countrie?.name}
                           onSelect={() => {
+                            selectedCountry(countrie?.name);
                             hookForm.setValue(countryName, countrie);
                           }}
                         >
@@ -121,20 +126,33 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
         control={hookForm?.control}
         name={cityName}
         render={({ field }) => (
-          <FormItem className="bg-zinc-300 flex flex-col w-1/2">
+          <FormItem className="bg-zinc-300 flex flex-col w-1/2 ">
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
+                    disabled={disabled}
                     variant="outline"
                     role="combobox"
                     data-muted={!field.value}
                     className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground max-sm:text-xs"
                   >
                     <div className="overflow-hidden text-ellipsis">
-                      {cityData?.find((city) => city?.city_name === field.value)
-                        ?.city_name || "Select the city"}
+                      {!disabled && (
+                        <>
+                          {cityData?.find(
+                            (city) => city?.city_name === field.value?.city_name
+                          )?.city_name || "Select the city"}
+                          <span className="text-xs text-zinc-500 block text-start">
+                            {cityData?.find(
+                              (city) =>
+                                city?.city_name === field.value?.city_name
+                            )?.cap}
+                          </span>
+                        </>
+                      )|| "Select the city"}
                     </div>
+
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
@@ -147,14 +165,14 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                   />
                   <CommandList>
                     <CommandEmpty>No city found.</CommandEmpty>
-                    <CommandGroup>
+                    <CommandGroup className="">
                       {cityData?.map((city, key) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
                           value={city?.city_name}
                           key={city?.city_name + String(key)}
                           onSelect={() => {
-                            hookForm.setValue(cityName, city?.city_name);
+                            hookForm.setValue(cityName, disabled ?"": city);
                           }}
                         >
                           {city?.city_name}
