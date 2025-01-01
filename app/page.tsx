@@ -10,6 +10,7 @@ const getCountryData = async () => {
   try {
     const data = await fetch("https://www.spedire.com/api/environment", {
       cache: "force-cache",
+      next: { revalidate: false }, 
     });
     return { res: await data.json() };
   } catch (error) {

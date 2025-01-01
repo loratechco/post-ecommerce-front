@@ -23,6 +23,8 @@ import {
   ProductDetailFormType,
 } from "@/app/types/shipping-selector-types";
 import Flag from "react-world-flags";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useEffect, useState } from "react";
 
 interface CountryCitySelectorProps {
   countries: Country[];
@@ -42,9 +44,13 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
   getSearchCityValue,
 }) => {
   const getCountriesSelected = ({ value }) => {
-    const result = countries.find((countrie) => countrie?.name === value);
+    const result = countries.find((countrie) => countrie?.name === value?.name);
     return result;
   };
+
+  const [cityValue, setCityValue] = useState<string>("");
+  const debounceValue = useDebounce(cityValue, 1500);
+  useEffect(() => getSearchCityValue(debounceValue), [debounceValue]);
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">
@@ -82,7 +88,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                 <Command>
                   <CommandInput placeholder="Search language..." />
                   <CommandList>
-                    <CommandEmpty>No city found.</CommandEmpty>
+                    <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup className="">
                       {countries.map((countrie) => (
                         <CommandItem
@@ -90,13 +96,13 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                           value={countrie.name}
                           key={countrie?.name}
                           onSelect={() => {
-                            hookForm.setValue(countryName, countrie.name);
+                            hookForm.setValue(countryName, countrie);
                           }}
                         >
                           <Flag code={countrie?.code} width={23} height={23} />
                           {countrie.name}
                           <Check
-                            data-active={countrie.name === field.value}
+                            data-active={countrie.name === field.value?.name}
                             className="ml-auto opacity-0  transition-opacity data-[active=true]:opacity-100"
                           />
                         </CommandItem>
@@ -137,7 +143,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                 <Command>
                   <CommandInput
                     placeholder="Search language..."
-                    onValueChange={getSearchCityValue}
+                    onValueChange={setCityValue}
                   />
                   <CommandList>
                     <CommandEmpty>No city found.</CommandEmpty>

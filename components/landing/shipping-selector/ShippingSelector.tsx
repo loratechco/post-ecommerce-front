@@ -22,7 +22,21 @@ import {
   initialCitySearchState,
 } from "./search-citys-reducer";
 import useSearchCitysLogic from "./use-search-citys-logic";
+import { API_Backend } from "@/hooks/use-fetch";
+import axios from "axios";
 type GetCitys = { city_name: string; id: number };
+
+const sendDeitailsDeliveryProduct = async (data) => {
+  try {
+    const res = await axios.post(
+      `${API_Backend}/api/providers/getavailibilities`,
+      data
+    );
+    return res;
+  } catch (error) {
+    console.error("error=>>>>", error);
+  }
+};
 
 export function SelectBox({
   token,
@@ -53,10 +67,6 @@ export function SelectBox({
     console.info(countrysData);
   }, [countrysData]);
 
-  function onSubmit(data) {
-    console.info(data);
-  }
-
   const addNewProductDetailsFormComponentHandler = () => {
     const randomKey = randomCodeGenerator(3);
     console.log("hi");
@@ -82,22 +92,53 @@ export function SelectBox({
     setAddNewComponent(filterRemoveItem);
   };
 
+  //search citys handler
   const [citySearchData, dispatch] = useReducer(
     citySearchReducer,
     initialCitySearchState
   );
-
-  const [originCityData, setOriginCityData] = useState<GetCitys[]>(null);
-  const [destinationCityData, setDestinationCityData] =
-    useState<GetCitys[]>(null);
-
   useSearchCitysLogic({
     citySearchData,
-    setOriginCityData,
-    setDestinationCityData,
+    dispatch,
   });
 
-  console.info(citySearchData);
+  type SendDetailProductShipment = {
+    senderCountry: string;
+    recipientCountry: string;
+    senderPostalCode: string;
+    recipientPostalCode: string;
+
+    senderCity: string;
+    recipientCity: string;
+    senderProvince: string;
+    recipientProvince: string;
+
+    packages: {
+      height: number;
+      width: number;
+      depth: number;
+      actualWeight: number;
+      packagingType: number;
+    }[];
+  };
+
+  function onSubmit(data) {
+
+    const sendDetailProductShipmentStructure: SendDetailProductShipment = {
+      senderCountry: data["country-origin"],
+      recipientCountry: data["country-destination"],
+
+      senderPostalCode: data["postal-code-origin"],
+      recipientPostalCode: data["postal-code-destination"],
+      senderCity: data["city-origin"],
+      recipientCity: data["city-destination"],
+      senderProvince: data["province-origin"],
+      recipientProvince: data["province-destination"],
+      packages: [],
+    };
+    console.info(data);
+    // sendDeitailsDeliveryProduct(data);
+  }
 
   return (
     <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 relative">
@@ -117,22 +158,25 @@ export function SelectBox({
             <div className="flex items-center justify-center max-lg:flex-col gap-3">
               <CountryCitySelector
                 getSearchCityValue={(value) =>
-                  dispatch({ type: "SET_ORIGIN_CITY", payload: value })
+                  dispatch({ type: "SET_DEBOUNCE_ORIGIN_CITY", payload: value })
                 }
+                cityData={citySearchData?.originCityData}
                 countries={
                   dataOriginDestinationCountries?.origin_countries as Country[]
                 }
                 hookForm={form}
                 countryName="country-origin"
-                cityData={originCityData}
                 cityName="city-origin"
               />
 
               <CountryCitySelector
                 getSearchCityValue={(value) =>
-                  dispatch({ type: "SET_DESTINATION_CITY", payload: value })
+                  dispatch({
+                    type: "SET_DEBOUNCE_DESTINATION_CITY",
+                    payload: value,
+                  })
                 }
-                cityData={destinationCityData}
+                cityData={citySearchData?.destinationCityData}
                 countries={
                   dataOriginDestinationCountries?.destination_countries as Country[]
                 }
@@ -144,10 +188,11 @@ export function SelectBox({
           </div>
 
           <div className="w-full space-y-5 pt-5">
+            {/* init fields */}
             <ProductDetailsForm
               hookForm={form}
               selectBoxName={"first-type-product"}
-              ProductDetailsFieldName={"-first-item"}
+              ProductDetailsFieldName={"-itme-0"}
             />
 
             {addNewComponent?.map((items) => (
@@ -155,7 +200,9 @@ export function SelectBox({
                 <ProductDetailsForm
                   disableFieldTitles={true}
                   hookForm={items?.hookForm}
-                  ProductDetailsFieldName={items?.ProductDetailsFieldName}
+                  ProductDetailsFieldName={
+                    "-itme-" + items?.ProductDetailsFieldName
+                  }
                   selectBoxName={String(items?.selectBoxName)}
                   key={`${items?.key}-${String(items?.selectBoxName)}`}
                 />
