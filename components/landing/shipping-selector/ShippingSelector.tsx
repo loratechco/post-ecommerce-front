@@ -172,9 +172,16 @@ export function SelectBox({
         finalData
       );
       console.log(res);
-      localStorage.setItem("landing-data", JSON.stringify(res?.data));
-      router.push("/shipping-options");
-      return res;
+      if (res?.data?.avalibles?.length <= 0 || !res) {
+        toast({
+          title: "Unsuccessful",
+          description: "There is no service",
+          className: "toaster-errors",
+        });
+      } else {
+        localStorage.setItem("landing-data", JSON.stringify(res?.data));
+        router.push("/shipping-options");
+      }
     } catch (error) {
       console.error("error=>>>>", error);
     }
@@ -262,7 +269,9 @@ export function SelectBox({
             className="w-full py-5 mt-7 flex items-center justify-center"
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting && <LoaderCircleIcon size="sm" />}
+            {form.formState.isSubmitting && (
+              <LoaderCircleIcon size="sm" className="animate-spin" />
+            )}
             Submit
           </Button>
         </form>

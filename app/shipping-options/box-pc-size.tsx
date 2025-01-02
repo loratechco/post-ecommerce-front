@@ -89,7 +89,7 @@ function BoxPcSize({
         </div>
 
         <div className="*:space-x-2">
-          <p className="">Withdraw:</p>
+          <p className="">Delivery:</p>
           <p className="">
             at home <span className="font-semibold"> 0,99€</span>
             <span>da SpedirePoint</span>
