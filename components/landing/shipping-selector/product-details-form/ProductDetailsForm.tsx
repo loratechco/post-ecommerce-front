@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 
 import { BOX_SIZE, BoxSizeType } from "./productBoxSize";
 import { PenLine } from "lucide-react";
-import {ProductDetailFormType} from '@/app/types/shipping-selector-types'
+import {ProductDetailFormType} from '@/app/types/landing-types'
 
 
 const detailFields = [

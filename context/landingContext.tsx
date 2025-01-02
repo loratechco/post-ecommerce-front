@@ -1,21 +1,29 @@
-import { useContext, createContext, ReactNode } from "react";
+"use client";
+import { useContext, createContext, ReactNode, useState } from "react";
 
 interface Props {
-  valueContext: any;
-  childern: ReactNode;
+  valueContext?: any;
+  children: ReactNode;
 }
 
-const LandingContextData = createContext<any>(null);
-function landingContext({ valueContext, childern }: Props) {
+
+
+const LandingContextProvider = createContext<any>(null);
+function LandingContext({ valueContext, children }: Props) {
+  const [data, setData] = useState<ResponseData | any>(null);
   return (
-    <LandingContextData.Provider value={valueContext}>
-      {childern}
-    </LandingContextData.Provider>
+    <LandingContextProvider.Provider
+      value={{ postServiceData: { data, setData }, ...valueContext }}
+    >
+      {children}
+    </LandingContextProvider.Provider>
   );
 }
 
-const useLandingContext = () => {
-  const context = useContext(LandingContextData);
+const useLandingContext = (): {
+  postServiceData: { data:  ResponseData; setData: (value: any) => any };
+} => {
+  const context = useContext(LandingContextProvider);
 
   if (!context) {
     console.error(
@@ -27,4 +35,4 @@ const useLandingContext = () => {
   return context;
 };
 
-export { landingContext, useLandingContext };
+export { LandingContext, useLandingContext };

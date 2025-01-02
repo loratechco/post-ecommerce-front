@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import CountryCitySelector from "./CountryCitySelector";
 
-import { Country } from "@/app/types/shipping-selector-types";
+import { Country } from "@/app/types/landing-types";
 
 interface Props {
   dispatch: any;

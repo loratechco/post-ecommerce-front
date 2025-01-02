@@ -9,6 +9,7 @@ import getSession from "@/lib/auth/getSession";
 import { SessionProvider } from "@/lib/auth/SessionProvider";
 import { PermissioinsProvider } from "@/lib/user-permissions/PermissionsProvider";
 import getPermissions from "@/lib/user-permissions/getPermissions";
+import { LandingContext } from "@/context/LandingContext";
 
 // const inter = Inter({
 //   subsets: ["latin"],
@@ -38,9 +39,9 @@ export default async function RootLayout({
         <SessionProvider session={JSON.parse(session as string)}>
           <PermissioinsProvider
             userPermissions={permissions}
-            initUserData={null}
+            initUserData={null} 
           >
-            {children}
+            <LandingContext>{children}</LandingContext>
             <Toaster />
           </PermissioinsProvider>
         </SessionProvider>

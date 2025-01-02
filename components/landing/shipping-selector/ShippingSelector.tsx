@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import CountryCitySelector from "./country-city-selector-form/CountryCitySelector";
 import ProductDetailsForm from "./product-details-form/ProductDetailsForm";
 import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useReducer, useState } from "react";
@@ -14,7 +13,7 @@ import {
   DataStructureCountry,
   Country,
   ProductDetailFormType,
-} from "@/app/types/shipping-selector-types";
+} from "@/app/types/landing-types";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";
 import TooltipPrimary from "@/components/toolltip-primary";
 import {
@@ -26,20 +25,9 @@ import { API_Backend } from "@/hooks/use-fetch";
 import axios from "axios";
 import { object } from "zod";
 import CounterySitySelectorListItems from "./country-city-selector-form/country-city-selector-list-items";
+import { useLandingContext } from "@/context/LandingContext";
+import { useRouter } from "next/navigation";
 type GetCitys = { city_name: string; id: number };
-
-const sendDeitailsDeliveryProduct = async (data) => {
-  try {
-    const res = await axios.post(
-      `${API_Backend}/api/providers/getavailibilities`,
-      data
-    );
-    console.log(res);
-    return res;
-  } catch (error) {
-    console.error("error=>>>>", error);
-  }
-};
 
 export function SelectBox({
   token,
@@ -108,7 +96,9 @@ export function SelectBox({
     dispatch,
   });
 
-  const onSubmit = useCallback((data: Record<string, any>) => {
+  const router = useRouter();
+
+  const onSubmit = useCallback(async (data: Record<string, any>) => {
     let capOrigin = null;
     let capDestination = null;
     console.log(data);
@@ -170,14 +160,24 @@ export function SelectBox({
       ...staticData,
       colli: colliArray.map((item) => ({
         ...item,
-        larghezza: item.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
-        packagingType: item.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
+        larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
+        packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
       })),
     };
 
     console.log("Final Data to Send:", finalData);
-
-    sendDeitailsDeliveryProduct(finalData);
+    try {
+      const res = await axios.post(
+        `${API_Backend}/api/providers/getavailibilities`,
+        finalData
+      );
+      console.log(res);
+      localStorage.setItem("landing-data", JSON.stringify(res?.data));
+      router.push("/shipping-options");
+      return res;
+    } catch (error) {
+      console.error("error=>>>>", error);
+    }
   }, []);
 
   return (

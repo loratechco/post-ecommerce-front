@@ -21,7 +21,7 @@ import {
   DataStructureCountry,
   Country,
   ProductDetailFormType,
-} from "@/app/types/shipping-selector-types";
+} from "@/app/types/landing-types";
 import Flag from "react-world-flags";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useEffect, useState } from "react";

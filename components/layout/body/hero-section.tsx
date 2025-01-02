@@ -1,5 +1,5 @@
 import { SelectBox } from "@/components/landing/shipping-selector/ShippingSelector";
-import { DataStructureCountry } from "@/app/types/shipping-selector-types";
+import { DataStructureCountry } from "@/app/types/landing-types";
 import Image from "next/image";
 import Link from "next/link";
 
