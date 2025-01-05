@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import Link from "next/link";
@@ -93,100 +94,99 @@ export function SelectBox({
 
   const router = useRouter();
 
-  const onSubmit = useCallback(
-    async (data: Record<string, any>) => {
-      let capOrigin = null;
-      let capDestination = null;
-      console.log(data);
-      if (
-        data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
-        data?.countryDestination?.name?.toLowerCase()?.includes("italia")
-      ) {
-        capOrigin = data?.cityOrigin?.cap;
-        capDestination = data?.cityDestination?.cap;
-      }
+  const onSubmit = useCallback(async (data: Record<string, any>) => {
+    let capOrigin = null;
+    let capDestination = null;
+    console.log(data);
+    if (
+      data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
+      data?.countryDestination?.name?.toLowerCase()?.includes("italia")
+    ) {
+      capOrigin = data?.cityOrigin?.cap;
+      capDestination = data?.cityDestination?.cap;
+    }
 
-      const staticData = {
-        nazioneMittente: data?.countryOrigin?.code ?? "",
-        nazioneDestinatario: data?.countryDestination?.code ?? "",
-        capMittente: capOrigin ?? "",
-        cittaMittente: data?.cityOrigin?.city_name ?? "",
-        // provinciaMittente: data?.cityOrigin?.province ?? "",
-        capDestinatario: capDestination ?? "",
-        cittaDestinatario: data?.cityDestination?.city_name ?? "",
-        // provinciaDestinatario: data?.cityDestination?.province ?? "",
-      };
+    const staticData = {
+      nazioneMittente: data?.countryOrigin?.code ?? "",
+      nazioneDestinatario: data?.countryDestination?.code ?? "",
+      capMittente: capOrigin ?? "",
+      cittaMittente: data?.cityOrigin?.city_name ?? "",
+      // provinciaMittente: data?.cityOrigin?.province ?? "",
+      capDestinatario: capDestination ?? "",
+      cittaDestinatario: data?.cityDestination?.city_name ?? "",
+      // provinciaDestinatario: data?.cityDestination?.province ?? "",
+    };
 
-      const keysData = ["height", "width", "depth", "realWeight", "product"];
+    const keysData = ["height", "width", "depth", "realWeight", "product"];
 
-      const mapKey = (key: string) =>
-        key
-          .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
-          .replace(/height/, "altezza")
-          .replace(/width/, "larghezza")
-          .replace(/depth/, "profondita")
-          .replace(/realWeight/, "pesoReale")
-          .replace(/product/, "packagingType");
+    const mapKey = (key: string) =>
+      key
+        .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
+        .replace(/height/, "altezza")
+        .replace(/width/, "larghezza")
+        .replace(/depth/, "profondita")
+        .replace(/realWeight/, "pesoReale")
+        .replace(/product/, "packagingType");
 
-      if (!keysData.some((key) => data.hasOwnProperty(`${key}-item-0`))) {
-        console.error(
-          "Missing data for item-0. Ensure the data starts with item-0."
-        );
-        return;
-      }
+    if (!keysData.some((key) => data.hasOwnProperty(`${key}-item-0`))) {
+      console.error(
+        "Missing data for item-0. Ensure the data starts with item-0."
+      );
+      return;
+    }
 
-      const groupedData = Object.entries(data)
-        .filter(([key]) => keysData.some((k) => key.includes(k)))
-        .reduce<Record<string, Record<string, any>>>((acc, [key, value]) => {
-          const match = key.match(/item-(\d+)$/);
-          if (match) {
-            const groupIndex = match[1];
-            if (!acc[groupIndex]) acc[groupIndex] = {};
-            acc[groupIndex][mapKey(key)] = value;
-          }
-          return acc;
-        }, {});
-
-      const colliArray = Object.keys(groupedData)
-        .sort((a, b) => Number(a) - Number(b))
-        .map((key) => groupedData[key]);
-
-      // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
-      const finalData = {
-        ...staticData,
-        colli: colliArray.map((item) => ({
-          ...item,
-          larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
-          packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
-        })),
-      };
-
-      console.log("Final Data to Send:", finalData);
-      try {
-        const res = await axios.post(
-          `${API_Backend}/api/providers/getavailibilities`,
-          finalData
-        );
-        console.log(res);
-        if (res?.data?.avalibles?.length <= 0 || !res) {
-          toast({
-            title: "Unsuccessful",
-            description: "There is no service",
-            className: "toaster-errors",
-          });
-        } else {
-          localStorage.setItem("landing-data", JSON.stringify(res?.data));
-          router.push("/shipping-options");
+    const groupedData = Object.entries(data)
+      .filter(([key]) => keysData.some((k) => key.includes(k)))
+      .reduce<Record<string, Record<string, any>>>((acc, [key, value]) => {
+        const match = key.match(/item-(\d+)$/);
+        if (match) {
+          const groupIndex = match[1];
+          if (!acc[groupIndex]) acc[groupIndex] = {};
+          acc[groupIndex][mapKey(key)] = value;
         }
-      } catch (error) {
-        console.error("error=>>>>", error);
+        return acc;
+      }, {});
+
+    const colliArray = Object.keys(groupedData)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key) => groupedData[key]);
+
+    // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
+    const finalData = {
+      ...staticData,
+      colli: colliArray.map((item) => ({
+        ...item,
+        larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
+        packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
+      })),
+    };
+
+    try {
+      const res = await axios.post(
+        `${API_Backend}/api/providers/getavailibilities`,
+        finalData
+      );
+      const checkData = res?.data?.avalibles?.[0]?.prices?.simulazione?.spedizioni?.find((item) => item || null);
+
+      if (!res?.data || !checkData || res?.data?.avalibles?.length <= 0) {
+        console.log(false);
+        toast({
+          title: "Unsuccessful",
+          description: "There is no service",
+          className: "toaster-errors",
+        });
+      } else {
+        console.log(true);
+        localStorage.setItem("landing-data", JSON.stringify(res?.data));
+        router.push("/shipping-options");
       }
-    },
-    [router]
-  );
+    } catch (error) {
+      console.error("error=>>>>", error);
+    }
+  }, []);
 
   return (
-    <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 relative">
+    <div className="p-5 shadow-md rounded-lg bg-white w-3/4 max-md:w-11/12 relative">
       <div className="w-full flex justify-center items-center">
         <span className="block -translate-y-8 h-fit max-md:text-sm max-sm:text-xs text-nowrap max-sm:px-1 bg-secondery-color hover:bg-amber-500 transition-colors duration-150 px-3 py-0.5   rounded-md text-white">
           <Link href={"#"} className="">
@@ -264,11 +264,11 @@ export function SelectBox({
 
           <Button
             type="submit"
-            className="w-full py-5 mt-7 flex items-center justify-center"
+            className="w-full py-5 mt-7 flex items-center justify-center bg-tertiary-color hover:bg-tertiary-color/70 transition-colors duration-150"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (
-              <LoaderCircleIcon size="sm" className="animate-spin" />
+              <LoaderCircleIcon width={20} height={20} className="animate-spin size-10 mx-1" />
             )}
             Submit
           </Button>

@@ -16,17 +16,17 @@ import { Label } from "@/components/ui/label";
 
 import { BOX_SIZE, BoxSizeType } from "./productBoxSize";
 import { PenLine } from "lucide-react";
-import {ProductDetailFormType} from '@/app/types/landing-types'
+import { ProductDetailFormType } from '@/app/types/landing-types'
 
 
 const detailFields = [
-  { id: `height`, label: "height" },
-  { id: `length`, label: "length" },
-  { id: `realWeight`, label: "realWeight" },
-  { id: `depth`, label: "depth" },
+  { id: `height`, label: "Height" },
+  { id: `length`, label: "Length" },
+  { id: `realWeight`, label: "RealWeight" },
+  { id: `depth`, label: "Depth" },
 ];
 
-interface Props{
+interface Props {
   disableFieldTitles?: boolean;
 }
 
@@ -85,7 +85,7 @@ function ProductDetailsForm({
                   setItemValue(
                     (BOX_SIZE?.find(
                       (item) => item?.name === value
-                    ) as BoxSizeType) || "value is null"
+                    ) as BoxSizeType) || "value is null" as null
                   );
                 }}
                 defaultValue={field.value}

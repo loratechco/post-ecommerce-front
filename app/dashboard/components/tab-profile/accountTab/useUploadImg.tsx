@@ -47,7 +47,7 @@ export function useUploadImg({
 
   return (
     <TooltipPrimary content="Upload your image">
-      <div className="cursor-pointer">
+      <div className="bg-transparent">
         <input
           className={cn(
             "z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer",
@@ -96,16 +96,19 @@ export const AvatarPreview = ({
   API_IMG_URL,
   className,
 }: AvatarPreviewProps) => {
-  console.log(`${API_IMG_URL} ${userData?.avatar}`, avatarPreview);
 
   const [initialSrc, setInitialSrc] = useState(false);
   useEffect(() => {
+    if (userData?.avatar === "0") {
+      setInitialSrc(false);
+      return;
+    }
     if (avatarPreview || userData?.avatar) {
       setInitialSrc(true);
     } else {
       setInitialSrc(false);
     }
-  }, [avatarPreview, userData?.avatar]);
+  }, [avatarPreview, userData]);
   return (
     <Avatar
       className={cn(

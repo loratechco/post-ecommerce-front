@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
@@ -50,9 +51,11 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
     return result;
   };
 
+  const [closeCountry, setCloseCountry] = useState(false);
+  const [closeCity, setCloseCity] = useState(false);
+
   const [cityValue, setCityValue] = useState<string>("");
   const debounceValue = useDebounce(cityValue, 1500);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => getSearchCityValue(debounceValue), [debounceValue]);
 
   return (
@@ -63,10 +66,13 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
         name={countryName}
         render={({ field }) => (
           <FormItem className="w-1/2">
-            <Popover>
+            <Popover open={closeCountry}
+              onOpenChange={(isOpen) => setCloseCountry(isOpen)}
+            >
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
+                    onClick={() => setCloseCountry((perv) => !perv)}
                     variant="outline"
                     role="combobox"
                     data-muted={!field.value}
@@ -87,10 +93,10 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56">
+              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56 p-0 z-10">
                 <Command>
                   <CommandInput placeholder="Search language..." />
-                  <CommandList>
+                  <CommandList className="max-h-44   ">
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup className="">
                       {countries?.map((countrie) => (
@@ -101,6 +107,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                           onSelect={() => {
                             selectedCountry(countrie?.name);
                             hookForm.setValue(countryName, countrie);
+                            setCloseCountry(false)
                           }}
                         >
                           <Flag code={countrie?.code} width={23} height={23} />
@@ -126,10 +133,11 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
         name={cityName}
         render={({ field }) => (
           <FormItem className="bg-zinc-300 flex flex-col w-1/2 ">
-            <Popover>
+            <Popover open={closeCity} onOpenChange={(isOpen) => setCloseCity(isOpen)}>
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
+                    onClick={() => setCloseCity((perv) => !perv)}
                     disabled={disabled}
                     variant="outline"
                     role="combobox"
@@ -140,41 +148,47 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                       {!disabled && (
                         <>
                           {cityData?.find(
-                            (city) => city?.city_name === field.value?.city_name
+                            (city) => city?.city_name === field.value?.city_name || city?.cap === field.value?.cap
                           )?.city_name || "Select the city"}
                           <span className="text-xs text-zinc-500 block text-start">
                             {cityData?.find(
                               (city) =>
-                                city?.city_name === field.value?.city_name
+                                city?.city_name === field.value?.city_name || city?.cap === field.value?.cap
                             )?.cap}
                           </span>
                         </>
-                      )|| "Select the city"}
+                      ) || "Select the city"}
                     </div>
 
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </FormControl>
               </PopoverTrigger>
-              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56 p-0">
+              <PopoverContent className="max-w-56 sm:max-w-64 lg:max-w-56 p-0 z-10">
                 <Command>
                   <CommandInput
                     placeholder="Search language..."
-                    onValueChange={setCityValue}
+                    onValueChange={(value) => {
+                      setCityValue(value)
+                      console.info(field.value, cityData)
+                    }}
                   />
-                  <CommandList>
+                  <CommandList className="max-h-48">
                     <CommandEmpty>No city found.</CommandEmpty>
+
                     <CommandGroup className="">
                       {cityData?.map((city, key) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
-                          value={city?.city_name}
+                          value={`${city?.city_name} ${city?.cap}`}
                           key={city?.city_name + String(key)}
                           onSelect={() => {
-                            hookForm.setValue(cityName, disabled ?"": city);
+                            hookForm.setValue(cityName, disabled ? "" : city);
+                            setCloseCity(false)
                           }}
                         >
                           {city?.city_name}
+                          <span className="text-zinc-500 text-xs">{city?.cap}</span>
                           <Check
                             data-active={city?.city_name === field?.value}
                             className="ml-auto opacity-0 transition-opacity data-[active=true]:opacity-100"

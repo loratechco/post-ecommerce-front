@@ -28,11 +28,7 @@ function CounterySitySelectorListItems({
       countryName: string;
       setState: (value: boolean) => void;
     }) => {
-      if(countryName?.toLowerCase() === "italia") {
-        setState(true);
-      }else{
-        setState(false);
-      }
+      countryName?.toLowerCase() === "italia" ? setState(true) : setState(false);
     };
     
     useEffect(() => {
@@ -85,6 +81,7 @@ function CounterySitySelectorListItems({
         />
       </div>
     );
+    
 }
 
 export default CounterySitySelectorListItems;

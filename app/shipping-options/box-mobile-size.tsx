@@ -1,4 +1,6 @@
-import { PrinterIcon } from "lucide-react";
+import {
+  PrinterIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +17,7 @@ type Service = {
 };
 
 type ShippingCardProps = {
-  courierLogo: string; // آدرس لوگوی شرکت حمل و نقل
+  // courierLogo: string; // آدرس لوگوی شرکت حمل و نقل
   courierName: string; // نام شرکت حمل و نقل
   estimatedDelivery: string; // زمان تخمینی تحویل
   departureDate: string; // تاریخ ارسال
@@ -24,7 +26,6 @@ type ShippingCardProps = {
 };
 
 function ShippingCard({
-  courierLogo,
   courierName,
   estimatedDelivery,
   departureDate,
@@ -47,9 +48,8 @@ function ShippingCard({
         <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 border-b pb-4">
           <div className="centerize-flex gap-2 flex-col">
             <Image
-              src={`${courierLogo}`}
+              src="/pic/inpost.png"
               alt={`${courierName} image-company`}
-              priority={true}
               width={120}
               height={90}
             />
@@ -66,7 +66,7 @@ function ShippingCard({
             {/* icons section  */}
             <span className="centerize-flex gap-2 h-24">
               {services?.map((service, index) => (
-                <div className="flex flex-col items-center " key={index}>
+                <div className="flex flex-col items-center " key={index+1}>
                   <div className="size-8">
                     <Image
                       src={service?.icon}
@@ -84,7 +84,9 @@ function ShippingCard({
             </span>
 
             <div className="space-y-2 text-sm">
-              <div className="text-muted-foreground">Departure date:</div>
+              <div className="text-muted-foreground">
+                Departure date:
+              </div>
               <div className="">{departureDate}</div>
             </div>
           </div>
@@ -127,4 +129,4 @@ function ShippingCard({
   );
 }
 
-export default memo(ShippingCard);
+  export default memo(ShippingCard);

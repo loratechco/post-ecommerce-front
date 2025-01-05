@@ -7,7 +7,7 @@ type Service = {
 };
 
 type ShippingCardProps = {
-  courierLogo: string; // آدرس لوگوی شرکت حمل و نقل
+  // courierLogo: string; // آدرس لوگوی شرکت حمل و نقل
   courierName: string; // نام شرکت حمل و نقل
   estimatedDelivery: string; // زمان تخمینی تحویل
   departureDate: string; // تاریخ ارسال
@@ -16,10 +16,11 @@ type ShippingCardProps = {
 };
 
 function BoxPcSize({
-  courierLogo,
+  // courierLogo,
   courierName,
   estimatedDelivery,
   departureDate,
+  // services,
   price,
 }: ShippingCardProps) {
   return (
@@ -40,13 +41,7 @@ function BoxPcSize({
         </li>
 
         <li className="centerize-flex flex-col gap-2">
-          <Image
-            src={courierLogo}
-            alt="company"
-            width={60}
-            height={40}
-            priority={true}
-          />
+          <Image src="/pic/inpost.png" alt="company" width={60} height={40} />
           <p className="text-zinc-500 text-sm w-24 text-center">
             {courierName}
           </p>

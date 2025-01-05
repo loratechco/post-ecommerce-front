@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useRouter } from "next/navigation";
 import BoxMobileSize from "./box-mobile-size";
@@ -47,19 +48,16 @@ function BoxOption() {
     if (landingData) {
       setPostServiceData(JSON.parse(landingData));
     } else {
-      router.push("/");
+      router.replace("/");
     }
-  }, [router]);
+  }, []);
   const avalible = postServiceData?.avalibles[0];
-  const date = "Wednesday 08 January 2025";
-  console.info(getEstimatedDelivery(date));
-
   return (
-    <section className="max-w-6xl max-[970px]:max-w-xl mx-auto space-y-9 pt-20 min-[970px]:pt-36">
+    <section className="max-w-7xl max-[970px]:max-w-xl mx-auto space-y-9 pt-20 px-[3%] min-[970px]:pt-36 pb-20 min-h-screen">
       {avalible?.prices?.simulazione?.spedizioni?.map((shipments, key) => (
-        <>
+        <div key={shipments?.id || key}>
           <BoxPcSize
-            courierLogo={shipments?.tariffImage} // فرض بر اینکه تصویر کوریر در `tariffImage` باشد
+            // courierLogo={'https://betaspedire.b-cdn.net/imgs/courier_logos/inpost.png'} // فرض بر اینکه تصویر کوریر در `tariffImage` باشد
             courierName={shipments?.corriere} // نام کوریر از `corriere`
             estimatedDelivery={getEstimatedDelivery(
               shipments?.dataConsegnaPrevista
@@ -67,11 +65,9 @@ function BoxOption() {
             departureDate={shipments?.dataRitiro} // تاریخ رهایی
             services={[]} // خدمات اضافی
             price={shipments?.tariffa}
-            key={shipments?.id + key}
           />
           <BoxMobileSize
-            key={shipments?.id || key}
-            courierLogo={shipments?.tariffImage} // فرض بر اینکه تصویر کوریر در `tariffImage` باشد
+            // courierLogo={'https://betaspedire.b-cdn.net/imgs/courier_logos/inpost.png'} // فرض بر اینکه تصویر کوریر در `tariffImage` باشد
             courierName={shipments?.corriere} // نام کوریر از `corriere`
             estimatedDelivery={getEstimatedDelivery(
               shipments?.dataConsegnaPrevista
@@ -80,7 +76,7 @@ function BoxOption() {
             services={[]} // خدمات اضافی
             price={shipments?.tariffa} // قیمت از `tariffa`
           />
-        </>
+        </div>
       ))}
     </section>
   );
