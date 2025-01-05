@@ -52,7 +52,8 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
 
   const [cityValue, setCityValue] = useState<string>("");
   const debounceValue = useDebounce(cityValue, 1500);
-  useEffect(() => getSearchCityValue(debounceValue), [debounceValue, getSearchCityValue]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => getSearchCityValue(debounceValue), [debounceValue]);
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">

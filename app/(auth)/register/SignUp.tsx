@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { CardContent } from "@/components/ui/card";
 import AuthToggle from "@/app/(auth)/components/AuthToggle ";
@@ -10,115 +10,122 @@ import useSignUp from "./useSignUp";
 import { SignUpFormData } from "./schema";
 import axios from "axios";
 import ErrorToast from "@/components/ErrorToast";
-import { useEffect, useState } from "react";
 import { API_Backend } from "@/hooks/use-fetch";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function SignUp() {
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useSignUp();
 
-    const [userMissingError, setUserMissingError] = useState<string | null>(null)
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useSignUp();
+  console.log("🚀 ~ SignUp ~ errors:", errors);
+  const formSubmit = async (data: SignUpFormData) => {
+    const {
+      email,
+      password,
+      name,
+      passwordConfirmation: password_confirmation,
+    } = data;
 
-    useEffect((() => setUserMissingError('')), [userMissingError])
+    try {
+      await axios.post(`${API_Backend}/api/register`, {
+        email,
+        password,
+        name,
+        password_confirmation,
+      });
+      router.push("/login");
+    } catch (error: any) {
+      console.log("🚀 ~ formSubmit ~ error:", error);
+      console.log(error);
+    }
+  };
 
-    console.log("🚀 ~ SignUp ~ errors:", errors)
-    const formSubmit = async (data: SignUpFormData) => {
-        const { email, password, name, passwordConfirmation: password_confirmation } = data;
+  const [errorMessagesArray, setErrorMessagesArray] = useState<
+    (string | undefined)[]
+  >([]);
 
-        try {
-            const res = await axios.post(
-               `${API_Backend}/api/register`,
-                { email, password, name, password_confirmation }
-            );
+  useEffect(() => {
+    setErrorMessagesArray([
+      errors?.name?.message,
+      errors?.email?.message,
+      errors?.password?.message,
+      errors?.passwordConfirmation?.message,
+    ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSubmitting]);
+  console.info(isSubmitting, "<<<=isSubmitting");
+  return (
+    <form onSubmit={handleSubmit(formSubmit)}>
+      <ErrorToast
+        dependency={isSubmitting}
+        errorMessagesArray={errorMessagesArray}
+      />
 
-            if (res.status !== 201)
-                return;
+      <CardContent className="space-y-3">
+        <AuthInput
+          id="name"
+          type="text"
+          placeholder="Michael"
+          nameLabel="Name"
+          disabled={isSubmitting}
+          register={register("name")}
+        />
 
-            console.log("🚀 ~ formSubmit ~ res:", res)
-            window.location.href = "/login";
+        <AuthInput
+          id="email"
+          type="email"
+          placeholder="example@gmail.com"
+          nameLabel="Email"
+          disabled={isSubmitting}
+          register={register("email")}
+        />
 
-        } catch (error) {
-            console.log("🚀 ~ formSubmit ~ error:", error)
-            setUserMissingError(error?.response?.data?.message);
+        <AuthInput
+          id="password"
+          type="password"
+          placeholder="#Az123"
+          nameLabel="Password"
+          disabled={isSubmitting}
+          register={register("password")}
+        />
 
-            console.log(error);
-        }
-    };
+        <AuthInput
+          id="password-confirmation"
+          type="password"
+          placeholder="#Az123"
+          nameLabel="Password Confirmation"
+          disabled={isSubmitting}
+          register={register("passwordConfirmation")}
+        />
 
-    const errorMessages =
-        [
-            userMissingError,
-            errors?.name?.message,
-            errors?.email?.message,
-            errors?.password?.message,
-            errors?.passwordConfirmation?.message,
-        ];
+        <div className="flex items-center">
+          <Link
+            href="/forgot-password"
+            className="ml-auto inline-block text-sm underline"
+          >
+            Forgot your password?
+          </Link>
+        </div>
 
-    return (
-        <form onSubmit={handleSubmit(formSubmit)}>
+        <div className="space-y-3 mt-3">
+          <AuthBtn
+            nameBtn="Sign Up"
+            variant="default"
+            className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900"
+            type="submit"
+            disabled={isSubmitting}
+          />
+        </div>
 
-            <ErrorToast
-                dependency={errors}
-                errorMessagesArray={errorMessages}
-                dependencyOption={userMissingError}
-            />
-
-            <CardContent className="space-y-3">
-                <AuthInput
-                    id="name"
-                    type="text"
-                    placeholder="Michael"
-                    nameLabel="Name"
-                    disabled={isSubmitting}
-                    register={register("name")}
-                />
-
-                <AuthInput
-                    id="email"
-                    type="email"
-                    placeholder="example@gmail.com"
-                    nameLabel="Email"
-                    disabled={isSubmitting}
-                    register={register("email")}
-                />
-
-                <AuthInput
-                    id="password"
-                    type="password"
-                    placeholder="#Az123"
-                    nameLabel="Password"
-                    disabled={isSubmitting}
-                    register={register("password")}
-                />
-
-                <AuthInput
-                    id="password-confirmation"
-                    type="password"
-                    placeholder="#Az123"
-                    nameLabel="Password Confirmation"
-                    disabled={isSubmitting}
-                    register={register("passwordConfirmation")}
-                />
-
-                <div className="flex items-center">
-                    <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-                        Forgot your password?
-                    </Link>
-                </div>
-
-                <div className="space-y-3 mt-3">
-                    <AuthBtn
-                        nameBtn="Sign Up"
-                        variant="default"
-                        className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900"
-                        type="submit"
-                        disabled={isSubmitting}
-                    />
-                </div>
-
-                <AuthToggle href="/login" title="Login" />
-            </CardContent>
-        </form>
-    );
+        <AuthToggle href="/login" title="Login" />
+      </CardContent>
+    </form>
+  );
 }
 
 export default SignUp;

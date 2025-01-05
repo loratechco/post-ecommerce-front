@@ -5,6 +5,7 @@ import { toast } from "@/hooks/use-toast";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { UserData } from "@/app/types/api-data";
 import { User2Icon } from "lucide-react";
+import TooltipPrimary from "@/components/toolltip-primary";
 
 /**
  * Custom hook for managing profile image upload and preview
@@ -45,33 +46,35 @@ export function useUploadImg({
   }, [fileSaver]);
 
   return (
-    <>
-      <input
-        className={cn(
-          "z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer",
-          className
-        )}
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (!file || !(file instanceof File)) return;
+    <TooltipPrimary content="Upload your image">
+      <div className="cursor-pointer">
+        <input
+          className={cn(
+            "z-10 size-full appearance-none bg-transparent opacity-0 absolute inset-0 cursor-pointer",
+            className
+          )}
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (!file || !(file instanceof File)) return;
 
-          if (file.size > sizeFile * 1024 * 1024) {
-            toast({
-              title: "Unsuccessful",
-              description: `Image size must be less than ${sizeFile}MB`,
-              className: "bg-red-300 text-red-950 font-semibold",
-            });
-            e.target.value = "";
-            return;
-          }
-          fileSubmit(file);
-          setFileSaver(file);
-        }}
-      />
-      {thereAvatar && AvatarPreview({ avatarPreview, userData, API_IMG_URL })}
-    </>
+            if (file.size > sizeFile * 1024 * 1024) {
+              toast({
+                title: "Unsuccessful",
+                description: `Image size must be less than ${sizeFile}MB`,
+                className: "bg-red-300 text-red-950 font-semibold",
+              });
+              e.target.value = "";
+              return;
+            }
+            fileSubmit(file);
+            setFileSaver(file);
+          }}
+        />
+        {thereAvatar && AvatarPreview({ avatarPreview, userData, API_IMG_URL })}
+      </div>
+    </TooltipPrimary>
   );
 }
 
@@ -88,33 +91,35 @@ interface AvatarPreviewProps {
  * @see https://ui.shadcn.com/docs/components/avatar
  */
 export const AvatarPreview = ({
-  avatarPreview,
+  avatarPreview = null,
   userData,
   API_IMG_URL,
   className,
 }: AvatarPreviewProps) => {
-  console.log(`${API_IMG_URL} / ${userData?.avatar}`);
+  console.log(`${API_IMG_URL} ${userData?.avatar}`, avatarPreview);
 
   const [initialSrc, setInitialSrc] = useState(false);
   useEffect(() => {
-    if (userData?.avatar) {
+    if (avatarPreview || userData?.avatar) {
       setInitialSrc(true);
+    } else {
+      setInitialSrc(false);
     }
-  }, [userData?.avatar]);
+  }, [avatarPreview, userData?.avatar]);
   return (
     <Avatar
       className={cn(
-        "cursor-pointer relative z-0 size-full bg-zinc-200",
+        "!cursor-pointer relative z-0 size-full bg-zinc-200",
         className
       )}
     >
       {initialSrc ? (
         <AvatarImage
           src={avatarPreview || `${API_IMG_URL}${userData?.avatar}`}
-          className="object-cover"
+          className="object-cover cursor-pointer"
         />
       ) : (
-        <User2Icon className="size-11/12 text-zinc-800 p-1 mx-auto" />
+        <User2Icon className="size-11/12 text-zinc-800 p-1 mx-auto cursor-pointer" />
       )}
     </Avatar>
   );

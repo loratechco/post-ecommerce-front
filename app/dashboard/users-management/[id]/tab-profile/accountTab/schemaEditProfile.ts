@@ -1,20 +1,37 @@
-import { PhoneNumberSchema, UserEmailSchema, UserLastNameSchema, UserNameSchema } from "@/app/types/field-schemas";
+import { PhoneNumberSchema, UserEmailSchema, UserLastNameSchema, UserNameSchema, UserPasswordSchema } from "@/app/types/field-schemas";
+import { ValidationMessages } from "@/app/types/validation-message";
 import { z } from "zod";
 
-const formSchema = z.object({
+const formSchemaCreateUser = z.object({
     name: UserNameSchema,
     last_name: UserLastNameSchema,
-    email:UserEmailSchema,
+    email: UserEmailSchema,
     phone: PhoneNumberSchema,
-    newPassword: z.string()
-        .min(6, { message: "Password must be at least 6 characters" })
-        .optional()
-        .or(z.literal('')),
-
-    confirmation: z.string()
-        .min(6, { message: "Confirmation password must be at least 6 characters" })
-        .optional()
-        .or(z.literal(''))
+    newPassword: UserPasswordSchema,
+    confirmation: UserPasswordSchema,
+}).refine((data) => {
+    if (data.newPassword || data.confirmation) {
+        return data.newPassword === data.confirmation;
+    }
+    return true;
+}, {
+    message: "Password and confirmation must be the same",
+    path: ["confirmation"]
+});
+const formSchemaEditUser = z.object({
+    name: UserNameSchema,
+    last_name: UserLastNameSchema,
+    email: UserEmailSchema,
+    phone: PhoneNumberSchema,
+    
+    newPassword: z
+  .string()
+  .min(6, ValidationMessages.passwordMinLength)
+  .min(1, ValidationMessages.passwordRequired).optional(),
+    confirmation: z
+  .string()
+  .min(6, ValidationMessages.passwordMinLength)
+  .min(1, ValidationMessages.passwordRequired).optional(),
 }).refine((data) => {
     if (data.newPassword || data.confirmation) {
         return data.newPassword === data.confirmation;
@@ -25,4 +42,7 @@ const formSchema = z.object({
     path: ["confirmation"]
 });
 
-export default formSchema;
+export {
+    formSchemaCreateUser,
+    formSchemaEditUser,
+};

@@ -11,7 +11,7 @@ import React, { useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
-import formSchema from "./schemaEditProfile";
+import { formSchemaCreateUser, formSchemaEditUser } from "./schemaEditProfile";
 
 import { toast } from "@/hooks/use-toast";
 import { useUploadImg } from "@/app/dashboard/components/tab-profile/accountTab/useUploadImg";
@@ -50,6 +50,8 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
 
   useEffect(() => setFetchError(null), [fetchError]);
 
+  const idCondition = userId.includes("create-user");
+  const formSchema = idCondition ? formSchemaCreateUser : formSchemaEditUser;
   type FormData = z.infer<typeof formSchema>;
   const {
     register,
@@ -65,6 +67,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       phone: "",
       newPassword: "",
       confirmation: "",
+      image: null,
     },
   });
 
@@ -74,6 +77,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       setUserData(null);
       return;
     }
+
     const getUser = async () => {
       try {
         const { data } = await axios.get(`${API_Backend}/api/users/${userId}`, {
@@ -82,22 +86,33 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
           },
         });
 
-        const { business_customer } = data?.data;
-
-        setSwitchState((business_customer == 1 && true) || false);
-
-        setUserData(data);
-        reset({
-          ...data?.data,
-        });
+        setUserData(data?.data);
       } catch (error) {
         console.error(error);
       }
     };
     getUser();
-  }, [userId, userToken, reset]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, userToken]);
 
-  const idCondition = userId.includes("create-user");
+  useEffect(() => {
+    console.info("userData=>>", userData?.avatar);
+  }, [userData]);
+
+  useEffect(() => {
+    if (userData) {
+      setSwitchState((userData?.business_customer == 1 && true) || false);
+      reset({
+        name: userData.name || "",
+        last_name: userData.last_name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        newPassword: "",
+        confirmation: "",
+        image: null,
+      });
+    }
+  }, [userData, reset]);
 
   const onSubmit = async (data: FormData) => {
     const formData = new FormData();
@@ -169,8 +184,8 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
           errors?.newPassword?.message,
           errors?.confirmation?.message,
         ]}
-        dependency={errors}
-        dependencyOption={fetchError}
+        disableDefaultDeps={true}
+        dependency={isSubmitting}
       />
       <form className="py-5 space-y-7" onSubmit={handleSubmit(onSubmit)}>
         {idCondition && (

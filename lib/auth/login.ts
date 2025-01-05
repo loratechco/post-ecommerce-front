@@ -1,14 +1,9 @@
 "use server";
 
-import "server-only";
-
 import { redirect } from "next/navigation";
 import { saveSession } from "./storage";
 import { refreshPermissionCookie } from "@/lib/user-permissions/fetchPermissions";
-
-const BACKEND_URL = "http://app.api";
-
-
+import { API_URL } from "@/app/actions/actionHelper";
 
 export async function singIn({
     redirectTo = "/dashboard",
@@ -19,7 +14,7 @@ export async function singIn({
     redirectTo?: string;
 }) {
 
-    const res = await fetch(`${BACKEND_URL}/api/login`, {
+    const res = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -48,11 +43,10 @@ export async function singIn({
     }
 
     redirect(redirectTo);
-
 }
 
 export async function initUserData({ token }: { token: string }) {
-    const res = await fetch(`${BACKEND_URL}/api/profile`, {
+    const res = await fetch(`${API_URL}/profile`, {
         headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

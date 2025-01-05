@@ -1,7 +1,5 @@
 'use client'
-
 import { useEffect, useState } from "react";
-import { boolean } from "zod";
 
 interface UseFetchProps {
     endpoint: string;
@@ -61,7 +59,6 @@ export const useGEt = ({
                 });
                 // console.info('response=>>>>>>', response, 'response and Json parse=====>', await response.json());
 
-                console.info(response);
                 if (!response.ok) {
                     throw new Error(
                         customErrorMessage || 'Error receiving information, please try again'

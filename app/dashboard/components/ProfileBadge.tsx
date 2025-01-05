@@ -26,7 +26,7 @@ function ProfileBadge() {
       <div className="flex aspect-square size-9 bg-zinc-200 items-center justify-center rounded-full bg-transparent text-sidebar-primary-foreground">
         <Avatar>
           {isValidAvatar ? (
-            <AvatarImage src={`${API_Backend}${data?.avatar}`} />
+            <AvatarImage src={`${API_Backend}${data?.avatar}`} className="object-cover"/>
           ) : (
             <User2Icon className="size-11/12 text-zinc-800 p-1 mx-auto" />
           )}
@@ -34,7 +34,7 @@ function ProfileBadge() {
         </Avatar>
       </div>
       <div className="grid flex-1 text-left text-sm leading-tight">
-        <p className="truncate font-semibold first-letter:uppercase">
+        <p className="font-semibold first-letter:uppercase overflow-hidden text-ellipsis w-4/5 truncate">
           {data?.name || "Name"}
         </p>
       </div>

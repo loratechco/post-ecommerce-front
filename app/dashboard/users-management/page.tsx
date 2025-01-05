@@ -25,16 +25,17 @@ export default async function UserListPage({ searchParams }: PropsNextPage) {
         { key: "name", label: "Name" },
         { key: "lastName", label: "Last Name" },
         { key: "phone", label: "Phone" },
+        { key: "actions", label: "Actions" },
       ]}
       table={{
         currentPage: page as string,
-        tableBodyData: res?.data?.data?.map((item:UserData) => ({
+        tableBodyData: res?.data?.data?.map((item: UserData) => ({
+          id: item?.id,
           name: item?.name,
-          urlLink: `/dashboard/users-management/${item?.id || ""}`,
           lastName: item?.last_name,
           phone: item?.phone,
           email: item?.email,
-          actions: <UserListDropDown person={item} page={page as string} token={token} />,
+          actions: <UserListDropDown person={item} />,
         })),
         customErrorMassage: "There is no data",
       }}

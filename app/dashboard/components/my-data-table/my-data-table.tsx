@@ -30,6 +30,7 @@ interface Props {
     tableBodyData: {
       actions?: ReactNode;
       urlLink?: string;
+      id?: number;
       badge?: {
         badgeValue: string;
         badgeClassname: string;
@@ -150,42 +151,40 @@ function MyDatatTable({
 
           <TbodyDesc>
             {tableBodyData?.length > 0 ? (
-              tableBodyData.map((row, rowIndex) => (
+              tableBodyData?.map((row, rowIndex) => (
                 <>
-                  <TrDesc key={rowIndex}>
+                  <TrDesc key={row?.id ? row.id + 1 : rowIndex}>
                     {indexItemsAvalabe && (
                       <TdDesc>
                         {calculateIndexListItems(rowIndex, currentPage)}
                       </TdDesc>
                     )}
 
-                    {!row?.actions &&
-                      headerItems.map(({ key }, colIndex) => (
-                        <TdDesc key={colIndex}>
-                          <Link
-                            href={
-                              row?.urlLink && colIndex == 0
-                                ? row?.urlLink || ""
-                                : ""
-                            }
-                            className={cn(
-                              "ps-3",
-                              row?.urlLink && colIndex == 0
-                                ? "pointer-events-auto select-auto underline"
-                                : "cursor-default select-none"
-                            )}
-                          >
-                            {row[key] || "-"}
-                          </Link>
-                        </TdDesc>
-                      ))}
-
-                    {row?.actions &&
-                      headerItems.map(({ key }, colIndex) => (
-                        <TdDesc key={colIndex}>
-                          {key === "actions" ? row?.actions : row[key] || "-"}
-                        </TdDesc>
-                      ))}
+                    {!row?.actions
+                      ? headerItems.map(({ key }, colIndex) => (
+                          <TdDesc key={colIndex}>
+                            <Link
+                              href={
+                                row?.urlLink && colIndex == 0
+                                  ? row?.urlLink || ""
+                                  : ""
+                              }
+                              className={cn(
+                                "ps-3 block",
+                                row?.urlLink && colIndex == 0
+                                  ? "pointer-events-auto select-auto underline"
+                                  : "cursor-default select-none"
+                              )}
+                            >
+                              {row[key] || "-"}
+                            </Link>
+                          </TdDesc>
+                        ))
+                      : headerItems.map(({ key }, colIndex) => (
+                          <TdDesc key={colIndex}>
+                            {key === "actions" ? row?.actions : row[key] || "-"}
+                          </TdDesc>
+                        ))}
                   </TrDesc>
                 </>
               ))
@@ -203,7 +202,7 @@ function MyDatatTable({
             tableBodyData.map((row, rowIndex) => (
               <div
                 className="flex items-center justify-center w-full hover:bg-zinc-200 transition-colors"
-                key={rowIndex}
+                key={row?.id || rowIndex}
               >
                 <Link
                   href={row?.urlLink || ""}

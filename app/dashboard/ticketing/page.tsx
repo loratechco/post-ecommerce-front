@@ -17,6 +17,8 @@ const dateConvert = (date: string) => {
   return format(new Date(date), "yyyy/MM/dd HH:mm:ss");
 };
 
+import {SearchParams} from '@/app/types/nextjs-types';
+
 enum StatusBadg {
   open = "bg-emerald-600 hover:bg-emerald-700",
   pending = "bg-yellow-600 hover:bg-yellow-700",
@@ -25,10 +27,11 @@ enum StatusBadg {
 const badgeClassname = (badgeStatus: keyof typeof StatusBadg) => {
   return StatusBadg[badgeStatus] || "bg-zinc-600 hover:bg-zinc-700";
 };
+
 async function TicketListPage({
   searchParams,
 }: {
-  searchParams: { page: string; search: string };
+  searchParams:SearchParams;
 }) {
   const { page = "1", search = "" } = await searchParams;
 
@@ -64,7 +67,7 @@ async function TicketListPage({
         { key: "statusTickets", label: "Status" },
       ]}
       table={{
-        currentPage: page,
+        currentPage: page as string,
         tableBodyData,
         customErrorMassage: "There is no data",
       }}

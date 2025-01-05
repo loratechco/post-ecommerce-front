@@ -17,7 +17,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
 import { API_Backend, useGEt } from "@/hooks/use-fetch";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
@@ -37,64 +37,78 @@ function DialogFormAddUserToGroup({
   groupId = "",
   token = "",
 }: Props) {
-
   //react-hook-form
   const form = useForm();
   const router = useRouter();
   const [pageUserListAlert, setPageUserListAlert] = useState("1");
 
   //get user list data
-  const {
-    data: userListData = [],
-    loading,
-  } = useGEt({
+  const { data: userListData, loading } = useGEt({
     endpoint: `api/users/group/${groupId}?page=${pageUserListAlert}`,
     token: token,
   });
 
-  const onSubmit = async (data: Record<string, string>) => {
-    //Get user IDs from selected users
-    const selectedUsers = {
-      user_ids: Object.entries(data)
-        .filter(([_, item]) => item)
-        .map(([item, _]) => item),
-    };
-
-    console.log("selectedUsers=>>>", selectedUsers, form.getValues);
-
-    try {
-      const res = await axios.post(
-        `${API_Backend}/api/groups/${groupId}/users`,
-        selectedUsers,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      dispatch({ type: "ADD_USER_TO_GROUP", data: false });
-
-      toast({
-        title: "Successful",
-        description: "Users have been added to the group",
-        className: "toaster-successfuls",
-      });
-
-      router.refresh();
-      console.log("response=>>", res, "id=>>", groupId);
-    } catch (error) {
-      console.log(error, "id=>>", groupId);
-      toast({
-        title: "Unsuccessful",
-        description: "Something went wrong, please try again later.",
-        className: "toaster-errors",
-      });
+  useEffect(() => {
+    const bodyElement = document.querySelector("body");
+    if (bodyElement) {
+      bodyElement.style.pointerEvents = "auto";
     }
-  };
 
-  const returnUsersNotAddedToGroup: [] =
-    userListData?.users.filter((person: any) => !person?.inGroup ) || [];
+    return () => {
+      const bodyElement = document.querySelector("body");
+      if (bodyElement) {
+        bodyElement.style.pointerEvents = "";
+      }
+    };
+  }, [alertState.addUser]);
+
+  const onSubmit = useCallback(
+    async (data: Record<string, string>) => {
+      //Get user IDs from selected users
+      const selectedUsers = {
+        user_ids: Object.entries(data)
+          .filter(([_, item]) => item)
+          .map(([item, _]) => item),
+      };
+
+      try {
+        const res = await axios.post(
+          `${API_Backend}/api/groups/${groupId}/users`,
+          selectedUsers,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        dispatch({ type: "ADD_USER_TO_GROUP", data: false });
+
+        toast({
+          title: "Successful",
+          description: "Users have been added to the group",
+          className: "toaster-successfuls",
+        });
+
+        router.refresh();
+        console.log("response=>>", res, "id=>>", groupId);
+      } catch (error) {
+        console.log(error, "id=>>", groupId);
+        toast({
+          title: "Unsuccessful",
+          description: "Something went wrong, please try again later.",
+          className: "toaster-errors",
+        });
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dispatch, form.getValues, groupId, token]
+  );
+
+  const returnUsersNotAddedToGroup: [] = useMemo(
+    () => userListData?.users.filter((person: any) => !person?.inGroup) || [],
+    [userListData?.users]
+  );
 
   return (
     <Dialog
@@ -114,7 +128,6 @@ function DialogFormAddUserToGroup({
 
         <FormProvider {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-
             {!loading ? (
               <ScrollArea>
                 <div className="w-full py-3 max-sm:divide-y divide-zinc-300 *:py-5 max-h-64 *:flex *:w-full *:items-center *:gap-3">

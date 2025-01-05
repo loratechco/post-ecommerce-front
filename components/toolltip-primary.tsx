@@ -25,7 +25,7 @@ export default function TooltipPrimary({
       <Tooltip>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
         <TooltipContent
-          className={cn("dark px-2 py-1 text-xs", classNameTooltipContent)}
+          className={cn("dark px-2 py-1 text-xs border border-zinc-300", classNameTooltipContent)}
         >
           {content || "This tooltip will be always dark"}
         </TooltipContent>

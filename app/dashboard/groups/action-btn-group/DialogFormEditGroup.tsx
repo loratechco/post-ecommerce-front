@@ -8,7 +8,7 @@ import { TextareaAutosize } from "@/components/ui/textarea-autosize";
 import { DialogContent, Dialog, DialogFooter, DialogHeader } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import FormInput from "@/components/FormInput";
-import React from "react";
+import React, { useEffect } from "react";
 import { DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
 import { API_Backend } from "@/hooks/use-fetch";
 import axios from "axios";
@@ -59,6 +59,20 @@ function DialogFormEditGroup({ dispatch, alertState, id, token }: Props) {
             })
         }
     }
+
+    useEffect(() => {
+        const bodyElement = document.querySelector("body");
+        if (bodyElement) {
+          bodyElement.style.pointerEvents = "auto";
+        }
+
+        return () => {
+          const bodyElement = document.querySelector("body");
+          if (bodyElement) {
+            bodyElement.style.pointerEvents = "";
+          }
+        };
+      }, [alertState.editUser]);
 
     return (
         <>
