@@ -1,4 +1,4 @@
-import {Globe, Package, Info, Briefcase, Newspaper, HelpCircle, MessageCircle, Edit3, MapPin, DollarSign, Truck, Users } from 'lucide-react';
+import {Globe, Package, Info, Briefcase, Newspaper, HelpCircle, MessageCircle, Edit3, MapPin, DollarSign, Truck } from 'lucide-react';
 
 const ICON_SIZE = 18 as const
 

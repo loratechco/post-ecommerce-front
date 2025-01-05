@@ -49,7 +49,7 @@ function BoxOption() {
     } else {
       router.push("/");
     }
-  }, []);
+  }, [router]);
   const avalible = postServiceData?.avalibles[0];
   const date = "Wednesday 08 January 2025";
   console.info(getEstimatedDelivery(date));

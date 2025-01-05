@@ -17,7 +17,7 @@ export type navMain = {
     icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>;
 }[];
 
-export default (BASE_ROUTE: string) => {
+const dataNavbarDashbord = (BASE_ROUTE: string) => {
     const data = {
         navMain: [
             {
@@ -61,7 +61,8 @@ export default (BASE_ROUTE: string) => {
                 icon: Settings2,
             },
         ],
-    }
+    };
 
     return data;
 }
+export default dataNavbarDashbord;

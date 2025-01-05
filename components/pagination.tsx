@@ -14,10 +14,9 @@ import { cn } from "@/lib/utils";
 
 interface Props {
     pages: number;
-    className?: string;
 }
 
-export function PaginationComponent({ pages = 1, className }: Props) {
+export function PaginationComponent({ pages = 1 }: Props) {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();

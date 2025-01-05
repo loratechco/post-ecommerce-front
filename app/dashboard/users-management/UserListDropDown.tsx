@@ -3,10 +3,8 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-export default function UserListDropDown({ person, page, token }: { person: any, page: string, token: string }) {
-    const router = useRouter();
+export default function UserListDropDown({ person }: { person: any, }) {
 
     // const handelDeleteUser = async () => {
     //     const res = await handleDelete({ id: person?.id, pageQuery: page, token: token });

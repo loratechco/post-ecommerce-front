@@ -13,7 +13,7 @@ interface Child {
     children: ReactNode
 }
 
-export function TheadDesc({ children, className }: Child & { className: string }) {
+export function TheadDesc({ children, className }: Child & { className?: string }) {
     return (
 
         <thead className={cn(

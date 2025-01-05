@@ -1,15 +1,7 @@
 import TicketChat from '@/components/chat/TicketChat'
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { cookies } from 'next/headers'
 import { cookieName } from '@/lib/auth/storage'
-import { getServerAction, getTicket } from '@/app/actions/chatTicketing'
-import { Suspense } from 'react'
-import axios from 'axios'
-import { API_URL } from '@/app/actions/actionHelper'
-import Loading from '@/components/Loading'
-import ErrorToast from '@/components/ErrorToast'
-
+import {  getTicket } from '@/app/actions/chatTicketing'
 interface Params {
     params: { id: string }
 }

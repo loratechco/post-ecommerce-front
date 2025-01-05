@@ -1,4 +1,3 @@
-import Auth from "@/app/(auth)/login/Login";
 import ForgotPassword from "./ForgotPassword";
 
 function ForgotPasswordPage() {

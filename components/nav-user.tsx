@@ -29,7 +29,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { signOut } from "@/lib/auth/logOut"
 
 export function NavUser({
   user,

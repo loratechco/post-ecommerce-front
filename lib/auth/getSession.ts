@@ -1,7 +1,6 @@
 'use server'
 
 import { cookies } from "next/headers"
-import { Session } from "./types"
 import { cookieName } from "./storage"
 
 export type GetSession = {

@@ -10,11 +10,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { API_Backend, useGEt } from "@/hooks/use-fetch";
+import { API_Backend } from "@/hooks/use-fetch";
 import { toast } from "@/hooks/use-toast";
 import axios from "axios";
 
-import { Ellipsis, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -28,11 +28,9 @@ function ActionTableGroupBtn({ userId, groupId, token }: Props) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
-  
   const deleteUserFromGroupHandler = async () => {
-    console.log(userId, groupId);
     try {
-      const res = await axios.delete(
+      await axios.delete(
         `${API_Backend}/api/groups/${groupId}/users/${userId}`,
         {
           headers: {
@@ -40,7 +38,6 @@ function ActionTableGroupBtn({ userId, groupId, token }: Props) {
           },
         }
       );
-      console.info(res);
 
       toast({
         title: "successfull",
@@ -61,7 +58,8 @@ function ActionTableGroupBtn({ userId, groupId, token }: Props) {
 
   const PROPS_VALUE_ALERT_DELETE: PropsAlertComponent = {
     tilte: "Are you absolutely sure?",
-    description: "You can remove the user from the group by pressing the continue button.",
+    description:
+      "You can remove the user from the group by pressing the continue button.",
     nameFirstBtn: "continue",
     cancelBtn: "cancel",
 
@@ -77,7 +75,7 @@ function ActionTableGroupBtn({ userId, groupId, token }: Props) {
   return (
     <>
       <AlertComponent {...PROPS_VALUE_ALERT_DELETE} />
-      
+
       <DropdownMenu>
         <DropdownMenuTrigger>
           <MoreHorizontal size={22} />

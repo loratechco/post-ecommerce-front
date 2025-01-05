@@ -14,7 +14,7 @@ const getCountryData = async () => {
     });
     return { res: await data.json() };
   } catch (error) {
-    console.error("country data has a problem");
+    console.error("country data has a problem",error);
     return { res: null };
   }
 };

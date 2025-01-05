@@ -12,6 +12,7 @@ interface ErrorToastProps {
 //(errorMessagesArray) This should be given an array of errors with string indices
 const ErrorToast: React.FC<ErrorToastProps> = ({ errorMessagesArray, dependency, dependencyOption = null }) => {
     const { toast } = useToast();
+    const dependencyValue = dependencyOption ?? null;
     useEffect(() => {
         const errorMsg = errorMessagesArray.find((error) => error);
 
@@ -23,7 +24,7 @@ const ErrorToast: React.FC<ErrorToastProps> = ({ errorMessagesArray, dependency,
                 className: "bg-red-300 text-red-950 border-none",
             });
         }
-    }, [dependency, toast, dependencyOption]);
+    }, [dependency, toast, dependencyValue, errorMessagesArray]);
 
     return null;
 };

@@ -10,7 +10,6 @@ import { PlusIcon } from "lucide-react"
 import { RiAppleLine, RiBankCardLine, RiPaypalLine } from "@remixicon/react"
 import { z } from "zod"
 import { toast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
 
 const walletSchema = z.object({
     amount: z.number().min(1),

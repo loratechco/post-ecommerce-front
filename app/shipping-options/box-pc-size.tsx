@@ -20,7 +20,6 @@ function BoxPcSize({
   courierName,
   estimatedDelivery,
   departureDate,
-  services,
   price,
 }: ShippingCardProps) {
   return (
@@ -41,7 +40,13 @@ function BoxPcSize({
         </li>
 
         <li className="centerize-flex flex-col gap-2">
-          <Image src={courierLogo} alt="company" width={60} height={40} />
+          <Image
+            src={courierLogo}
+            alt="company"
+            width={60}
+            height={40}
+            priority={true}
+          />
           <p className="text-zinc-500 text-sm w-24 text-center">
             {courierName}
           </p>

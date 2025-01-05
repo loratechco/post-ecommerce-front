@@ -1,49 +1,52 @@
-"use client"
+"use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+  // CollapsibleContent,
+  // CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
+  // SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
+  // SidebarMenuSub,
+  // SidebarMenuSubButton,
+  // SidebarMenuSubItem,
+} from "@/components/ui/sidebar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon: LucideIcon
-    isActive?: boolean
-  }[]
+    title: string;
+    url: string;
+    icon: LucideIcon;
+    isActive?: boolean;
+  }[];
 }) {
   const path = usePathname();
   return (
-    <SidebarGroup >
+    <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
-              <SidebarMenuButton asChild tooltip={item.title}
+              <SidebarMenuButton
+                asChild
+                tooltip={item.title}
                 className={cn(
-                  'hover:bg-zinc-200',
-                  path === item.url && 'bg-zinc-200 text-zinc-900'
-                )}>
+                  "hover:bg-zinc-200",
+                  path === item.url && "bg-zinc-200 text-zinc-900"
+                )}
+              >
                 <Link href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
@@ -54,5 +57,5 @@ export function NavMain({
         ))}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

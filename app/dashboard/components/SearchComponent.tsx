@@ -25,7 +25,7 @@ function SearchComponent({ className, children, delay = 1000 }: Props) {
     );
 
     return () => clearTimeout(timeOutId);
-  }, [searchValue, router]);
+  }, [searchValue, router, path, delay]);
 
   return (
     <div className="pt-5 w-full flex max-md:flex-col justify-between  gap-y-4 items-center">

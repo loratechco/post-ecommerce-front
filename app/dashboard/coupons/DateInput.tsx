@@ -12,7 +12,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { DateRange } from "react-day-picker"
 
 const today = new Date();
@@ -28,7 +27,7 @@ export function DatePickerInput({getDate}:{getDate:(value:object)=>void}) {
     to: addDays(new Date(nowYear||2024, 0, 20), 20),
   })
 
-  useEffect(()=>getDate(date as DateRange),[date])
+  useEffect(()=>getDate(date as DateRange),[date,getDate])
 
   return (
     <Popover >

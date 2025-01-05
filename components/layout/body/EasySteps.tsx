@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -47,7 +46,7 @@ function EasySteps() {
     <section className="space-y-12">
       <div className=" space-y-5">
         <h2 className="section-title">
-          Online shipping? It's very simple on Spedire.com
+          Online shipping? It&#39;s very simple on Spedire.com
         </h2>
         <p className="section-description">
           To ship online throughout Italy or abroad you need a PC or Smartphone

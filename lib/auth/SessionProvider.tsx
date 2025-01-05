@@ -2,7 +2,7 @@
 
 import { createContext } from "react";
 
-export const SessionContext = createContext<string | null | undefined>(
+export const SessionContext = createContext<any>(
     undefined
 );
 

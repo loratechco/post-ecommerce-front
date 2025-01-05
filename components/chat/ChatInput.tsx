@@ -1,5 +1,5 @@
 "use client"
-import { forwardRef, memo, useRef } from 'react'
+import { forwardRef, memo } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send } from 'lucide-react'

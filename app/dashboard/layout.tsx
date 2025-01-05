@@ -4,9 +4,8 @@ import {
     SidebarInset,
     SidebarProvider,
 } from "@/components/ui/sidebar"
-import Skeleton from "./components/Skeleton"
 import HeaderDasboard from "./components/Header"
-import React, { Suspense } from "react"
+import React from "react"
 
 // import { Suspense } from "react"
 
@@ -21,7 +20,7 @@ function DashboardLayout({
 
                 <AppSidebar />
 
-                <SidebarInset>
+                <SidebarInset className="">
                     <HeaderDasboard />
                     {/* <Suspense fallback={<Skeleton />}> */}
                     <section className="px-4">

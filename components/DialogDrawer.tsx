@@ -21,8 +21,6 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import FormInput from "./FormInput"
 
 interface ProfileFormProps extends React.ComponentProps<"form"> {
@@ -34,10 +32,11 @@ interface ProfileFormProps extends React.ComponentProps<"form"> {
         placeholder?: string;
     }[];
     register: any;
-    errors: any;
+    errors?: any;
 }
 
 function ProfileForm({ className, onSubmit, fields, register, errors }: ProfileFormProps) {
+    console.error(errors);
     return (
         <form onSubmit={onSubmit} className={cn("grid items-start gap-4", className)}>
             {fields.map((field) => (
@@ -75,13 +74,13 @@ export function DrawerDialogAddUser({ onSubmit, fields, register, errors }: Draw
         return (
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
-                    <Button variant="outline">ایجاد کاربر جدید</Button>
+                    <Button variant="outline">creat new user</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                     <DialogHeader>
-                        <DialogTitle>ایجاد کاربر جدید</DialogTitle>
+                        <DialogTitle>creat new user</DialogTitle>
                         <DialogDescription>
-                            لطفا اطلاعات کاربر جدید را وارد کنید
+                            please enter the user&apos;s information
                         </DialogDescription>
                     </DialogHeader>
                     <ProfileForm
@@ -104,7 +103,7 @@ export function DrawerDialogAddUser({ onSubmit, fields, register, errors }: Draw
                 <DrawerHeader className="text-left">
                     <DrawerTitle>Create new user</DrawerTitle>
                     <DrawerDescription>
-                        Make changes to your profile here. Click save when you're done.
+                        Make changes to your profile here. Click save when you&apos;re done.
                     </DrawerDescription>
                 </DrawerHeader>
                 <ProfileForm

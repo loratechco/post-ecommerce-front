@@ -6,12 +6,12 @@ import AuthBtn from "@/app/(auth)/components/AuthBtn";
 import Link from "next/link";
 import AuthInput from "@/components/FormInput";
 // this is token context
-import { useSession } from "@/lib/auth/useSession";
 import useSignUp from "./useSignUp";
-import { SignUpFormData, SignUpSchema } from "./schema";
+import { SignUpFormData } from "./schema";
 import axios from "axios";
-import ErrorToast from "../../../components/ErrorToast";
+import ErrorToast from "@/components/ErrorToast";
 import { useEffect, useState } from "react";
+import { API_Backend } from "@/hooks/use-fetch";
 
 function SignUp() {
 
@@ -26,7 +26,7 @@ function SignUp() {
 
         try {
             const res = await axios.post(
-                "http://app.api/api/register",
+               `${API_Backend}/api/register`,
                 { email, password, name, password_confirmation }
             );
 

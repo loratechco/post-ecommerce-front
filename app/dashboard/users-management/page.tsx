@@ -5,14 +5,11 @@ import { Button } from "@/components/ui/button";
 import { MyDatatTable } from "../components/my-data-table/my-data-table";
 import getToken, { GetSession } from "@/lib/auth/getSession";
 import { getData } from "@/app/actions/apiHandler";
+import { UserData } from "@/app/types/api-data";
 
-interface Params {
-  searchParams: {
-    page: string;
-    search: string;
-  };
-}
-export default async function UserListPage({ searchParams }: Params) {
+import { PropsNextPage } from "@/app/types/nextjs-types";
+
+export default async function UserListPage({ searchParams }: PropsNextPage) {
   const { page = "1", search = "" } = await searchParams;
   const { token }: GetSession = JSON.parse((await getToken()) as string);
 
@@ -30,18 +27,17 @@ export default async function UserListPage({ searchParams }: Params) {
         { key: "phone", label: "Phone" },
       ]}
       table={{
-        currentPage: page,
-        tableBodyData: res?.data?.data?.map((item) => ({
+        currentPage: page as string,
+        tableBodyData: res?.data?.data?.map((item:UserData) => ({
           name: item?.name,
-          urlLink:`/dashboard/users-management/${item?.id ||''}`,
+          urlLink: `/dashboard/users-management/${item?.id || ""}`,
           lastName: item?.last_name,
           phone: item?.phone,
           email: item?.email,
-          actions: <UserListDropDown person={item} page={page} token={token} />,
+          actions: <UserListDropDown person={item} page={page as string} token={token} />,
         })),
         customErrorMassage: "There is no data",
       }}
-      
       lastPageForPagination={res?.data?.last_page || 1}
       OptionalComponentNextToInput={
         <Link

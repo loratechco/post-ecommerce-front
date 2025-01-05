@@ -11,7 +11,6 @@ import { LoaderCircleIcon, PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import {
   DataStructureCountry,
-  Country,
   ProductDetailFormType,
 } from "@/app/types/landing-types";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";
@@ -23,14 +22,9 @@ import {
 import useSearchCitysLogic from "./use-search-citys-logic";
 import { API_Backend } from "@/hooks/use-fetch";
 import axios from "axios";
-import { object } from "zod";
 import CounterySitySelectorListItems from "./country-city-selector-form/country-city-selector-list-items";
-import { useLandingContext } from "@/context/LandingContext";
-import { useRouter } from "next/navigation";
-type GetCitys = { city_name: string; id: number };
 
 export function SelectBox({
-  token,
   countrysData,
 }: {
   token: string;
@@ -98,94 +92,97 @@ export function SelectBox({
 
   const router = useRouter();
 
-  const onSubmit = useCallback(async (data: Record<string, any>) => {
-    let capOrigin = null;
-    let capDestination = null;
-    console.log(data);
-    if (
-      data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
-      data?.countryDestination?.name?.toLowerCase()?.includes("italia")
-    ) {
-      capOrigin = data?.cityOrigin?.cap;
-      capDestination = data?.cityDestination?.cap;
-    }
-
-    const staticData = {
-      nazioneMittente: data?.countryOrigin?.code ?? "",
-      nazioneDestinatario: data?.countryDestination?.code ?? "",
-      capMittente: capOrigin ?? "",
-      cittaMittente: data?.cityOrigin?.city_name ?? "",
-      // provinciaMittente: data?.cityOrigin?.province ?? "",
-      capDestinatario: capDestination ?? "",
-      cittaDestinatario: data?.cityDestination?.city_name ?? "",
-      // provinciaDestinatario: data?.cityDestination?.province ?? "",
-    };
-
-    const keysData = ["height", "width", "depth", "realWeight", "product"];
-
-    const mapKey = (key: string) =>
-      key
-        .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
-        .replace(/height/, "altezza")
-        .replace(/width/, "larghezza")
-        .replace(/depth/, "profondita")
-        .replace(/realWeight/, "pesoReale")
-        .replace(/product/, "packagingType");
-
-    if (!keysData.some((key) => data.hasOwnProperty(`${key}-item-0`))) {
-      console.error(
-        "Missing data for item-0. Ensure the data starts with item-0."
-      );
-      return;
-    }
-
-    const groupedData = Object.entries(data)
-      .filter(([key]) => keysData.some((k) => key.includes(k)))
-      .reduce<Record<string, Record<string, any>>>((acc, [key, value]) => {
-        const match = key.match(/item-(\d+)$/);
-        if (match) {
-          const groupIndex = match[1];
-          if (!acc[groupIndex]) acc[groupIndex] = {};
-          acc[groupIndex][mapKey(key)] = value;
-        }
-        return acc;
-      }, {});
-
-    const colliArray = Object.keys(groupedData)
-      .sort((a, b) => Number(a) - Number(b))
-      .map((key) => groupedData[key]);
-
-    // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
-    const finalData = {
-      ...staticData,
-      colli: colliArray.map((item) => ({
-        ...item,
-        larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
-        packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
-      })),
-    };
-
-    console.log("Final Data to Send:", finalData);
-    try {
-      const res = await axios.post(
-        `${API_Backend}/api/providers/getavailibilities`,
-        finalData
-      );
-      console.log(res);
-      if (res?.data?.avalibles?.length <= 0 || !res) {
-        toast({
-          title: "Unsuccessful",
-          description: "There is no service",
-          className: "toaster-errors",
-        });
-      } else {
-        localStorage.setItem("landing-data", JSON.stringify(res?.data));
-        router.push("/shipping-options");
+  const onSubmit = useCallback(
+    async (data: Record<string, any>) => {
+      let capOrigin = null;
+      let capDestination = null;
+      console.log(data);
+      if (
+        data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
+        data?.countryDestination?.name?.toLowerCase()?.includes("italia")
+      ) {
+        capOrigin = data?.cityOrigin?.cap;
+        capDestination = data?.cityDestination?.cap;
       }
-    } catch (error) {
-      console.error("error=>>>>", error);
-    }
-  }, []);
+
+      const staticData = {
+        nazioneMittente: data?.countryOrigin?.code ?? "",
+        nazioneDestinatario: data?.countryDestination?.code ?? "",
+        capMittente: capOrigin ?? "",
+        cittaMittente: data?.cityOrigin?.city_name ?? "",
+        // provinciaMittente: data?.cityOrigin?.province ?? "",
+        capDestinatario: capDestination ?? "",
+        cittaDestinatario: data?.cityDestination?.city_name ?? "",
+        // provinciaDestinatario: data?.cityDestination?.province ?? "",
+      };
+
+      const keysData = ["height", "width", "depth", "realWeight", "product"];
+
+      const mapKey = (key: string) =>
+        key
+          .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
+          .replace(/height/, "altezza")
+          .replace(/width/, "larghezza")
+          .replace(/depth/, "profondita")
+          .replace(/realWeight/, "pesoReale")
+          .replace(/product/, "packagingType");
+
+      if (!keysData.some((key) => data.hasOwnProperty(`${key}-item-0`))) {
+        console.error(
+          "Missing data for item-0. Ensure the data starts with item-0."
+        );
+        return;
+      }
+
+      const groupedData = Object.entries(data)
+        .filter(([key]) => keysData.some((k) => key.includes(k)))
+        .reduce<Record<string, Record<string, any>>>((acc, [key, value]) => {
+          const match = key.match(/item-(\d+)$/);
+          if (match) {
+            const groupIndex = match[1];
+            if (!acc[groupIndex]) acc[groupIndex] = {};
+            acc[groupIndex][mapKey(key)] = value;
+          }
+          return acc;
+        }, {});
+
+      const colliArray = Object.keys(groupedData)
+        .sort((a, b) => Number(a) - Number(b))
+        .map((key) => groupedData[key]);
+
+      // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
+      const finalData = {
+        ...staticData,
+        colli: colliArray.map((item) => ({
+          ...item,
+          larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
+          packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
+        })),
+      };
+
+      console.log("Final Data to Send:", finalData);
+      try {
+        const res = await axios.post(
+          `${API_Backend}/api/providers/getavailibilities`,
+          finalData
+        );
+        console.log(res);
+        if (res?.data?.avalibles?.length <= 0 || !res) {
+          toast({
+            title: "Unsuccessful",
+            description: "There is no service",
+            className: "toaster-errors",
+          });
+        } else {
+          localStorage.setItem("landing-data", JSON.stringify(res?.data));
+          router.push("/shipping-options");
+        }
+      } catch (error) {
+        console.error("error=>>>>", error);
+      }
+    },
+    [router]
+  );
 
   return (
     <div className="p-5 shadow-md rounded-lg bg-sky-50 w-3/4 max-md:w-11/12 relative">

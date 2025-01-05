@@ -19,7 +19,6 @@ import { PaginationComponent } from "@/components/pagination";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import clsx from "clsx";
 
 interface Props {
   OptionalComponentNextToInput?: ReactNode;

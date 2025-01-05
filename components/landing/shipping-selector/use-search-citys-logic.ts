@@ -1,7 +1,7 @@
 
 import { API_Backend } from "@/hooks/use-fetch";
 import axios from "axios";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 interface Props {
   citySearchData: {
@@ -16,7 +16,7 @@ function useSearchCitysLogic({
   citySearchData,
   dispatch,
 }: Props) {
-  const getCityData = async ({ city, dispatchType }: { city: string, dispatchType: DispatchType }) => {
+  const getCityData = useCallback(async ({ city, dispatchType }: { city: string, dispatchType: DispatchType }) => {
     try {
       const { data } = await axios.get(
         `${API_Backend}/api/cities?${city && `city=${city}`}`
@@ -26,21 +26,21 @@ function useSearchCitysLogic({
     } catch (error) {
       console.error(`Error fetching __${dispatchType}__ city data:`, error);
     }
-  };
+  },[dispatch]);
 
   useEffect(() => {
     getCityData({
       city: citySearchData?.originDebounceCityData,
       dispatchType: "SET_FETCH_RESULT_DATA_ORIGIN_CITY"
     });
-  }, [citySearchData?.originDebounceCityData]);
+  }, [citySearchData?.originDebounceCityData, getCityData]);
 
   useEffect(() => {
     getCityData({
       city: citySearchData?.destinationDebounceCityData,
       dispatchType: "SET_FETCH_RESULT_DATA_DESTINATION_CITY"
     });
-  }, [citySearchData?.destinationDebounceCityData]);
+  }, [citySearchData?.destinationDebounceCityData,getCityData]);
 }
 
 export default useSearchCitysLogic;

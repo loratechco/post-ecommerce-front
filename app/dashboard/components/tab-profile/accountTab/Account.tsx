@@ -81,7 +81,7 @@ function Account() {
         image: userData?.avatar,
       });
     }
-  }, [userData]);
+  }, [userData, reset]);
 
   const onSubmit = async (data: FormData) => {
     const formData = new FormData();
@@ -117,6 +117,7 @@ function Account() {
         className: "toaster-successfuls",
       });
     } catch (error: any) {
+      console.error("Error updating profile:", error);
       toast({
         title: "Unsuccessful",
         description: "Something went wrong. Please try again",
@@ -156,7 +157,7 @@ function Account() {
               placeholder={placeholder}
               type={type}
               nameLabel={nameLabel}
-              register={register(id)}
+              register={register(id as any)}
               className="input-primary w-full"
             />
           ))}

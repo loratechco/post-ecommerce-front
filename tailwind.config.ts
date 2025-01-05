@@ -22,6 +22,7 @@ const config: Config = {
 				'primary-color': '#00A6E4',
 				'secondery-color': '#FF9343',
 				'tertiary-color': '#2ECC71',
+				
 				'toast-bgc-successful': 'var(--toaste-bg-success)',
 				'toast-bgc-error': 'var(--toaste-bg-error)',
 				'toast-txt-color-error': 'var(--toaste-txt-color-error)',

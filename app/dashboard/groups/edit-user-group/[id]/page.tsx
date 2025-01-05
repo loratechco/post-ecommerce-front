@@ -3,22 +3,18 @@ import { MyDatatTable } from "@/app/dashboard/components/my-data-table/my-data-t
 import ErrorToast from "@/components/ErrorToast";
 import getToken, { GetSession } from "@/lib/auth/getSession";
 import ActionTableGroupBtn from "../ActionTableGroupBtn";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Params } from "@/app/types/nextjs-types";
 
-interface Params {
-  params: {
-    id: string;
-  };
-  searchParams: Record<string, string>;
-}
-
-async function GroupEditPge({ searchParams, params }: Params) {
+async function GroupEditPge({
+  searchParams,
+  params,
+}: {
+  params: Params;
+  searchParams: Promise<Record<string, string>>;
+}) {
   const { id: groupId = "" } = await params;
   const { page: currentPage = "1", search } = await searchParams;
-  const { initData, token } = JSON.parse(
-    (await getToken()) as string
-  ) as GetSession;
+  const { token } = JSON.parse((await getToken()) as string) as GetSession;
 
   const {
     res: {
@@ -46,7 +42,6 @@ async function GroupEditPge({ searchParams, params }: Params) {
     ),
   }));
 
-  console.log(data);
   return (
     <>
       <ErrorToast

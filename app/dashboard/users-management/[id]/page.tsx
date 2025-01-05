@@ -1,13 +1,7 @@
-import { string } from "zod";
+import { PropsNextPage } from "@/app/types/nextjs-types";
 import TabsListProfile from "./tab-profile/TabsList";
 
-interface Props {
-    params: {
-        id: string
-    }
-}
-
-async function EditePofile({ params }: Props) {
+async function EditePofile({ params }: PropsNextPage) {
     const { id } = await params;
     return (
         <TabsListProfile userId={id} />

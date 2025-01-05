@@ -1,9 +1,6 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DatePickerInput } from "./DateInput";
-import { memo, ReactNode } from "react";
-import { Input } from "@/components/ui/input";
-import InputNumber from "../components/input-number";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {  ReactNode } from "react";
 
 function TabDemo({
   currentTabs,

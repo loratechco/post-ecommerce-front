@@ -2,7 +2,9 @@
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { UserData } from "@/app/types/api-data";
+import { User2Icon } from "lucide-react";
 
 /**
  * Custom hook for managing profile image upload and preview
@@ -25,7 +27,7 @@ export function useUploadImg({
 }: {
   sizeFile?: number;
   className?: string;
-  userData: any;
+  userData: UserData;
   API_IMG_URL: string;
   thereAvatar: true | false;
   fileSubmit: (file: File) => void;
@@ -90,21 +92,30 @@ export const AvatarPreview = ({
   userData,
   API_IMG_URL,
   className,
-  initialAvatar = "https://github.com/shadcn.png",
 }: AvatarPreviewProps) => {
   console.log(`${API_IMG_URL} / ${userData?.avatar}`);
 
-  const initialSrc = () => {
-    if (!userData?.avatar) return initialAvatar;
-    return `${API_IMG_URL}/${userData?.avatar}`;
-  };
-
+  const [initialSrc, setInitialSrc] = useState(false);
+  useEffect(() => {
+    if (userData?.avatar) {
+      setInitialSrc(true);
+    }
+  }, [userData?.avatar]);
   return (
-    <Avatar className={cn("cursor-pointer relative z-0 size-full bg-zinc-200", className)}>
-      <AvatarImage
-        src={`${avatarPreview || initialSrc()}`}
-        className="object-cover"
-      />
+    <Avatar
+      className={cn(
+        "cursor-pointer relative z-0 size-full bg-zinc-200",
+        className
+      )}
+    >
+      {initialSrc ? (
+        <AvatarImage
+          src={avatarPreview || `${API_IMG_URL}${userData?.avatar}`}
+          className="object-cover"
+        />
+      ) : (
+        <User2Icon className="size-11/12 text-zinc-800 p-1 mx-auto" />
+      )}
     </Avatar>
   );
 };

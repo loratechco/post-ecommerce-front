@@ -6,7 +6,7 @@ const PERMISSION_COOKIE_NAME = 'USER_PERMISSIONS';
 
 type RefreshPermissionResponse = {
     success: boolean;
-    data: any | null;
+    data: any;
     error?: string;
 }
 

@@ -1,7 +1,6 @@
 "use client";
 import FormInput from "@/components/FormInput";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -9,18 +8,15 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import ErrorToast from "@/components/ErrorToast";
 import React, { useEffect, useState } from "react";
-import useImagePreview from "./useImagePrwie";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import formSchema from "./schemaEditProfile";
 
-import { getUserAccount } from "./useFetch"; // وارد کردن تابع getUserAccount
-import { useSession } from "@/lib/auth/useSession"; // وارد کردن useSession
 import { toast } from "@/hooks/use-toast";
-import { useImageUpload } from "@/app/dashboard/components/tab-profile/accountTab/useImagePrwie";
 import { useUploadImg } from "@/app/dashboard/components/tab-profile/accountTab/useUploadImg";
 import { API_Backend } from "@/hooks/use-fetch";
+import { UserData } from "@/app/types/api-data";
 
 const formFields = [
   { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -49,8 +45,8 @@ const formFields = [
 function Account({ userId, userToken }: { userId: string; userToken: string }) {
   const [switchState, setSwitchState] = useState<boolean>(false);
   const [fetchError, setFetchError] = useState<null | string>(null);
-  const [userData, setUserData] = useState<[] | Promise<void> | null>([]);
-  const [fileSaver, setFileSaver] = useState(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [fileSaver, setFileSaver] = useState<File | null>(null);
 
   useEffect(() => setFetchError(null), [fetchError]);
 
@@ -71,17 +67,16 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       confirmation: "",
     },
   });
-  
 
   // get user data
   useEffect(() => {
     if (userId === "create-user") {
-      setUserData([]);
+      setUserData(null);
       return;
     }
     const getUser = async () => {
       try {
-        const { data } = await axios.get(`http://app.api/api/users/${userId}`, {
+        const { data } = await axios.get(`${API_Backend}/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${userToken}`,
           },
@@ -95,10 +90,12 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
         reset({
           ...data?.data,
         });
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      }
     };
     getUser();
-  }, []);
+  }, [userId, userToken, reset]);
 
   const idCondition = userId.includes("create-user");
 
@@ -145,7 +142,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       console.info(error);
       const errorMessage = Object.values(error?.response?.data?.errors || {})
         .flat()
-        .find((message: string) => typeof message === "string");
+        .find((message): message is string => typeof message === "string");
 
       console.log(
         "error?.response ==>",
@@ -155,14 +152,11 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       );
       toast({
         title: "Error",
-        // نمایش اولین پیام خطا در toast
         description: (errorMessage as string) || "Error updating profile",
         className: "bg-red-300 text-red-950 font-semibold",
       });
     }
   };
-
-  console.log(userData?.data?.avatar);
 
   return (
     <>
@@ -189,7 +183,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
             sizeFile: 1,
             API_IMG_URL: API_Backend,
             thereAvatar: true,
-            userData: userData as any,
+            userData: userData as UserData,
             fileSubmit: (file: File) => setFileSaver(file),
           })}
         </div>

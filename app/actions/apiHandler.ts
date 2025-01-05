@@ -23,7 +23,7 @@ export const getData = async (
 ): Promise<{
     res: any;
     errorMessage: string | null;
-} | undefined> => {
+} | any> => {
     try {
         const endpointResult = checkeEndPoint(endpoint);
         if (!endpointResult.ok) return;

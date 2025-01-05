@@ -18,9 +18,7 @@ import {
 } from "@/components/ui/popover";
 
 import {
-  DataStructureCountry,
   Country,
-  ProductDetailFormType,
 } from "@/app/types/landing-types";
 import Flag from "react-world-flags";
 import { useDebounce } from "@/hooks/use-debounce";
@@ -54,7 +52,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
 
   const [cityValue, setCityValue] = useState<string>("");
   const debounceValue = useDebounce(cityValue, 1500);
-  useEffect(() => getSearchCityValue(debounceValue), [debounceValue]);
+  useEffect(() => getSearchCityValue(debounceValue), [debounceValue, getSearchCityValue]);
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">

@@ -1,7 +1,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -19,7 +18,7 @@ function SideBar() {
         <AlignJustify />
       </SheetTrigger>
       <SheetContent className="bg-sky-200 p-0 !border-none" side={'left'}>
-        <SheetTitle className="sr-only">Sidebar contet</SheetTitle>
+        <SheetTitle className="sr-only">Sidebar content</SheetTitle>
         <SheetHeader className=" text-start">
           <div className="w-full h-32 overflow-hidden">
             <Image

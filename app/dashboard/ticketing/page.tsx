@@ -17,22 +17,6 @@ const dateConvert = (date: string) => {
   return format(new Date(date), "yyyy/MM/dd HH:mm:ss");
 };
 
-// type BadgeStatus = "open" | "pending" | "closed";
-
-const badgeChecker = (badgeStatus: BadgeStatus) => {
-  switch (badgeStatus) {
-    case "open":
-      return "bg-emerald-600 hover:bg-emerald-700";
-    case "pending":
-      return "bg-yellow-600 hover:bg-yellow-700";
-    case "closed":
-      return "bg-red-600 hover:bg-red-700";
-    default:
-      "bg-zinc-600 hover:bg-zinc-700";
-      break;
-  }
-};
-
 enum StatusBadg {
   open = "bg-emerald-600 hover:bg-emerald-700",
   pending = "bg-yellow-600 hover:bg-yellow-700",

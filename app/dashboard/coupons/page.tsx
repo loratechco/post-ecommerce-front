@@ -1,16 +1,8 @@
-import getSession from "@/lib/auth/getSession";
 
+import { UserData } from "@/app/types/api-data";
 import { MyDatatTable } from "../components/my-data-table/my-data-table";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import CreateNewCoupen from "./CreatNewCoupen";
-
 export default async function CouponsPage() {
-  const session = await getSession();
-
-  const { token } = JSON.parse(session as string);
-
-  const groups = { data: [] };
   return (
      <>
      {/* <ErrorToast 
@@ -25,12 +17,12 @@ export default async function CouponsPage() {
         ]}
         table={{
           currentPage: "1",
-          tableBodyData: []?.map((item) => ({
+          tableBodyData: []?.map((item: UserData) => ({
             name: item?.name,
             lastName: item?.last_name,
             phone: item?.phone,
             email: item?.email,
-          })),
+          }) as any),
           customErrorMassage: "There is no data",
         }}
         lastPageForPagination={1}

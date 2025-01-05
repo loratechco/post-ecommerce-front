@@ -35,29 +35,33 @@ function CreateNewGroup({ token }: { token: string }) {
     resolver: zodResolver(schemaEditGroupAndCreatGroup),
   });
 
-  const sumbitHandler = useCallback(async (data: Submit) => {
-    try {
-      const res = await axios.post(`${API_Backend}/api/groups`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  const sumbitHandler = useCallback(
+    async (data: Submit) => {
+      try {
+        await axios.post(`${API_Backend}/api/groups`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
-      toast({
-        className: "bg-green-300 text-green-950 border-none",
-        title: "Successful",
-        description: "Your group was temporarily registered",
-      });
-      reset();
-      router.refresh();
-    } catch (error) {
-      toast({
-        className: "bg-red-300 text-red-950 border-none z-50",
-        title: "Unsuccessful",
-        description: "The group could not be registered",
-      });
-    }
-  }, [token]);
+        toast({
+          className: "bg-green-300 text-green-950 border-none",
+          title: "Successful",
+          description: "Your group was temporarily registered",
+        });
+        reset();
+        router.refresh();
+      } catch (error) {
+        console.error(error);
+        toast({
+          className: "bg-red-300 text-red-950 border-none z-50",
+          title: "Unsuccessful",
+          description: "The group could not be registered",
+        });
+      }
+    },
+    [token, reset, router]
+  );
 
   return (
     <div className="z-40 relative">

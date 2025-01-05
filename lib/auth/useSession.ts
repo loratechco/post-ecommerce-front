@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { SessionContext } from "./SessionProvider";
 
-export function useSession() {
+export function useSession(): { token: string } {
   const session = useContext(SessionContext);
 
   if (session === undefined)

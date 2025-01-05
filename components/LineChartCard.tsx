@@ -1,15 +1,10 @@
 "use client"
-
-import { TrendingUp } from "lucide-react"
+// import { TrendingUp } from "lucide-react"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
 
 import {
     Card,
     CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card"
 import {
     ChartConfig,
@@ -32,11 +27,11 @@ interface LineChartCardProps {
 }
 
 export function LineChartCard({
-    title,
-    description,
+    // title,
+    // description,
     data,
     config,
-    trendingPercentage = 5.2,
+    // trendingPercentage = 5.2,
     // footerText = "Showing total visitors for the last 6 months"
 }: LineChartCardProps) {
     return (

@@ -10,16 +10,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { FormProvider, useForm } from "react-hook-form";
-import FormInput from "@/components/FormInput";
 import { FormControl, FormField, FormItem } from "@/components/ui/form";
-import axios from "axios";
-import { API_Backend } from "@/hooks/use-fetch";
-import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { randomCodeGenerator } from "@/lib/randomGeneratCode";

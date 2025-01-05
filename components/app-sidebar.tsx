@@ -21,34 +21,27 @@ import {
 import { signOut } from "@/lib/auth/logOut"
 // import Link from "next/link"
 import ProfileUser from "@/app/dashboard/components/ProfileBadge"
-import { Session } from "inspector/promises"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
 import dataNavMain from "@/app/dashboard/components/dataNavbarDashoard"
 
 const BASE_ROUTE = '/dashboard'
 const data = dataNavMain(BASE_ROUTE)
-interface Props {
-  userData: Session;
-}
 
-export function AppSidebar({ userData }: Props) {
+export function AppSidebar() {
 
   return (
     <Sidebar variant="inset"
-      className={`h-full`}
+      className='h-full'
     >
-      <ScrollArea className="flex-1">
+      <ScrollArea className="flex-1 ">
         <Link href="/dashboard/profile" className="bg-transparent">
           <SidebarHeader className=" rounded-md h-14 hover:bg-gray-200 hover:text-black overflow-hidden">
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton size="lg" asChild>
 
-                  <ProfileUser userData={userData} />
+                  <ProfileUser />
 
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -56,7 +49,7 @@ export function AppSidebar({ userData }: Props) {
           </SidebarHeader>
         </Link>
 
-        <SidebarContent>
+        <SidebarContent className="">
           <NavMain items={data?.navMain} />
           {/* <NavProjects projects={data.projects} /> */}
           {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}

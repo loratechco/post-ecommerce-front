@@ -55,7 +55,7 @@ export default function ChangePassword() {
         duration: 3000,
         className: "bg-green-400 text-green-950",
       });
-    } catch (error) {
+    } catch (error:any) {
       toast({
         description: error?.response?.data?.message,
         duration: 3000,
@@ -80,7 +80,7 @@ export default function ChangePassword() {
             id={field?.id}
             type="password"
             nameLabel={field?.nameLabel}
-            register={register(field?.id)}
+            register={register(field?.id as "oldPassword" | "newPassword" | "confirmation")}
             className="border-none"
             placeholder="least 6 characters long"
             classNameParentPasswordInput="w-full lg:w-1/2"

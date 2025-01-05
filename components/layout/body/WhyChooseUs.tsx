@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import IconsCustomSvg from "@/public/Icons-custom-svg";
 import Image from "next/image";
 import Link from "next/link";
 

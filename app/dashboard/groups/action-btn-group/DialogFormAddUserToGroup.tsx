@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,7 +46,6 @@ function DialogFormAddUserToGroup({
   //get user list data
   const {
     data: userListData = [],
-    errorMessage,
     loading,
   } = useGEt({
     endpoint: `api/users/group/${groupId}?page=${pageUserListAlert}`,
@@ -94,7 +94,7 @@ function DialogFormAddUserToGroup({
   };
 
   const returnUsersNotAddedToGroup: [] =
-    userListData?.users.filter((person: object) => !person?.inGroup ) || [];
+    userListData?.users.filter((person: any) => !person?.inGroup ) || [];
 
   return (
     <Dialog
@@ -119,7 +119,7 @@ function DialogFormAddUserToGroup({
               <ScrollArea>
                 <div className="w-full py-3 max-sm:divide-y divide-zinc-300 *:py-5 max-h-64 *:flex *:w-full *:items-center *:gap-3">
                   {returnUsersNotAddedToGroup?.length > 0 ? (
-                    returnUsersNotAddedToGroup?.map((person: object) => (
+                    returnUsersNotAddedToGroup?.map((person: any) => (
                       <FormField
                         key={person?.id}
                         control={form.control}

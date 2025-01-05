@@ -1,11 +1,4 @@
-import {
-  CalendarIcon,
-  HomeIcon,
-  PrinterIcon,
-  Package,
-  Truck,
-  Lock,
-} from "lucide-react";
+import { PrinterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,7 +7,6 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import Image from "next/image";
-import { LandingDataStructure } from "@/app/types/landing-types";
 import { memo } from "react";
 
 type Service = {
@@ -55,8 +47,9 @@ function ShippingCard({
         <div className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-4 border-b pb-4">
           <div className="centerize-flex gap-2 flex-col">
             <Image
-              src={`https://betaspedire.b-cdn.net/imgs/courier_logos/${courierLogo}`}
+              src={`${courierLogo}`}
               alt={`${courierName} image-company`}
+              priority={true}
               width={120}
               height={90}
             />
@@ -91,9 +84,7 @@ function ShippingCard({
             </span>
 
             <div className="space-y-2 text-sm">
-              <div className="text-muted-foreground">
-                Departure date:
-              </div>
+              <div className="text-muted-foreground">Departure date:</div>
               <div className="">{departureDate}</div>
             </div>
           </div>
@@ -136,4 +127,4 @@ function ShippingCard({
   );
 }
 
-  export default memo(ShippingCard);
+export default memo(ShippingCard);

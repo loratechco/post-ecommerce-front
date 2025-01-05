@@ -1,5 +1,4 @@
 "use client"
-import { usePathname } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card"
 import AuthCardheader from "@/app/(auth)/components/AuthCardHeader"
 import AuthToggle from "@/app/(auth)/components/AuthToggle "
@@ -8,7 +7,7 @@ import AuthInput from "@/components/FormInput";
 
 import { useForm } from "react-hook-form";
 function ForgotPassword() {
-    const { register, handleSubmit } = useForm();
+    const { register} = useForm();
 
     return (
         <Card className="mx-auto !border-zinc-400 max-w-screen-md max-sm:min-w-72 sm:min-w-96 ">
