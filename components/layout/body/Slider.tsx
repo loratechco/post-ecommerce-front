@@ -10,18 +10,17 @@ import Autoplay from "embla-carousel-autoplay";
 
 
 const CAROUSEL_DATA = [
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/ups.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
-  "https://betaspedire.b-cdn.net/imgs/courier_logos/poste.svg",
+  "/pic/ups.svg",
+  "/pic/ups.svg",
+  "/pic/poste.svg",
+  "/pic/poste.svg",
+  "/pic/ups.svg",
+  "/pic/poste.svg",
+  "/pic/ups.svg",
+  "/pic/poste.svg",
+  "/pic/ups.svg",
+  "/pic/poste.svg",
+  "/pic/poste.svg",
 ];
 
 function Slider() {

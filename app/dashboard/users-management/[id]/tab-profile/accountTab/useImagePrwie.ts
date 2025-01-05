@@ -30,7 +30,7 @@ function useImagePreview(fileInput: (FileList | null), maxSizeMB = 1): ImageData
 
         return () => {
             if (fileInput && fileInput[0]) {
-                URL.revokeObjectURL(fileInput[0]);
+                URL.revokeObjectURL(fileInput[0] as any);
             }
         };
     }, [fileInput, maxSizeMB]);

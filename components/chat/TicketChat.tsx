@@ -7,6 +7,7 @@ import { sendMessage } from "@/app/actions/chatTicketing";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
 import ChatInput from "./ChatInput";
+import { API_Backend } from "@/hooks/use-fetch";
 
 type Message = {
   user_id: string;
@@ -116,7 +117,7 @@ export default function TicketChat({
                 )}
               >
                 <Avatar className="size-8">
-                  <AvatarImage src={`http://app.api/${avatar}`} />
+                  <AvatarImage src={`${API_Backend}/${avatar}`} />
                   <AvatarFallback>
                     {sender.slice(2, 0).toUpperCase() || "N"}
                   </AvatarFallback>

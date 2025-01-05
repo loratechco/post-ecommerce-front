@@ -18,9 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import {
-  Country,
-} from "@/app/types/landing-types";
+import { Country } from "@/app/types/landing-types";
 import Flag from "react-world-flags";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useEffect, useState } from "react";
@@ -30,7 +28,12 @@ interface CountryCitySelectorProps {
   hookForm: any;
   countryName: string;
   cityName: string;
-  cityData: { city_name: string; id: number; cap?: string }[];
+  cityData: {
+    city_name: string;
+    id: number;
+    cap?: string;
+    province?: string;
+  }[];
   selectedCountry: (value: string) => void;
   getSearchCityValue: (searchValue: string) => void;
   disabled?: boolean;
@@ -66,7 +69,8 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
         name={countryName}
         render={({ field }) => (
           <FormItem className="w-1/2">
-            <Popover open={closeCountry}
+            <Popover
+              open={closeCountry}
               onOpenChange={(isOpen) => setCloseCountry(isOpen)}
             >
               <PopoverTrigger asChild>
@@ -107,11 +111,11 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                           onSelect={() => {
                             selectedCountry(countrie?.name);
                             hookForm.setValue(countryName, countrie);
-                            setCloseCountry(false)
+                            setCloseCountry(false);
                           }}
                         >
                           <Flag code={countrie?.code} width={23} height={23} />
-                          {countrie.name}
+                          {countrie?.name}
                           <Check
                             data-active={countrie.name === field.value?.name}
                             className="ml-auto opacity-0  transition-opacity data-[active=true]:opacity-100"
@@ -133,7 +137,10 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
         name={cityName}
         render={({ field }) => (
           <FormItem className="bg-zinc-300 flex flex-col w-1/2 ">
-            <Popover open={closeCity} onOpenChange={(isOpen) => setCloseCity(isOpen)}>
+            <Popover
+              open={closeCity}
+              onOpenChange={(isOpen) => setCloseCity(isOpen)}
+            >
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
@@ -145,19 +152,36 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     className="w-full justify-between py-5 rounded-none data-[muted=true]:text-muted-foreground max-sm:text-xs"
                   >
                     <div className="overflow-hidden text-ellipsis">
-                      {!disabled && (
+                      {(!disabled && (
                         <>
                           {cityData?.find(
-                            (city) => city?.city_name === field.value?.city_name || city?.cap === field.value?.cap
+                            (city) =>
+                              city?.city_name === field.value?.city_name ||
+                              city?.cap === field.value?.cap
                           )?.city_name || "Select the city"}
-                          <span className="text-xs text-zinc-500 block text-start">
-                            {cityData?.find(
-                              (city) =>
-                                city?.city_name === field.value?.city_name || city?.cap === field.value?.cap
-                            )?.cap}
-                          </span>
+                          <div className="flex items-center justify-start gap-2">
+                            <span className="text-xs text-zinc-500 block text-start">
+                              {
+                                cityData?.find(
+                                  (city) =>
+                                    city?.city_name ===
+                                      field.value?.city_name ||
+                                    city?.cap === field.value?.cap
+                                )?.cap
+                              }
+                            </span>
+                            <span className="text-xs text-zinc-500 block text-start">
+                              {
+                                cityData?.find(
+                                  (city) =>
+                                    city?.city_name === field.value?.city_name
+                                )?.province
+                              }
+                            </span>
+                          </div>
                         </>
-                      ) || "Select the city"}
+                      )) ||
+                        "Select the city"}
                     </div>
 
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -169,8 +193,8 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                   <CommandInput
                     placeholder="Search language..."
                     onValueChange={(value) => {
-                      setCityValue(value)
-                      console.info(field.value, cityData)
+                      setCityValue(value);
+                      console.info(field.value, cityData);
                     }}
                   />
                   <CommandList className="max-h-48">
@@ -184,11 +208,16 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                           key={city?.city_name + String(key)}
                           onSelect={() => {
                             hookForm.setValue(cityName, disabled ? "" : city);
-                            setCloseCity(false)
+                            setCloseCity(false);
                           }}
                         >
-                          {city?.city_name}
-                          <span className="text-zinc-500 text-xs">{city?.cap}</span>
+                          <p>{city?.city_name}</p>
+                          <span className="text-zinc-500 text-xs">
+                            {city?.cap}
+                          </span>
+                          <span className="text-zinc-500 text-xs">
+                            {city?.province}
+                          </span>
                           <Check
                             data-active={city?.city_name === field?.value}
                             className="ml-auto opacity-0 transition-opacity data-[active=true]:opacity-100"

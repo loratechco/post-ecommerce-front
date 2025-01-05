@@ -1,5 +1,5 @@
-import AuthInput from "./AuthInput";
-import AuthBtn from "../../app/(auth)/components/AuthBtn";
+import AuthInput from "@/components/FormInput";
+import AuthBtn from "@/app/(auth)/components/AuthBtn";
 import Link from "next/link";
 
 interface Props {
@@ -8,8 +8,6 @@ interface Props {
 }
 
 function AuthForm({ path, titleBtn }: Props) {
-
-
 
     return (
         <div className="grid gap-4">

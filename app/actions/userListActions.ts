@@ -13,11 +13,11 @@ const userListFetch = async ({ pageQuery = '', query = '', token }: { pageQuery?
 
         return { success: true, data: data.data, error: null };
 
-    } catch (error) {
+    } catch (error:any) {
         return {
             success: false,
             data: [],
-            error: error?.message || 'خطا در دریافت لیست کاربران'
+            error: error?.message || 'Error in receiving user list'
         };
     }
 }
@@ -37,11 +37,11 @@ const handleDelete = async ({ id, pageQuery, token }: { id: string, pageQuery: s
         if (!res.ok) {
             return {
                 success: false,
-                error: data.message || 'خطا در حذف کاربر'
+                error: data.message || 'Error in delete user list'
             };
         }
 
-        const updatedList = await userListFetch({ pageQuery });
+        const updatedList = await userListFetch({ pageQuery, token });
 
         console.log(updatedList.data.data);
         return {
@@ -52,7 +52,7 @@ const handleDelete = async ({ id, pageQuery, token }: { id: string, pageQuery: s
         console.log("🚀 ~ handleDelete ~ error:", error);
         return {
             success: false,
-            error: error.message || 'خطا در حذف کاربر'
+            error: error.message || 'Error in delete user list'
         };
     }
 }

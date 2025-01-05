@@ -134,7 +134,7 @@ body {
     @apply text-xl max-md:text-base text-zinc-800;
   }
   .btn-perimary{
-    @apply transition-colors duration-150 rounded-lg bg-primary-color px-7 py-5 hover:bg-sky-400 text-base text-white font-semibold h-12 !important;
+    @apply transition-colors duration-150 rounded-lg bg-primary-color px-7 py-5 hover:bg-primary-color/85 text-base text-white font-semibold h-12 !important;
   }
 
 }

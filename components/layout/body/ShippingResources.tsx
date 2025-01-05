@@ -3,7 +3,7 @@ const SHIPPING_GUIDE_DATA = [
     title: "What You Can Ship",
     content:
       "Before booking your shipment online, we recommend checking what items can be shipped online.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/cosa-spedire.jpg",
+    icon: "/pic/cosa-spedire.jpg",
     button: {
       label: "Learn More",
       href: "#",
@@ -13,7 +13,7 @@ const SHIPPING_GUIDE_DATA = [
     title: "Packaging Guide",
     content:
       "Proper packaging is essential to prepare your package before handing it over to the courier and ensuring the safety of your shipment.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/imballaggio.jpg",
+    icon: "/pic/imballaggio.jpg",
     button: {
       label: "Learn More",
       href: "#",
@@ -23,7 +23,7 @@ const SHIPPING_GUIDE_DATA = [
     title: "The Spedire.com Blog",
     content:
       "We select everything that could help you organize your shipments in Italy or abroad. The best rates, solutions, couriers, exclusive guides, and much more!",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/blog-small.jpg",
+    icon: "/pic/blog-small.jpg",
     button: {
       label: "Learn More",
       href: "#",
@@ -53,7 +53,7 @@ function ShippingResources() {
       </div>
 
       <div className=" *:shadow-none *:border-none grid grid-cols-3 max-md:grid-cols-1 gap-x-3 max-md:space-y-12">
-        {SHIPPING_GUIDE_DATA.map((items, Key) => (
+        {SHIPPING_GUIDE_DATA?.map((items, Key) => (
           <Card key={Key} className="">
             <CardHeader className="p-0 rounded-lg overflow-hidden max-h-64">
               <Image
@@ -61,16 +61,15 @@ function ShippingResources() {
                 alt={items?.title.toLowerCase()}
                 width={500}
                 height={500}
-                className="size-full object-cover"
                 loading="lazy"
-                priority={false}
+                className="size-full object-cover"
               />
             </CardHeader>
 
             <CardContent className="text-start p-0 py-7 space-y-3 px-3">
               <CardTitle className="text-[#2B2F41]">{items?.title}</CardTitle>
               <CardDescription className="text-base font-medium">
-                {items.content}
+                {items?.content}
               </CardDescription>
             </CardContent>
             <CardFooter className="flex items-center justify-start w-full p-0 px-5 pb-3">

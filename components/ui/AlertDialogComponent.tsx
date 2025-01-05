@@ -9,7 +9,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { MouseEvent } from "react";
 
 export type PropsAlertComponent = {
   tilte: string;
@@ -49,7 +48,7 @@ export function AlertComponent({
   open,
   setOpen,
 }: PropsAlertComponent) {
-  const setCloseAlertAndGetValue = (e: MouseEvent<HTMLButtonElement>) => {
+  const setCloseAlertAndGetValue = (e: any) => {
     setOpen(false);
     btnValue(e?.target?.textContent);
   };

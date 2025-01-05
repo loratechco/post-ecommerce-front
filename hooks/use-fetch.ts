@@ -15,7 +15,7 @@ interface UseFetchResult {
     loading: boolean;
 }
 
-export const API_Backend = 'http://app.api';
+export const API_Backend = 'https://posteco.liara.run';
 
 const checkeEndPoint = (endpoint: string) => {
     // Endpoint should not start with slash and http.

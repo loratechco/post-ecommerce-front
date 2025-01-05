@@ -1,5 +1,5 @@
 'use server'
-const API_URL = 'http://app.api';
+const API_URL = 'https://posteco.liara.run';
 
 const checkeEndPoint = (endpoint: string) => {
     // Endpoint should not start with slash and http.

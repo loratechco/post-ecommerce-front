@@ -1,4 +1,5 @@
 "use client";
+import { LandingDataStructure } from "@/app/types/landing-types";
 import { useContext, createContext, ReactNode, useState } from "react";
 
 interface Props {
@@ -6,11 +7,9 @@ interface Props {
   children: ReactNode;
 }
 
-
-
 const LandingContextProvider = createContext<any>(null);
 function LandingContext({ valueContext, children }: Props) {
-  const [data, setData] = useState<ResponseData | any>(null);
+  const [data, setData] = useState<LandingDataStructure | null>(null);
   return (
     <LandingContextProvider.Provider
       value={{ postServiceData: { data, setData }, ...valueContext }}
@@ -20,8 +19,20 @@ function LandingContext({ valueContext, children }: Props) {
   );
 }
 
+const defaultContextValue: {
+  postServiceData: {
+    data: LandingDataStructure | null;
+    setData: (value: any) => any;
+  };
+} = {
+  postServiceData: {
+    data: null,
+    setData: () => {},
+  }
+};
+
 const useLandingContext = (): {
-  postServiceData: { data:  ResponseData; setData: (value: any) => any };
+  postServiceData: { data: LandingDataStructure | null; setData: (value: any) => any };
 } => {
   const context = useContext(LandingContextProvider);
 
@@ -29,7 +40,7 @@ const useLandingContext = (): {
     console.error(
       "useLandingContext must be used within a LandingContextProvider"
     );
-    return;
+    return defaultContextValue;
   }
 
   return context;

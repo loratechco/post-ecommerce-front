@@ -7,6 +7,7 @@ import { LandingDataStructure } from "@/app/types/landing-types";
 import { useEffect, useState } from "react";
 
 import { differenceInHours, parse } from "date-fns";
+import { AccardionSkeleton } from "@/components/skeletons/AccardionSkeleton";
 
 function getEstimatedDelivery(dataConsegnaPrevista: string): string {
   // تبدیل تاریخ ورودی به یک شیء تاریخ با فرمت درست
@@ -33,7 +34,6 @@ function getEstimatedDelivery(dataConsegnaPrevista: string): string {
   else if (diffInHours >= 72 && diffInHours <= 96) {
     return "72/96"; // نمایش 72/96
   }
-
   // در غیر این صورت، نمایش تعداد ساعت‌ها
   return `${diffInHours}`;
 }
@@ -41,7 +41,7 @@ function getEstimatedDelivery(dataConsegnaPrevista: string): string {
 function BoxOption() {
   const router = useRouter();
   const [postServiceData, setPostServiceData] =
-    useState<LandingDataStructure>(null);
+    useState<LandingDataStructure | null>(null);
 
   useEffect(() => {
     const landingData = localStorage.getItem("landing-data");
@@ -51,10 +51,10 @@ function BoxOption() {
       router.replace("/");
     }
   }, []);
-  const avalible = postServiceData?.avalibles[0];
+  const avalible = postServiceData?.avalibles[0] || null;
   return (
-    <section className="max-w-7xl max-[970px]:max-w-xl mx-auto space-y-9 pt-20 px-[3%] min-[970px]:pt-36 pb-20 min-h-screen">
-      {avalible?.prices?.simulazione?.spedizioni?.map((shipments, key) => (
+    <section className="max-w-7xl max-[970px]:max-w-xl mx-auto space-y-9 pt-28 px-[3%] min-[970px]:pt-36 pb-16 min-h-screen">
+      {avalible? (avalible?.prices?.simulazione?.spedizioni?.map((shipments, key) => (
         <div key={shipments?.id || key}>
           <BoxPcSize
             // courierLogo={'https://betaspedire.b-cdn.net/imgs/courier_logos/inpost.png'} // فرض بر اینکه تصویر کوریر در `tariffImage` باشد
@@ -77,7 +77,9 @@ function BoxOption() {
             price={shipments?.tariffa} // قیمت از `tariffa`
           />
         </div>
-      ))}
+      ))):(
+        <AccardionSkeleton numberItems={4} perrentClassName="*:!h-40 !space-y-7"/>
+      )}
     </section>
   );
 }

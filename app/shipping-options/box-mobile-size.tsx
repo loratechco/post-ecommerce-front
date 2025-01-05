@@ -92,7 +92,7 @@ function ShippingCard({
           </div>
         </div>
 
-        <div className="border-b pb-4  text-zinc-500">
+        <div className="border-b pb-4 text-zinc-500">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="font-medium">Withdraw:</p>
@@ -117,7 +117,7 @@ function ShippingCard({
 
       <CardFooter className="flex justify-between items-center pt-2">
         <div>
-          <div className="text-2xl font-bold text-sky-500">€{price}</div>
+          <div className="text-2xl font-bold text-primary-color">€{price}</div>
           <div className="text-sm text-muted-foreground">VAT included</div>
         </div>
 

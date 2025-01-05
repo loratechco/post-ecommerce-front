@@ -1,6 +1,7 @@
 'use server'
 import { cookies } from 'next/headers';
 import axios from 'axios';
+import { API_Backend } from '@/hooks/use-fetch';
 
 const PERMISSION_COOKIE_NAME = 'USER_PERMISSIONS';
 
@@ -22,7 +23,7 @@ export async function refreshPermissionCookie(token: string): Promise<RefreshPer
 
         // دریافت پرمیشن‌های جدید از API
         const response = await axios.get(
-            'http://app.api/api/permissions/my-permissions',
+            `${API_Backend}/api/permissions/my-permissions`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

@@ -29,7 +29,7 @@ const schema = z.object({
 function AddTicketing({ token }: { token: string }) {
   const router = useRouter();
 
-  const [formError, setFormError] = useState<object>({
+  const [formError, setFormError] = useState<any>({
     title: "",
   });
 
@@ -38,9 +38,8 @@ function AddTicketing({ token }: { token: string }) {
     e.preventDefault();
     const {
       title: { value },
-    } = e.target as HTMLFormElement;
+    } = e.target as any;
 
-    console.log("title=>>>", value);
     const { success, error } = schema.safeParse({
       title: value,
     });

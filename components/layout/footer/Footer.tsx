@@ -29,23 +29,23 @@ const footerLinks = [
 const socialLinks = [
   {
     href: "#",
-    iconPath: "https://betaspedire.b-cdn.net/imgs/facebook.svg",
+    iconPath: "/pic/facebook.svg",
     label: "facebook community",
   },
   {
     href: "#",
-    iconPath: "https://betaspedire.b-cdn.net/imgs/twitter-black-shape.svg",
+    iconPath: "/pic/twitter-black-shape.svg",
     label: "Twitter page",
   },
   {
     href: "#",
-    iconPath: "https://www.spedire.com/imgs/instagram.svg",
+    iconPath: "/pic/instagram.svg",
     label: "instagram account",
   },
   {
     href: "#",
     iconPath:
-      "https://betaspedire.b-cdn.net/imgs/linked-in-logo-of-two-letters.svg",
+      "/pic/linked-in-logo-of-two-letters.svg",
     label: "linked account",
   },
 ];

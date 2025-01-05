@@ -1,4 +1,4 @@
-import PurchaseInvoice from "./purchase-invoice"
+import PurchaseInvoice from "./components/purchase-invoice"
 
 export default function Home() {
   const sampleInvoiceData = {

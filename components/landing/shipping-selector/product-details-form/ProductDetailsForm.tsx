@@ -18,18 +18,15 @@ import { BOX_SIZE, BoxSizeType } from "./productBoxSize";
 import { PenLine } from "lucide-react";
 import { ProductDetailFormType } from '@/app/types/landing-types'
 
-
 const detailFields = [
   { id: `height`, label: "Height" },
   { id: `length`, label: "Length" },
   { id: `realWeight`, label: "RealWeight" },
   { id: `depth`, label: "Depth" },
 ];
-
 interface Props {
   disableFieldTitles?: boolean;
 }
-
 function ProductDetailsForm({
   hookForm,
   selectBoxName,
@@ -85,7 +82,7 @@ function ProductDetailsForm({
                   setItemValue(
                     (BOX_SIZE?.find(
                       (item) => item?.name === value
-                    ) as BoxSizeType) || "value is null" as null
+                    ) as BoxSizeType) || "value is null" as unknown as null
                   );
                 }}
                 defaultValue={field.value}
@@ -140,7 +137,7 @@ function ProductDetailsForm({
               placeholder={field.label}
               id={field.id}
               className={cn(
-                "input-primary bg-zinc-50 input-primary py-5 rounded-none border-zinc-400 text-[14px]",
+                "input-primary bg-zinc-50 input-primary py-5 rounded-none border-zinc-400 text-[14px] max-sm:placeholder:text-xs",
                 index === 0 && "rounded-l-lg",
                 index === detailFields?.length - 1 && "rounded-r-lg"
               )}

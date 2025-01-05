@@ -17,7 +17,7 @@ function SideBar() {
       <SheetTrigger className="">
         <AlignJustify />
       </SheetTrigger>
-      <SheetContent className="bg-sky-200 p-0 !border-none" side={'left'}>
+      <SheetContent className="bg-white p-0 !border-none" side={'left'}>
         <SheetTitle className="sr-only">Sidebar content</SheetTitle>
         <SheetHeader className=" text-start">
           <div className="w-full h-32 overflow-hidden">

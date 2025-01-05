@@ -38,7 +38,7 @@ function SignUp() {
         name,
         password_confirmation,
       });
-      router.push("/login");
+      window.location.href = "/login";
     } catch (error: any) {
       console.log("🚀 ~ formSubmit ~ error:", error);
       console.log(error);
@@ -58,7 +58,6 @@ function SignUp() {
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitting]);
-  console.info(isSubmitting, "<<<=isSubmitting");
   return (
     <form onSubmit={handleSubmit(formSubmit)}>
       <ErrorToast

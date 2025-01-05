@@ -4,7 +4,6 @@ import { CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface Props {
     title: string;
-
 }
 
 function AuthCardheader({ title }: Props) {

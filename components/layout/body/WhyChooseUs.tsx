@@ -15,7 +15,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Affordable Rates",
     content:
       "On Spedire.com, thanks to agreements with our partner carriers, you can find the most affordable rates for shipping within Italy or abroad.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-01.svg",
+    icon: "/pic/plus-01.svg",
     href: "#",
     btnName: "Find out more",
   },
@@ -23,7 +23,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Spedire.com Recharge Options",
     content:
       "The more you ship, the more you save! Purchase Spedire.com recharges and get additional discounts on your shipments.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-02.svg",
+    icon: "/pic/plus-02.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -31,7 +31,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Shipping Guarantee",
     content:
       "We offer free guarantees for your shipments against damage or loss, up to a maximum value of €49.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-03.svg",
+    icon: "/pic/plus-03.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -39,7 +39,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Spedire Point",
     content:
       "Choose whether to have the courier pick up your package from your home or drop it off at a Spedire Point. Find the most practical and convenient solution for you!",
-    icon: "https://www.spedire.com/imgs/home/plus-06.svg",
+    icon: "/pic/plus-06.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -47,7 +47,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Tracking Service",
     content:
       "Track the status of your shipment at any time using our tracking service for national and international deliveries.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-04.svg",
+    icon: "/pic/plus-04.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -55,7 +55,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Dedicated Support",
     content:
       "On Spedire.com, you’ll have access to a dedicated support service available at all times to help you manage any shipment or use Spedire.com effectively.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-07.svg",
+    icon: "/pic/plus-07.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -63,7 +63,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Carriers",
     content:
       "Why rely on just one carrier? Choose the best carrier for each of your shipments, whether within Italy or abroad.",
-    icon: "https://www.spedire.com/imgs/home/traccia.svg",
+    icon: "/pic/traccia.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -71,7 +71,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Cash on Delivery",
     content:
       "On Spedire.com, you can send packages and envelopes within Italy or abroad using cash on delivery with a single click. Just select this option during the booking process.",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-01.svg",
+    icon: "/pic/plus-01.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -79,7 +79,7 @@ const WHY_CHOOSEUS_DATA = [
     title: "Triangulation",
     content:
       "Do you want to ship a package with a sender that differs from the departure location? On Spedire.com, you can do it!",
-    icon: "https://betaspedire.b-cdn.net/imgs/home/plus-02.svg",
+    icon: "/pic/plus-02.svg",
     href: "#",
     btnName: "Buy refills",
   },
@@ -122,7 +122,6 @@ function WhyChooseUs() {
                         "https://betaspedire.b-cdn.net/imgs/caret-circled.svg"
                       }
                       alt="circl-arrow"
-                      loading="lazy"
                       className="inline-block"
                       width={19}
                       height={30}

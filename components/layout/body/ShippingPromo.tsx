@@ -43,6 +43,7 @@ function ShippingPromo() {
           className="object-cover size-full"
           src={"/pic/delivery-tools.webp"}
           alt="delivery-tools"
+          loading="lazy"
           priority={false}
         />
       </div>

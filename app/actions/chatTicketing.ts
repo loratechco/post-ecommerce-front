@@ -1,6 +1,7 @@
 'use server'
 import axios from "axios"
 import { API_URL } from './actionHelper'
+import { API_Backend } from "@/hooks/use-fetch"
 
 const sendMessage = async ({ ticketId, message, token }: { ticketId: string, message: string, token: string }) => {
     try {
@@ -28,7 +29,7 @@ const getTicket = async ({ ticketId, token }: { ticketId: string, token: string 
         }
 
         // درخواست به سرور
-        const res = await axios.get(`http://app.api/api/tickets/${ticketId}/messages`, {
+        const res = await axios.get(`${API_Backend}/api/tickets/${ticketId}/messages`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

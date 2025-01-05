@@ -8,8 +8,8 @@ import { User2 } from "lucide-react";
 function HeaderAndSidBar() {
   return (
     <header className="relative z-40">
-      <div className="shadow-lg flex gap-5 items-center justify-start max-lg:justify-between fixed top-0 left-0 bg-sky-50  w-full px-4">
-        <Link href={"#home"}>LOGO</Link>
+      <div className="shadow-md flex gap-5 items-center justify-start max-lg:justify-between fixed top-0 left-0 bg-white  w-full px-4">
+        <Link href={"/"}>LOGO</Link>
 
         <div className="max-lg:hidden flex items-center justify-between w-full py-3.5">
           <Navbar />
@@ -23,7 +23,7 @@ function HeaderAndSidBar() {
 
             <Button
               variant={"default"}
-              className="bg-primary-color hover:bg-sky-400 px-3 font-semibold py-0.5"
+              className="bg-primary-color hover:bg-primary-color/85 px-3 font-semibold py-0.5"
             >
               Track shipment
             </Button>
@@ -45,7 +45,9 @@ function HeaderAndSidBar() {
               className="block h-full cursor-pointer centerize-flex gap-2"
             >
               <User2 />
-              <span className="max-lg:sr-only block text-[#2B2F41] font-semibold !text-sm w-12">Log in</span>
+              <span className="max-lg:sr-only block text-[#2B2F41] font-semibold !text-sm w-12">
+                Log in
+              </span>
             </Link>
             <span className="block h-16 w-px bg-zinc-300 lg:hidden"></span>
           </div>

@@ -68,7 +68,7 @@ function EasySteps() {
                   alt={item?.title.toLowerCase() || "image"}
                 />
 
-                <div className="border  px-1 py-0.5 border-sky-400 absolute sm:right-1/3 -right-1 -top-4 z-10 bg-sky-50 rounded-full animation-group-move-right">
+                <div className="border px-0.5 sm:px-[5px] py-0.5 border-primary-color absolute sm:right-1/3 -right-1 -top-4 z-10 bg-white rounded-full animation-group-move-right">
                   <IconsCustomSvg
                     svgName="arrowRight"
                     className="max-sm:hidden pt-1.5 flex items-center justify-center *:stroke-2"

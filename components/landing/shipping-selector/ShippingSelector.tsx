@@ -166,7 +166,10 @@ export function SelectBox({
         `${API_Backend}/api/providers/getavailibilities`,
         finalData
       );
-      const checkData = res?.data?.avalibles?.[0]?.prices?.simulazione?.spedizioni?.find((item) => item || null);
+      const checkData =
+        res?.data?.avalibles?.[0]?.prices?.simulazione?.spedizioni?.find(
+          (item) => item || null
+        );
 
       if (!res?.data || !checkData || res?.data?.avalibles?.length <= 0) {
         console.log(false);
@@ -189,7 +192,7 @@ export function SelectBox({
     <div className="p-5 shadow-md rounded-lg bg-white w-3/4 max-md:w-11/12 relative">
       <div className="w-full flex justify-center items-center">
         <span className="block -translate-y-8 h-fit max-md:text-sm max-sm:text-xs text-nowrap max-sm:px-1 bg-secondery-color hover:bg-amber-500 transition-colors duration-150 px-3 py-0.5   rounded-md text-white">
-          <Link href={"#"} className="">
+          <Link href={"#"} className="px-1 max-sm:px-0.5">
             Do you do a lot of shipping? Discover SPEDIREPRO
           </Link>
         </span>
@@ -218,7 +221,7 @@ export function SelectBox({
             />
 
             {addNewComponent?.map((items) => (
-              <div className="max-md:hidden" key={items?.key}>
+              <div  key={items?.key}>
                 <ProductDetailsForm
                   disableFieldTitles={true}
                   hookForm={items?.hookForm}
@@ -237,7 +240,7 @@ export function SelectBox({
                 </button>
               </div>
             ))}
-            <div className="w-full pt-3 lg:pt-5 flex items-center justify-start gap-3 max-md:hidden max-md:pointer-events-none max-md:select-none">
+            <div className="w-full pt-3 lg:pt-5 flex items-center justify-start gap-3">
               <TooltipPrimary
                 content={
                   addNewComponent?.length >= 2
@@ -268,7 +271,11 @@ export function SelectBox({
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (
-              <LoaderCircleIcon width={20} height={20} className="animate-spin size-10 mx-1" />
+              <LoaderCircleIcon
+                width={20}
+                height={20}
+                className="animate-spin size-10 mx-0.5"
+              />
             )}
             Submit
           </Button>
