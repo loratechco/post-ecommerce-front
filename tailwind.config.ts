@@ -110,6 +110,7 @@ const config: Config = {
 		}
 
 	},
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
 	plugins: [require("tailwindcss-animate")],
 	components: {
 		'.table-text': 'text-[14px] font-medium'

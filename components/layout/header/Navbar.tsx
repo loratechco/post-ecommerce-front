@@ -28,7 +28,7 @@ export function Navbar({
                   navigationMenuTriggerStyle(),
                   "hover:!bg-zinc-100/50 px-2"
                 )}
-                href="#nav"
+                href={nav.items[0]?.href}
               >
                 {nav?.title}
               </NavigationMenuLink>

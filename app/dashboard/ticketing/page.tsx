@@ -35,11 +35,11 @@ async function TicketListPage({
 }) {
   const { page = "1", search = "" } = await searchParams;
 
-  const { token }: GetSession = JSON.parse((await getToken()) as string);
+   const tokenStore: GetSession = JSON.parse((await getToken()) as string);
 
   const { res } = await getData(
     `api/tickets?page=${page}&search=${search}`,
-    token
+    tokenStore?.token || ''
   );
 
   const resultData = res || res?.data?.data.length > 0 ? res?.data : [];
@@ -74,7 +74,7 @@ async function TicketListPage({
       lastPageForPagination={resultData?.last_page || 1}
       OptionalComponentNextToInput={
         <div className="max-md:w-full max-md:flex justify-start">
-          <AddTicketing token={token} />
+          <AddTicketing token={tokenStore?.token || ''} />
         </div>
       }
     />

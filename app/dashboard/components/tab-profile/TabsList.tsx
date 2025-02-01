@@ -8,7 +8,6 @@ import ChangePassword from "./ChangeUserPassword";
 import Permission from "./permissionTab/PermissionAccordion";
 
 function TabsListProfile() {
-
     // console.log("🚀 ~ findRoute ~ findRoute:", tabApis[0].getApi)
 
     return (

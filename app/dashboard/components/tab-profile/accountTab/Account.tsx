@@ -117,6 +117,8 @@ function Account() {
         className: "toaster-successfuls",
       });
     } catch (error: any) {
+      console.info(error);
+
       console.error("Error updating profile:", error);
       toast({
         title: "Unsuccessful",

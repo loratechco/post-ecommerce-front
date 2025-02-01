@@ -4,9 +4,9 @@ const ICON_SIZE = 18 as const
 
 export const navbarStructur = [
   {
-    title: 'Services',
+    title: 'Dashbord',
     items: [
-      { href: '#services', titleItem: 'Our Services', icon: <Package size={ICON_SIZE}/> },
+      { href: '/dashboard', titleItem: 'dashboard', icon: <Package size={ICON_SIZE}/> },
       { href: '#pricing', titleItem: 'Pricing', icon: <DollarSign size={ICON_SIZE}/> },
       { href: '#branches', titleItem: 'Branches and Agents', icon: <MapPin size={ICON_SIZE}/> },
     ],

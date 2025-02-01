@@ -21,7 +21,7 @@ import {
 import { Country } from "@/app/types/landing-types";
 import Flag from "react-world-flags";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 interface CountryCitySelectorProps {
   countries: Country[];
@@ -49,8 +49,17 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
   getSearchCityValue,
   disabled,
 }) => {
+  const countrieDataChecker = useMemo(() => {
+    console.info(countries);
+    return Object.entries(countries).length <= 0 || !countries
+      ? null
+      : countries;
+  }, [countries]);
+
   const getCountriesSelected = ({ value }) => {
-    const result = countries.find((countrie) => countrie?.name === value?.name);
+    const result = countrieDataChecker?.find(
+      (countrie) => countrie?.name === value?.name
+    );
     return result;
   };
 
@@ -60,6 +69,11 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
   const [cityValue, setCityValue] = useState<string>("");
   const debounceValue = useDebounce(cityValue, 1500);
   useEffect(() => getSearchCityValue(debounceValue), [debounceValue]);
+
+  const cityDataChecker = useMemo(() => {
+    console.info(cityData);
+    return Object.entries(cityData).length <= 0 || !cityData ? null : cityData;
+  }, [cityData]);
 
   return (
     <div className="flex items-center justify-center w-full lg:w-1/2 rounded-lg overflow-hidden">
@@ -103,7 +117,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                   <CommandList className="max-h-44   ">
                     <CommandEmpty>No country found.</CommandEmpty>
                     <CommandGroup className="">
-                      {countries?.map((countrie) => (
+                      {countrieDataChecker?.map((countrie) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
                           value={countrie.name}
@@ -154,15 +168,17 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     <div className="overflow-hidden text-ellipsis">
                       {(!disabled && (
                         <>
-                          {cityData?.find(
-                            (city) =>
-                              city?.city_name === field.value?.city_name ||
-                              city?.cap === field.value?.cap
-                          )?.city_name || "Select the city"}
+                          <p className="text-start">
+                            {cityDataChecker?.find(
+                              (city) =>
+                                city?.city_name === field.value?.city_name ||
+                                city?.cap === field.value?.cap
+                            )?.city_name || "Select the city"}
+                          </p>
                           <div className="flex items-center justify-start gap-2">
                             <span className="text-xs text-zinc-500 block text-start">
                               {
-                                cityData?.find(
+                                cityDataChecker?.find(
                                   (city) =>
                                     city?.city_name ===
                                       field.value?.city_name ||
@@ -172,7 +188,7 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                             </span>
                             <span className="text-xs text-zinc-500 block text-start">
                               {
-                                cityData?.find(
+                                cityDataChecker?.find(
                                   (city) =>
                                     city?.city_name === field.value?.city_name
                                 )?.province
@@ -194,14 +210,14 @@ const CountryCitySelector: React.FC<CountryCitySelectorProps> = ({
                     placeholder="Search language..."
                     onValueChange={(value) => {
                       setCityValue(value);
-                      console.info(field.value, cityData);
+                      console.info(field.value, cityDataChecker);
                     }}
                   />
                   <CommandList className="max-h-48">
                     <CommandEmpty>No city found.</CommandEmpty>
 
                     <CommandGroup className="">
-                      {cityData?.map((city, key) => (
+                      {cityDataChecker?.map((city, key) => (
                         <CommandItem
                           className="hover:!bg-zinc-200/70"
                           value={`${city?.city_name} ${city?.cap}`}

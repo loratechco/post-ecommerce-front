@@ -64,7 +64,7 @@ function CreateNewGroup({ token }: { token: string }) {
   );
 
   return (
-    <div className="z-40 relative">
+    <div className="z-40 relative max-md:w-full max-md:flex items-center justify-start">
       <Dialog>
         <ErrorToast
           dependency={errors}
@@ -73,6 +73,7 @@ function CreateNewGroup({ token }: { token: string }) {
             errors?.description?.message,
           ]}
         />
+        
         <DialogTrigger className="btn-outline py-2 px-1.5 text-sm">
           Create Group
         </DialogTrigger>

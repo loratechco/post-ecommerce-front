@@ -118,11 +118,10 @@ function WhyChooseUs() {
                   >
                     {items?.btnName}
                     <Image
-                      src={
-                        "https://betaspedire.b-cdn.net/imgs/caret-circled.svg"
-                      }
+                      src={"/pic/caret-circled.svg"}
                       alt="circl-arrow"
                       className="inline-block"
+                      loading="lazy"
                       width={19}
                       height={30}
                     />

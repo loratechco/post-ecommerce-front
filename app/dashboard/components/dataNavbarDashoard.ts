@@ -1,5 +1,6 @@
 import React from "react";
 import {
+    ExternalLink,
     FolderKanban,
     Home,
     LucideProps,
@@ -54,6 +55,11 @@ const dataNavbarDashbord = (BASE_ROUTE: string) => {
                 title: "Coupons",
                 url: BASE_ROUTE + "/coupons",
                 icon: TicketPercent,
+            },
+            {
+                title: "Visit website",
+                url: '/',
+                icon: ExternalLink  ,
             },
             {
                 title: "Settings",

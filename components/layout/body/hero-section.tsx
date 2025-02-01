@@ -26,7 +26,7 @@ function HeroSection({ data, token }: Props) {
   return (
     <>
       <section className="w-full flex items-center flex-col justify-center relative">
-        <div className=" absolute top-0 left-0 -z-10 overflow-hidden size-full bg-primary-color">
+        <div className=" absolute top-0 left-0 -z-10 overflow-hidden size-full bg-primary">
           <Image
             src="/pic/freepik__candid-image-photography-natural-textures-highly-r__77571.jpeg"
             alt="delivery-ship"

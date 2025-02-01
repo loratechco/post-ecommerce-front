@@ -52,7 +52,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-primary-color text-zinc-300 mt-12">
+    <footer className="bg-primary text-zinc-300 mt-12">
       <div className="max-w-screen-xl mx-auto p-8">
         <div className="flex flex-col-reverse md:flex-row-reverse justify-between gap-10 pb-5">
           <div className="grid grid-cols-3 max-md:grid-cols-1 gap-7 max-md:text-center">

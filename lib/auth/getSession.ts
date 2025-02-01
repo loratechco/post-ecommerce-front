@@ -8,6 +8,7 @@ export type GetSession = {
     initData: string;
 }
 
+
 export default async function getToken(): Promise<string | null> {
     const coockie = await cookies()
     const accessToken = coockie.get(cookieName)?.value as string

@@ -1,6 +1,6 @@
 import { getData } from "@/app/actions/apiHandler";
 import { MyDatatTable } from "@/app/dashboard/components/my-data-table/my-data-table";
-import ErrorToast from "@/components/ErrorToast";
+// import ErrorToast from "@/components/ErrorToast";
 import getToken, { GetSession } from "@/lib/auth/getSession";
 import ActionTableGroupBtn from "../ActionTableGroupBtn";
 import { Params } from "@/app/types/nextjs-types";
@@ -16,38 +16,34 @@ async function GroupEditPge({
   const { page: currentPage = "1", search } = await searchParams;
   const { token } = JSON.parse((await getToken()) as string) as GetSession;
 
-  const {
-    res: {
-      users: { data = [], last_page = 1 },
-    },
-    errorMessage,
-  } = await getData(
+  const { res } = await getData(
     `api/groups/${groupId}/users?page=${currentPage}&search=${search}`,
     token
   );
-
-  const tableBodyData = data?.map((user: Record<string, string>) => ({
-    name: user?.name,
-    lastName: user?.last_name,
-    phone: user?.phone,
-    email: user?.email,
-    id: user?.id,
-    actions: (
-      <ActionTableGroupBtn
-        key={user?.id}
-        groupId={groupId}
-        userId={String(user?.id)}
-        token={token}
-      />
-    ),
-  }));
+  const tableBodyData = res?.users?.data?.map(
+    (user: Record<string, string>) => ({
+      name: user?.name,
+      lastName: user?.last_name,
+      phone: user?.phone,
+      email: user?.email,
+      id: user?.id,
+      actions: (
+        <ActionTableGroupBtn
+          key={user?.id}
+          groupId={groupId}
+          userId={String(user?.id)}
+          token={token}
+        />
+      ),
+    })
+  );
 
   return (
     <>
-      <ErrorToast
+      {/* <ErrorToast
         dependency={errorMessage}
         errorMessagesArray={[errorMessage]}
-      />
+      /> */}
 
       <MyDatatTable
         headerItems={[
@@ -58,7 +54,7 @@ async function GroupEditPge({
           { key: "actions", label: "Actions" },
         ]}
         table={{ currentPage, tableBodyData }}
-        lastPageForPagination={last_page}
+        lastPageForPagination={res?.users?.last_page || 1}
       />
     </>
   );

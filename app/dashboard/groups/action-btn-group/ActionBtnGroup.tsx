@@ -20,7 +20,6 @@ import { ActionReducerFunc, initialState } from "./action-btn-reducer";
 import DialogFormEditGroup from "./DialogFormEditGroup";
 import DialogFormAddUserToGroup from "./DialogFormAddUserToGroup";
 import { API_Backend } from "@/hooks/use-fetch";
-
 interface Props {
   id: string;
   token: string;
@@ -131,6 +130,16 @@ function ActionBtnGroup(props: Props) {
               }}
             >
               Delete Group
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={() =>
+                router.push(
+                  `/dashboard/groups/edit-user-group/${props?.id || ""}`
+                )
+              }
+            >
+              show Group
             </DropdownMenuItem>
           </div>
         </DropdownMenuContent>

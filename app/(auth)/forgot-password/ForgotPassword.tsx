@@ -10,7 +10,7 @@ function ForgotPassword() {
     const { register} = useForm();
 
     return (
-        <Card className="mx-auto !border-zinc-400 max-w-screen-md max-sm:min-w-72 sm:min-w-96 ">
+        <Card className="mx-auto !border-secondary/70 max-w-screen-md max-sm:min-w-72 sm:min-w-96 ">
 
             {/* Form Title */}
             <AuthCardheader
@@ -33,7 +33,7 @@ function ForgotPassword() {
                     <AuthBtn
                         nameBtn="Login"
                         variant="default"
-                        className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900"
+                        className="bg-secondary dark:bg-gray-200 hover:bg-secondary/90"
                         type="submit"
                     />
                 </div>

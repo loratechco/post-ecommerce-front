@@ -1,5 +1,5 @@
 'use server'
-const API_URL = 'https://posteco.liara.run';
+const API_URL = 'https://postapi.liara.run';
 
 const checkeEndPoint = (endpoint: string) => {
     // Endpoint should not start with slash and http.
@@ -35,17 +35,19 @@ export const getData = async (
             }
         })
 
+        
         if (!response.ok) {
             console.info(response);
             throw `${customErrorMessage || 'Error receiving information, please try again'}`
         };
-
+        
         const resutl = await response.json();
         return {
             res: resutl,
             errorMessage: null,
         };
-    } catch (error) {
+    } catch (error:any) {
+        console.info(error);
         console.error(error);
         return {
             res: error,

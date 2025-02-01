@@ -17,6 +17,7 @@ import { toast } from "@/hooks/use-toast";
 import { useUploadImg } from "@/app/dashboard/components/tab-profile/accountTab/useUploadImg";
 import { API_Backend } from "@/hooks/use-fetch";
 import { UserData } from "@/app/types/api-data";
+import { useRouter } from "next/navigation";
 
 const formFields = [
   { id: "name", placeholder: "Json", type: "text", nameLabel: "Name" },
@@ -47,7 +48,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
   const [fetchError, setFetchError] = useState<null | string>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [fileSaver, setFileSaver] = useState<File | null>(null);
-
+  const router = useRouter();
   useEffect(() => setFetchError(null), [fetchError]);
 
   const idCondition = userId.includes("create-user");
@@ -129,14 +130,22 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
       phone: data.phone,
       business_customer: switchState ? "1" : "0",
       is_administrator: "0",
-      password: data.newPassword,
-      password_confirmation: data.confirmation,
+      ...(!idCondition &&
+      data.newPassword &&
+      data.confirmation &&
+      data.newPassword.trim() !== "" &&
+      data.confirmation.trim() !== ""
+        ? {
+            password: data.newPassword,
+            password_confirmation: data.confirmation,
+          }
+        : {}),
     }).forEach(([key, value]) => {
       formData.append(key, value as string);
     });
 
     console.info("🚀 ~ onSubmit ~ formData:", formData, userId, userToken);
-    const apis = idCondition ? "api/users" : `/api/users/${userId}`;
+    const apis = idCondition ? "api/users" : `api/users/${userId}`;
     try {
       const res = await axios.post(`${API_Backend}/${apis}`, formData, {
         headers: {
@@ -146,13 +155,16 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
         },
       });
 
-      console.info(res);
       // Show success message
       toast({
         title: "Success",
-        description: res?.data?.message || "Profile updated successfully",
+        description: res?.data?.message || "successfully",
         className: "toaster-successfuls",
       });
+
+      if (idCondition) {
+        router.push("/dashboard/users-management");
+      }
     } catch (error: any) {
       console.info(error);
       const errorMessage = Object.values(error?.response?.data?.errors || {})
@@ -236,10 +248,7 @@ function Account({ userId, userToken }: { userId: string; userToken: string }) {
           </Label>
         </div>
 
-        <div className="">
-          <label className="block pb-2 text-sm">
-            Save {idCondition ? "new user" : "profile changes"}
-          </label>
+        <div className=" pt-2">
           <Button
             className="px-5  font-semibold"
             type="submit"

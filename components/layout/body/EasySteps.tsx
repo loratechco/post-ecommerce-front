@@ -9,6 +9,7 @@ import {
 import IconsCustomSvg from "@/public/Icons-custom-svg";
 import Image from "next/image";
 import Link from "next/link";
+
 const steps = [
   {
     title: "Compare",
@@ -41,6 +42,7 @@ const steps = [
     icon: "/pic/track-pacakage.png",
   },
 ];
+
 function EasySteps() {
   return (
     <section className="space-y-12">

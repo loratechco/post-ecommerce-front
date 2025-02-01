@@ -33,9 +33,9 @@ body {
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 240 5.9% 10%;
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
+    --secondary: 145 73% 49%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
@@ -75,7 +75,7 @@ body {
     --popover-foreground: 0 0% 98%;
     --primary: 0 0% 98%;
     --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
+    --secondary: 145 73% 49%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 64.9%;
@@ -88,8 +88,8 @@ body {
     --ring: 240 4.9% 83.9%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
+    --chart-3: 199 89% 48%;
+    --chart-4: 145 73% 49%;
     --chart-5: 340 75% 55%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -134,7 +134,7 @@ body {
     @apply text-xl max-md:text-base text-zinc-800;
   }
   .btn-perimary{
-    @apply transition-colors duration-150 rounded-lg bg-primary-color px-7 py-5 hover:bg-primary-color/85 text-base text-white font-semibold h-12 !important;
+    @apply transition-colors duration-150 rounded-lg bg-primary px-7 py-5 hover:bg-primary/85 text-base text-white font-semibold h-12 !important;
   }
 
 }

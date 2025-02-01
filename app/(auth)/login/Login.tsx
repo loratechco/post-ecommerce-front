@@ -38,17 +38,16 @@ export default function Login() {
     }
   };
 
-  const errorMessages = [
-    userMissingError,
-    errors?.email?.message,
-    errors?.password?.message,
-  ];
-
   return (
     <CardContent>
       <ErrorToast
-        errorMessagesArray={errorMessages}
-        dependency={errors}
+        errorMessagesArray={[
+          userMissingError,
+          errors?.email?.message,
+          errors?.password?.message,
+        ]}
+        dependency={isSubmitting}
+        disableDefaultDeps={true}
         dependencyOption={userMissingError}
       />
       <form onSubmit={handleSubmit(formSubmit)} className="space-y-3">
@@ -82,7 +81,7 @@ export default function Login() {
         <AuthBtn
           nameBtn="Login"
           variant="default"
-          className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900 mt-3"
+          className="bg-secondary hover:!bg-secondary/90 dark:bg-gray-200 mt-3"
           type="submit"
           disabled={isSubmitting}
         />

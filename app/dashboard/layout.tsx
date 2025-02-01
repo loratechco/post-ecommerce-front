@@ -7,8 +7,6 @@ import {
 import HeaderDasboard from "./components/Header"
 import React from "react"
 
-// import { Suspense } from "react"
-
 function DashboardLayout({
     children,
 }: Readonly<{

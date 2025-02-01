@@ -43,8 +43,8 @@ export function NavMain({
                 asChild
                 tooltip={item.title}
                 className={cn(
-                  "hover:bg-zinc-200",
-                  path === item.url && "bg-zinc-200 text-zinc-900"
+                  "hover:bg-primary/20",
+                  path === item.url && "bg-primary/20 text-zinc-900"
                 )}
               >
                 <Link href={item.url}>

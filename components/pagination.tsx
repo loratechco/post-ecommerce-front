@@ -85,7 +85,7 @@ export function PaginationComponent({ pages = 1 }: Props) {
                 </PaginationItem>
 
                 {getVisiblePages()?.map((pageNumber, idx) => (
-                    <PaginationItem key={idx}>
+                    <PaginationItem key={idx} >
                         {pageNumber === DOTS ? (
                             <PaginationEllipsis />
                         ) : (
@@ -94,7 +94,7 @@ export function PaginationComponent({ pages = 1 }: Props) {
                                 isActive={currentPage === pageNumber}
                                 className={cn(
                                     "cursor-pointer",
-                                    currentPage === pageNumber && "border-primary"
+                                    currentPage === pageNumber && "border-zinc-400"
                                 )}
                             >
                                 {pageNumber}

@@ -51,27 +51,32 @@ export default function ChangePassword() {
 
       reset();
       toast({
+        title:'Successful',
         description: res?.data?.message,
         duration: 3000,
-        className: "bg-green-400 text-green-950",
+        className: "toaster-successfuls",
       });
-    } catch (error:any) {
+    } catch (error: any) {
       toast({
+        title:'Unsuccessful',
         description: error?.response?.data?.message,
         duration: 3000,
-        className: "bg-red-200 text-red-800",
+        className: "toaster-errors",
       });
     }
   };
 
-  const errorMessages = [
-    errors?.confirmation?.message,
-    errors?.newPassword?.message,
-    errors?.oldPassword?.message,
-  ];
   return (
     <form className="py-5 " onSubmit={handleSubmit(onSubmit)}>
-      <ErrorToast errorMessagesArray={errorMessages} dependency={errors} />
+      <ErrorToast
+        errorMessagesArray={[
+          errors?.confirmation?.message,
+          errors?.newPassword?.message,
+          errors?.oldPassword?.message,
+        ]}
+        dependency={isSubmitting}
+        disableDefaultDeps={true}
+      />
 
       <div className="size-full space-y-3">
         {formFields.map((field) => (
@@ -80,7 +85,9 @@ export default function ChangePassword() {
             id={field?.id}
             type="password"
             nameLabel={field?.nameLabel}
-            register={register(field?.id as "oldPassword" | "newPassword" | "confirmation")}
+            register={register(
+              field?.id as "oldPassword" | "newPassword" | "confirmation"
+            )}
             className="border-none"
             placeholder="least 6 characters long"
             classNameParentPasswordInput="w-full lg:w-1/2"

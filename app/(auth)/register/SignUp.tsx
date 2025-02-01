@@ -11,11 +11,9 @@ import { SignUpFormData } from "./schema";
 import axios from "axios";
 import ErrorToast from "@/components/ErrorToast";
 import { API_Backend } from "@/hooks/use-fetch";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function SignUp() {
-  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -115,7 +113,7 @@ function SignUp() {
           <AuthBtn
             nameBtn="Sign Up"
             variant="default"
-            className="!bg-black dark:bg-gray-200 hover:!bg-zinc-900"
+            className="bg-secondary hover:bg-secondary/90"
             type="submit"
             disabled={isSubmitting}
           />

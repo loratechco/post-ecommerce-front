@@ -1,1 +1,1 @@
-export const API_URL = 'https://posteco.liara.run/api';
+export const API_URL = 'https://postapi.liara.run/api';

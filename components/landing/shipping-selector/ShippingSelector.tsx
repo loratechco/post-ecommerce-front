@@ -72,9 +72,7 @@ export function SelectBox({
     const filterRemoveItem = addNewComponent?.filter(
       (filterItem) => filterItem?.selectBoxName !== items?.selectBoxName
     );
-    console.log(filterRemoveItem);
     ["height", "length", "depth", "realWeight"]?.forEach((staticKey) => {
-      console.log(`${staticKey}-item-${items?.selectBoxName}`);
       form.unregister(`${staticKey}-item-${items?.selectBoxName}`);
     });
 
@@ -97,7 +95,6 @@ export function SelectBox({
   const onSubmit = useCallback(async (data: Record<string, any>) => {
     let capOrigin = null;
     let capDestination = null;
-    console.log(data);
     if (
       data?.countryOrigin?.name?.toLowerCase()?.includes("italia") &
       data?.countryDestination?.name?.toLowerCase()?.includes("italia")
@@ -121,7 +118,7 @@ export function SelectBox({
 
     const mapKey = (key: string) =>
       key
-        .replace(/-(item-\d+)$/, "") // حذف پسوند "-item-*"
+        .replace(/-(item-\d+)$/, "") 
         .replace(/height/, "altezza")
         .replace(/width/, "larghezza")
         .replace(/depth/, "profondita")
@@ -151,15 +148,23 @@ export function SelectBox({
       .sort((a, b) => Number(a) - Number(b))
       .map((key) => groupedData[key]);
 
-    // اضافه کردن مقادیر از گروه بندی و مقادیر پیش‌فرض
     const finalData = {
       ...staticData,
       colli: colliArray.map((item) => ({
         ...item,
-        larghezza: item?.larghezza ?? 15, // مقدار پیش‌فرض برای larghezza
-        packagingType: item?.packagingType ?? 0, // مقدار پیش‌فرض برای packagingType
+        larghezza: item?.larghezza ?? 15, 
+        packagingType: item?.packagingType ?? 0, 
       })),
     };
+
+    toast({
+      title: "Due to the disabled APIs, this section is displayed as a demo",
+      description: (
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(finalData, null, 2)}</code>
+        </pre>
+      ),
+    })
 
     try {
       const res = await axios.post(
@@ -172,14 +177,12 @@ export function SelectBox({
         );
 
       if (!res?.data || !checkData || res?.data?.avalibles?.length <= 0) {
-        console.log(false);
         toast({
           title: "Unsuccessful",
           description: "There is no service",
           className: "toaster-errors",
         });
       } else {
-        console.log(true);
         localStorage.setItem("landing-data", JSON.stringify(res?.data));
         router.push("/shipping-options");
       }
@@ -267,7 +270,7 @@ export function SelectBox({
 
           <Button
             type="submit"
-            className="w-full py-5 mt-7 flex items-center justify-center bg-tertiary-color hover:bg-tertiary-color/70 transition-colors duration-150"
+            className="w-full py-5 mt-7 flex items-center justify-center bg-secondary hover:bg-secondary/90 transition-colors duration-150 text-zinc-50 font-semibold"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting && (

@@ -11,11 +11,11 @@ import { PropsNextPage } from "@/app/types/nextjs-types";
 
 export default async function UserListPage({ searchParams }: PropsNextPage) {
   const { page = "1", search = "" } = await searchParams;
-  const { token }: GetSession = JSON.parse((await getToken()) as string);
+  const tokenStore: GetSession = JSON.parse((await getToken()) as string);
 
   const { res } = await getData(
     `api/users?search=${search}&page=${page}`,
-    token
+    tokenStore?.token||''
   );
 
   return (

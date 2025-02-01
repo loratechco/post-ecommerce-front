@@ -31,7 +31,6 @@ type AccordionItem = {
 
 export const useFetchPermissions = (token: string | null) => {
   const { toast } = useToast();
-
   const [data, setData] = useState<AccordionItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -53,9 +52,9 @@ export const useFetchPermissions = (token: string | null) => {
           }
         );
 
-        setData(response.data);
+        setData(response?.data);
       } catch (err: any) {
-        console.error("Error fetching data:", err);
+        console.info("Error fetching data:", err);
         toast({
           description: "Failed to fetch permissions data. Please try again.",
           variant: "destructive",
@@ -75,10 +74,13 @@ export default function Permission() {
   const { toast } = useToast();
   const { token } = useSession();
 
+  console.info("token=>>>>", token);
+
   const [switchStates, setSwitchStates] = useState<Record<string, boolean>>({});
   const [initialStateSet, setInitialStateSet] = useState(false);
 
   const { data: accordionData, isLoading } = useFetchPermissions(token);
+  console.log("🚀 ~ Permission ~ accordionData:", accordionData);
 
   useEffect(() => {
     if (!initialStateSet && accordionData && Array.isArray(accordionData)) {
@@ -148,7 +150,7 @@ export default function Permission() {
   const dynamicAccordionItem = useMemo(() => {
     if (!accordionData) return null;
 
-    return accordionData.map((item) => (
+    return accordionData?.map((item) => (
       <AccordionItem
         key={item.id}
         value={item.id}

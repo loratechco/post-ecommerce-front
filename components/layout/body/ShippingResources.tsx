@@ -80,7 +80,7 @@ function ShippingResources() {
                 >
                   {items?.button?.label}
                   <Image
-                    src={"https://betaspedire.b-cdn.net/imgs/caret-circled.svg"}
+                    src={"/pic/caret-circled.svg"}
                     alt="circl-arrow"
                     loading="lazy"
                     className="inline-block"

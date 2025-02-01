@@ -4,8 +4,8 @@ import { Card } from "@/components/ui/card";
 
 export default function Page() {
   return (
-    <div className="flex h-screen w-full items-center justify-center px-4">
-      <Card className="mx-auto !border-zinc-400 max-w-screen-md max-sm:min-w-72 sm:min-w-96">
+    <div className="flex min-h-screen w-full items-center justify-center px-4">
+      <Card className="mx-auto max-w-screen-md max-sm:min-w-72 sm:min-w-96 border-secondary/70">
         <AuthCardheader title="Login" />
         <Login />
       </Card>

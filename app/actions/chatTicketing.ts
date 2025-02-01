@@ -27,6 +27,7 @@ const getTicket = async ({ ticketId, token }: { ticketId: string, token: string 
         if (!ticketId || !token) {
             throw new Error('Ticket ID or Token is missing');
         }
+        console.info('hi');
 
         // درخواست به سرور
         const res = await axios.get(`${API_Backend}/api/tickets/${ticketId}/messages`, {
@@ -35,14 +36,14 @@ const getTicket = async ({ ticketId, token }: { ticketId: string, token: string 
             }
         });
 
-        console.log(res?.data);
+        console.log(res?.status);
 
         // بررسی پاسخ و جلوگیری از ارورهای غیرمنتظره
         if (res?.data || Array.isArray(res.data)) {
             return { error: null, response: res.data };
         } else {
             // اگر داده‌ها به صورت غیرمنتظره‌ای نباشند، یک آرایه خالی ارسال می‌کنیم
-            return { error: new Error('Invalid data structure'), response: [] };
+            return { error: new Error(`Invalid data structure${res?.status}`), response: [] };
         }
     } catch (error: any) {
         // مدیریت خطا به طور دقیق‌تر
