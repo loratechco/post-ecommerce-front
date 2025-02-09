@@ -34,7 +34,7 @@ const listData = [
 export default async function Page() {
   return (
     <section className="space-y-3">
-      <ul className="grid grid-cols-4 gap-[1%] w-full *:w-full *:bg-sky-200 max-lg:grid-cols-3 max-md:grid-cols-1 gap-y-2">
+      <ul className="md:grid grid-cols-4 max-md:flex max-md:items-start max-md:justify-center flex-col  max-lg:grid-cols-3 gap-y-2  gap-[1%] w-full *:w-full *:bg-sky-200">
         {listData?.map((item, index) => (
           <li className=" rounded-xl p-5 space-y-2" key={index}>
             <p className="">{item?.title}</p>
